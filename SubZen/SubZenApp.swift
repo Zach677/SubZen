@@ -11,7 +11,7 @@ import SwiftUI
 struct SubZenApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            SubView()
         }
     }
 }
