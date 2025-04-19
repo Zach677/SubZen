@@ -101,10 +101,3 @@ struct AddSubView: View {
         dismiss()
     }
 }
-
-#Preview {
-    NavigationStack {
-        AddSubView()
-            .modelContainer(for: Subscription.self, inMemory: true)  // Use in-memory for preview
-    }
-}

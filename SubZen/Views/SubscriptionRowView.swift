@@ -36,14 +36,3 @@ struct SubscriptionRowView: View {
     .contentShape(Rectangle())
   }
 }
-
-#Preview {
-  let sampleSub = Subscription(
-    name: "SampleFlix",
-    price: 14.99,
-    Cycle: "Monthly"
-  )
-  return List {
-    SubscriptionRowView(subscription: sampleSub)
-  }
-}

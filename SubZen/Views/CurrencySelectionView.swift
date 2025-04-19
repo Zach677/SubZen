@@ -46,7 +46,3 @@ struct CurrencySelectionView: View {
         }
     }
 }
-
-#Preview {
-    CurrencySelectionView(selectedCurrency: .constant("USD"))
-}
