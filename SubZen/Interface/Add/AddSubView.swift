@@ -5,16 +5,27 @@
 //  Created by Star on 2025/4/6.
 //
 
+import Foundation
 import SwiftData
 import SwiftUI
+
+// Define the Cycle enum
+enum Cycle: String, CaseIterable, Identifiable {
+  case monthly = "Monthly"
+  case yearly = "Yearly"
+  case weekly = "Weekly"
+  case daily = "Daily"
+
+  var id: String { self.rawValue }
+}
 
 struct AddSubView: View {
   @Environment(\.modelContext) private var modelContext
   @Environment(\.dismiss) var dismiss
 
   @State private var subscriptionName: String = ""
-  @State private var price: Decimal = 0.0
-  @State private var Cycle: String = "Monthly"
+  @State private var price: Decimal? = nil
+  @State private var cycle: Cycle = .monthly
   @State private var selectedCurrency: String = CurrencyList.allCurrencies.first?.code ?? "USD"
   @State private var showingCurrencySelector = false
 
@@ -40,12 +51,13 @@ struct AddSubView: View {
             )
           }
 
-          TextField("Price", value: $price, format: .number)
+          TextField("0.00", value: $price, format: .number)
             .keyboardType(.decimalPad)
         }
-        Picker("Cycle", selection: $Cycle) {
-          Text("Monthly").tag("Monthly")
-          Text("Yearly").tag("Yearly")
+        Picker("Cycle", selection: $cycle) {
+          ForEach(Cycle.allCases) { cycleCase in
+            Text(cycleCase.rawValue.capitalized).tag(cycleCase)
+          }
         }
       }
       Section {
@@ -56,7 +68,8 @@ struct AddSubView: View {
         .disabled(
           subscriptionName.trimmingCharacters(in: .whitespaces)
             .isEmpty
-					|| price <= 0
+            || price == nil
+            || price ?? 0 <= 0
         )
       }
     }
@@ -73,8 +86,8 @@ struct AddSubView: View {
 
     let newSubscription = Subscription(
       name: trimmedName,
-      price: price,
-      Cycle: Cycle,
+      price: price ?? 0.0,
+      cycle: cycle.rawValue,
       dateAdded: .now,
       currencyCode: selectedCurrency
     )
@@ -83,12 +96,11 @@ struct AddSubView: View {
 
     do {
       try modelContext.save()
+      dismiss()
     } catch {
       print("Error saving context: \(error)")
-		  alertMessage = "Failed to save subscription. Error: \(error.localizedDescription)"
-		  showingAlert = true
+      alertMessage = "Failed to save subscription. Error: \(error.localizedDescription)"
+      showingAlert = true
     }
-
-    dismiss()
   }
 }

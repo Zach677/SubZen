@@ -17,7 +17,7 @@ struct EditSubscriptionView: View {
 								 TextField("Name", text: $subscription.name)
 								 TextField("Price", value: $subscription.price, format: .number)
 										 .keyboardType(.decimalPad)
-								 Picker("Cycle", selection: $subscription.Cycle) {
+								 Picker("Cycle", selection: $subscription.cycle) {
 										 Text("Monthly").tag("Monthly")
 										 Text("Yearly").tag("Yearly")
 								 }

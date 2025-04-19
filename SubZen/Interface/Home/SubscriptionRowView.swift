@@ -18,7 +18,7 @@ struct SubscriptionRowView: View {
       VStack(alignment: .leading, spacing: 4) {
         Text(subscription.name)
           .font(.headline)
-        Text("/ \(subscription.Cycle)")
+        Text("/ \(subscription.cycle)")
           .font(.caption)
           .foregroundStyle(.secondary)
       }

@@ -12,20 +12,20 @@ import SwiftData
 final class Subscription {
   var name: String
   var price: Decimal
-  var Cycle: String
+  var cycle: String
   var dateAdded: Date
   var currencyCode: String
 
   init(
     name: String = "",
     price: Decimal = 0.0,
-    Cycle: String = "Monthly",
+    cycle: String = "Monthly",
     dateAdded: Date = .now,
     currencyCode: String = "USD"
   ) {
     self.name = name
     self.price = price
-    self.Cycle = Cycle
+    self.cycle = cycle
     self.dateAdded = dateAdded
     self.currencyCode = currencyCode
   }
