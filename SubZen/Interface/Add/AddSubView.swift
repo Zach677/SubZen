@@ -15,7 +15,7 @@ struct AddSubView: View {
     @State private var subscriptionName: String = ""
     @State private var priceString: String = ""
     @State private var Cycle: String = "Monthly"
-    @State private var selectedCurrency: String = "USD"
+		@State private var selectedCurrency: String = CurrencyList.allCurrencies.first?.code ?? "USD"
     @State private var showingCurrencySelector = false
 
     @State private var showingAlert = false
@@ -87,7 +87,8 @@ struct AddSubView: View {
             name: trimmedName,
             price: price,
             Cycle: Cycle,
-            dateAdded: .now  // Automatically set current date
+            dateAdded: .now,
+						currencyCode: selectedCurrency
         )
 
         modelContext.insert(newSubscription)

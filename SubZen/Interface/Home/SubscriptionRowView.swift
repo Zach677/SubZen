@@ -28,7 +28,7 @@ struct SubscriptionRowView: View {
       Text(
         subscription.price,
         format: .currency(
-          code: Locale.current.currency?.identifier ?? "USD"
+						code: subscription.currencyCode
         )
       )
       .font(.headline)

@@ -14,16 +14,19 @@ final class Subscription {
     var price: Double
     var Cycle: String
     var dateAdded: Date
+		var currencyCode: String
 
     init(
         name: String = "",
         price: Double = 0.0,
         Cycle: String = "Monthly",
-        dateAdded: Date = .now
+        dateAdded: Date = .now,
+				currencyCode: String = "USD"
     ) {
         self.name = name
         self.price = price
         self.Cycle = Cycle
         self.dateAdded = dateAdded
+				self.currencyCode = currencyCode
     }
 }
