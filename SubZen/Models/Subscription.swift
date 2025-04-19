@@ -10,23 +10,23 @@ import SwiftData
 
 @Model
 final class Subscription {
-    var name: String
-    var price: Double
-    var Cycle: String
-    var dateAdded: Date
-		var currencyCode: String
+  var name: String
+  var price: Decimal
+  var Cycle: String
+  var dateAdded: Date
+  var currencyCode: String
 
-    init(
-        name: String = "",
-        price: Double = 0.0,
-        Cycle: String = "Monthly",
-        dateAdded: Date = .now,
-				currencyCode: String = "USD"
-    ) {
-        self.name = name
-        self.price = price
-        self.Cycle = Cycle
-        self.dateAdded = dateAdded
-				self.currencyCode = currencyCode
-    }
+  init(
+    name: String = "",
+    price: Decimal = 0.0,
+    Cycle: String = "Monthly",
+    dateAdded: Date = .now,
+    currencyCode: String = "USD"
+  ) {
+    self.name = name
+    self.price = price
+    self.Cycle = Cycle
+    self.dateAdded = dateAdded
+    self.currencyCode = currencyCode
+  }
 }
