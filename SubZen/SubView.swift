@@ -78,8 +78,8 @@ struct SubView: View {
 				let container = try ModelContainer(for: Subscription.self, configurations: config)
 
 				// Add sample data for preview
-				let sampleSub1 = Subscription(name: "Streamify", price: 9.99, billingCycle: "Monthly", dateAdded: Calendar.current.date(byAdding: .day, value: -1, to: .now)!)
-				 let sampleSub2 = Subscription(name: "CloudDrive Pro", price: 119.99, billingCycle: "Yearly", dateAdded: .now)
+				let sampleSub1 = Subscription(name: "Streamify", price: 9.99, Cycle: "Monthly", dateAdded: Calendar.current.date(byAdding: .day, value: -1, to: .now)!)
+				 let sampleSub2 = Subscription(name: "CloudDrive Pro", price: 119.99, Cycle: "Yearly", dateAdded: .now)
 				container.mainContext.insert(sampleSub1)
 				container.mainContext.insert(sampleSub2)
 

@@ -18,7 +18,7 @@ struct SubscriptionRowView: View {
 						VStack(alignment: .trailing) { // Align price and cycle vertically
 								Text(subscription.price, format: .currency(code: Locale.current.currency?.identifier ?? "USD")) // Format price as currency
 										.font(.subheadline)
-								Text("/ \(subscription.billingCycle)")
+								Text("/ \(subscription.Cycle)")
 										.font(.caption)
 										.foregroundStyle(.secondary) // Make cycle less prominent
 						}
@@ -30,7 +30,7 @@ struct SubscriptionRowView: View {
 // Preview requires a sample Subscription object
 #Preview {
 		// Create a sample subscription for the preview
-		let sampleSub = Subscription(name: "SampleFlix", price: 14.99, billingCycle: "Monthly")
+		let sampleSub = Subscription(name: "SampleFlix", price: 14.99, Cycle: "Monthly")
 		return List { // Show it within a List for context
 				 SubscriptionRowView(subscription: sampleSub)
 		}

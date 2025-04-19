@@ -12,13 +12,13 @@ import SwiftData
 final class Subscription {
 		var name: String
 		var price: Double
-		var billingCycle: String
+		var Cycle: String
 		var dateAdded: Date
 		
-		init(name: String = "", price: Double = 0.0, billingCycle: String = "Monthly", dateAdded: Date = .now) {
+		init(name: String = "", price: Double = 0.0, Cycle: String = "Monthly", dateAdded: Date = .now) {
 				self.name = name
 				self.price = price
-				self.billingCycle = billingCycle
+				self.Cycle = Cycle
 				self.dateAdded = dateAdded
 		}
 }
