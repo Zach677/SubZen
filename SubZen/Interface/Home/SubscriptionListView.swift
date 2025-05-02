@@ -13,9 +13,28 @@ struct SubscriptionListView: View {
 
   private let subscriptionsKey = "subscriptions"
 
+  private var currencyFormatter: NumberFormatter {
+    let formatter = NumberFormatter()
+    formatter.numberStyle = .currency
+    formatter.currencyCode = "USD"
+    // You could potentially make this dynamic based on user settings or locale later
+    formatter.maximumFractionDigits = 2
+    formatter.minimumFractionDigits = 2
+    return formatter
+  }
+
   var body: some View {
     NavigationStack {
-      VStack {
+      VStack(spacing: 0) {
+        if !subscriptions.isEmpty {
+          Text("Total Monthly: \(subscriptions.monthlyTotal as NSNumber, formatter: currencyFormatter)")
+            .font(.headline)
+            .foregroundColor(.secondary)
+            .padding(.vertical, 10)
+            .frame(maxWidth: .infinity, alignment: .center)
+          Divider()
+        }
+
         if subscriptions.isEmpty {
           ContentUnavailableView(
             "No Subscriptions",
@@ -24,6 +43,7 @@ struct SubscriptionListView: View {
               "Tap the + button to add your first subscription."
             )
           )
+          .frame(maxHeight: .infinity)
         } else {
           List {
             ForEach(subscriptions) { sub in

@@ -1,7 +1,5 @@
 # Subscription Tracker iOS – Lean PRD & Kanban (Markdown)
 
-> **Purpose**: Provide a single lightweight doc you can drop straight into your repo (`/docs/PRD.md` or `/README_TODO.md`) and maintain as code‑adjacent source of truth.
-
 ---
 ## 1. Background & Goal
 - **Problem**  iOS 自带订阅页零散，用户难以把握总体花费 & 到期时间。
@@ -45,7 +43,7 @@
 # Feature: F2 订阅列表 + 汇总
 - [x] 创建显示订阅列表的 `SwiftUI` `List` 视图
 - [x] 实现从 `UserDefaults` 加载和排序数据
-- [ ] 实现月度/年度支出汇总计算逻辑
+- [x] 实现月度/年度支出汇总计算逻辑
 - [ ] 在 `SwiftUI` 视图中展示汇总信息
 
 # Feature: F3 本地推送提醒
