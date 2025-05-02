@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import SwiftData
 import SwiftUI
 
 // Define the Cycle enum
@@ -20,8 +19,9 @@ enum Cycle: String, CaseIterable, Identifiable {
 }
 
 struct AddSubView: View {
-  @Environment(\.modelContext) private var modelContext
   @Environment(\.dismiss) var dismiss
+
+  var onSave: (Subscription) -> Void
 
   @State private var subscriptionName: String = ""
   @State private var price: Decimal? = nil
@@ -92,15 +92,7 @@ struct AddSubView: View {
       currencyCode: selectedCurrency
     )
 
-    modelContext.insert(newSubscription)
-
-    do {
-      try modelContext.save()
-      dismiss()
-    } catch {
-      print("Error saving context: \(error)")
-      alertMessage = "Failed to save subscription. Error: \(error.localizedDescription)"
-      showingAlert = true
-    }
+    onSave(newSubscription)
+    dismiss()
   }
 }

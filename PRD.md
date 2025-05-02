@@ -18,14 +18,14 @@
 ---
 ## 3. Scope
 ### 3.1  Now (0‑2 mo)
-- **F1 手动添加订阅** – 名称 / 金额 / 周期 / 到期日 (`SwiftUI`, `CoreData` / `SwiftData`)
-- **F2 订阅列表 + 月/年支出汇总** (`SwiftUI`, `Swift`)
+- **F1 手动添加订阅** – 名称 / 金额 / 周期 / 到期日 (`SwiftUI`, `UserDefaults`)
+- **F2 订阅列表 + 月/年支出汇总** (`SwiftUI`, `Swift`, `UserDefaults`)
 - **F3 本地推送提醒** – 到期前 X 天 (`UserNotifications`)
 - **F4 导出 CSV** _(可选)_ (`ShareLink` / `UIActivityViewController`)
 
 ### 3.2  Next (3‑4 mo)
 - **N1 自动识别 App  Store 订阅** (`StoreKit 2`)
-- **N2 iCloud 同步** (`CloudKit` + `CoreData` / `SwiftData`)
+- **N2 iCloud 同步** (`CloudKit` + `UserDefaults`)
 - **N3 支出图表** (`Swift Charts`)
 
 ### 3.3  Later (5‑6 mo)
@@ -37,14 +37,14 @@
 ## 4. Kanban Checklist (Now)
 ```markdown
 # Feature: F1 手动添加订阅
-- [x] 设计 `Subscription` 数据模型 (`CoreData`/`SwiftData`)
+- [x] 设计 `Subscription` 数据结构 (用于 `UserDefaults` 存储)
 - [x] 创建添加/编辑订阅的 `SwiftUI` 表单视图
 - [x] 实现数据验证逻辑
-- [x] 实现数据保存到 `CoreData`/`SwiftData`
+- [x] 实现数据保存到 `UserDefaults`
 
 # Feature: F2 订阅列表 + 汇总
 - [x] 创建显示订阅列表的 `SwiftUI` `List` 视图
-- [x] 实现从 `CoreData`/`SwiftData` 加载和排序数据
+- [x] 实现从 `UserDefaults` 加载和排序数据
 - [ ] 实现月度/年度支出汇总计算逻辑
 - [ ] 在 `SwiftUI` 视图中展示汇总信息
 
@@ -60,14 +60,14 @@
 
 ---
 ## 5. Non‑Functional
-- 离线可用（数据本地持久化，考虑加密 `CoreData`/`SwiftData`)
+- 离线可用（数据本地持久化 `UserDefaults`)
 - 冷启动 ≤ 800 ms (使用 Instruments 进行性能分析)
-- iOS 16+ (若使用 `Swift Charts`, `ShareLink`, `SwiftData` 等较新 API)
+- iOS 16+ (若使用 `Swift Charts`, `ShareLink` 等较新 API)
 
 ---
 ## 6. Tech Stack Summary (推荐)
 - **UI:** SwiftUI
-- **Data Persistence:** CoreData (或 SwiftData for iOS 17+)
+- **Data Persistence:** UserDefaults
 - **Notifications:** UserNotifications
 - **App Store Interaction:** StoreKit 2
 - **Cloud Sync:** CloudKit
