@@ -10,9 +10,9 @@ import SwiftUI
 @main
 struct SubZenApp: App {
 
-  var body: some Scene {
-    WindowGroup {
-      SubscriptionListView()
+    var body: some Scene {
+        WindowGroup {
+            SubscriptionListView()
+        }
     }
-  }
 }
