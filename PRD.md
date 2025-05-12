@@ -44,7 +44,7 @@
 - [x] 创建显示订阅列表的 `SwiftUI` `List` 视图
 - [x] 实现从 `UserDefaults` 加载和排序数据
 - [x] 实现月度/年度支出汇总计算逻辑
-- [ ] 在 `SwiftUI` 视图中展示汇总信息
+- [x] 在 `SwiftUI` 视图中展示汇总信息
 
 # Feature: F3 本地推送提醒
 - [ ] 请求 `UserNotifications` 推送权限
