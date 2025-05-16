@@ -143,7 +143,7 @@ struct SubscriptionListView: View {
         from: savedData
       ) {
         subscriptions = loadedSubscriptions
-        subscriptions.sort { $0.dateAdded > $1.dateAdded }
+        subscriptions.sort { $0.lastBillingDate > $1.lastBillingDate }
         print(
           "Loaded \(subscriptions.count) subscriptions from UserDefaults"
         )
