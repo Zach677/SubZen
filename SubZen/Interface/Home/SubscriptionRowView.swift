@@ -34,17 +34,23 @@ struct SubscriptionRowView: View {
       Spacer()
 
       VStack(alignment: .trailing, spacing: 4) {
-        Text(
-          subscription.price,
-          format: .currency(
-            code: subscription.currencyCode
-          )
-        )
-        .font(.headline)
-        .foregroundColor(.primary)
-        Text("/ \(subscription.cycle)")
-          .font(.caption)
-          .foregroundColor(.secondary)
+					HStack {
+							Text(
+								subscription.price,
+								format: .currency(
+										code: subscription.currencyCode
+								)
+							)
+							.font(.headline)
+							.foregroundColor(.primary)
+							Text("/ \(subscription.cycle)")
+									.font(.caption)
+									.foregroundColor(.secondary)
+					}
+					Text("\(subscription.remainingDays) days lefts")
+						.font(.caption)
+						.foregroundColor(.secondary)
+					
       }
     }
     .padding(EdgeInsets(top: 14, leading: 16, bottom: 14, trailing: 16))
