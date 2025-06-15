@@ -5,6 +5,7 @@
 //  Created by Star on 2025/4/6.
 //
 
+import ColorfulX
 import SwiftUI
 
 struct SubscriptionListView: View {
@@ -66,17 +67,21 @@ struct SubscriptionListView: View {
               )
               .listRowBackground(
                 RoundedRectangle(cornerRadius: 15)
-                  .fill(Color(.secondarySystemGroupedBackground))
+                  .fill(Color(.secondarySystemGroupedBackground).opacity(0.7))
                   .padding(.vertical, 4)
               )
               .listRowSeparator(.hidden)
             }
           }
           .listStyle(.plain)
-          .background(Color(.systemGroupedBackground))
+          .background(Color.clear)
           .scrollContentBackground(.hidden)
           .scrollIndicators(.hidden)
         }
+      }
+      .background {
+					ColorfulView(color: .jelly, noise: .constant(32))
+          .ignoresSafeArea()
       }
       .toolbar {
         ToolbarItem(placement: .topBarLeading) {

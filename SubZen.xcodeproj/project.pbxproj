@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		F8A3FD8F2DFC5EB300333182 /* ColorfulX in Frameworks */ = {isa = PBXBuildFile; productRef = F8A3FD8E2DFC5EB300333182 /* ColorfulX */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		F882CE902D982DE2000E2FB7 /* SubZen.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SubZen.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F8A3FD8F2DFC5EB300333182 /* ColorfulX in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +70,7 @@
 			);
 			name = SubZen;
 			packageProductDependencies = (
+				F8A3FD8E2DFC5EB300333182 /* ColorfulX */,
 			);
 			productName = SubZen;
 			productReference = F882CE902D982DE2000E2FB7 /* SubZen.app */;
@@ -94,6 +100,9 @@
 			);
 			mainGroup = F882CE872D982DE2000E2FB7;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				F8A3FD8D2DFC5EB300333182 /* XCRemoteSwiftPackageReference "ColorfulX" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = F882CE912D982DE2000E2FB7 /* Products */;
 			projectDirPath = "";
@@ -255,6 +264,8 @@
 				DEVELOPMENT_TEAM = S56VW4D8X4;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = SubZen;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -284,6 +295,8 @@
 				DEVELOPMENT_TEAM = S56VW4D8X4;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = SubZen;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -324,6 +337,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		F8A3FD8D2DFC5EB300333182 /* XCRemoteSwiftPackageReference "ColorfulX" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Lakr233/ColorfulX.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.6.6;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		F8A3FD8E2DFC5EB300333182 /* ColorfulX */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F8A3FD8D2DFC5EB300333182 /* XCRemoteSwiftPackageReference "ColorfulX" */;
+			productName = ColorfulX;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = F882CE882D982DE2000E2FB7 /* Project object */;
 }
