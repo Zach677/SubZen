@@ -11,14 +11,15 @@ import SwiftUI
 struct SubscriptionListView: View {
   @State private var subscriptions: [Subscription] = []
   @State private var subscriptionToEdit: Subscription?
+  @State private var monthlyTotal: Decimal = 0
+  @State private var isCalculatingTotal = false
 
   private let subscriptionsKey = "subscriptions"
 
   private var currencyFormatter: NumberFormatter {
     let formatter = NumberFormatter()
     formatter.numberStyle = .currency
-    formatter.currencyCode = "USD"
-    // You could potentially make this dynamic based on user settings or locale later
+    formatter.currencyCode = CurrencyTotalService.shared.baseCurrency
     formatter.maximumFractionDigits = 2
     formatter.minimumFractionDigits = 2
     return formatter
@@ -28,11 +29,17 @@ struct SubscriptionListView: View {
     NavigationStack {
       VStack(spacing: 0) {
         if !subscriptions.isEmpty {
-          Text(
-            "\(subscriptions.monthlyTotal as NSNumber, formatter: currencyFormatter)"
-          )
-          .font(.largeTitle)
-          .foregroundColor(.primary)
+          HStack {
+            if isCalculatingTotal {
+              ProgressView()
+                .scaleEffect(0.8)
+            }
+            Text(
+              "\(monthlyTotal as NSNumber, formatter: currencyFormatter)"
+            )
+            .font(.largeTitle)
+            .foregroundColor(.primary)
+          }
           .padding(.vertical, 20)
           .frame(maxWidth: .infinity, alignment: .center)
           Divider()
@@ -80,7 +87,7 @@ struct SubscriptionListView: View {
         }
       }
       .background {
-					ColorfulView(color: .jelly, noise: .constant(32))
+        ColorfulView(color: .jelly, noise: .constant(32))
           .ignoresSafeArea()
       }
       .toolbar {
@@ -109,12 +116,37 @@ struct SubscriptionListView: View {
       .onAppear {
         loadSubscriptions()
       }
+      .onChange(of: subscriptions) { _, _ in
+        calculateMonthlyTotal()
+      }
     }
   }
 
-  private func binding(for subscription: Subscription) -> Binding<
-    Subscription
-  > {
+  private func calculateMonthlyTotal() {
+    guard !subscriptions.isEmpty else {
+      monthlyTotal = 0
+      return
+    }
+
+    isCalculatingTotal = true
+    Task {
+      do {
+        let total = try await subscriptions.monthlyTotal()
+        await MainActor.run {
+          monthlyTotal = total
+          isCalculatingTotal = false
+        }
+      } catch {
+        await MainActor.run {
+          monthlyTotal = 0
+          isCalculatingTotal = false
+        }
+        print("Error calculating monthly total: \(error)")
+      }
+    }
+  }
+
+  private func binding(for subscription: Subscription) -> Binding<Subscription> {
     guard
       let index = subscriptions.firstIndex(where: {
         $0.id == subscription.id

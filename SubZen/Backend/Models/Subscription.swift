@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class Subscription: Codable, Identifiable {
+final class Subscription: Codable, Identifiable, Equatable {
   var id = UUID()
   var name: String
   var price: Decimal
@@ -51,5 +51,12 @@ final class Subscription: Codable, Identifiable {
     try container.encode(cycle, forKey: .cycle)
     try container.encode(lastBillingDate, forKey: .lastBillingDate)
     try container.encode(currencyCode, forKey: .currencyCode)
+  }
+
+  // MARK: - Equatable
+  static func == (lhs: Subscription, rhs: Subscription) -> Bool {
+    return lhs.id == rhs.id && lhs.name == rhs.name && lhs.price == rhs.price
+      && lhs.cycle == rhs.cycle && lhs.lastBillingDate == rhs.lastBillingDate
+      && lhs.currencyCode == rhs.currencyCode
   }
 }
