@@ -1,3 +1,9 @@
+//
+//  CurrencyTotal.swift
+//  SubZen
+//
+//  Created by Star on 2025/4/19.
+//
 import Foundation
 
 extension Array where Element == Subscription {
