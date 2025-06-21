@@ -12,6 +12,7 @@ struct SubscriptionListView: View {
   @State private var subscriptionToEdit: Subscription?
   @State private var monthlyTotal: Decimal = 0
   @State private var isCalculatingTotal = false
+  @State private var isRefreshing = false
 
   private let subscriptionsKey = "subscriptions"
 
@@ -29,7 +30,7 @@ struct SubscriptionListView: View {
       VStack(spacing: 0) {
         if !subscriptions.isEmpty {
           HStack {
-            if isCalculatingTotal {
+            if isCalculatingTotal || isRefreshing {
               ProgressView()
                 .scaleEffect(0.8)
             }
@@ -87,6 +88,9 @@ struct SubscriptionListView: View {
           .listStyle(.plain)
           .scrollContentBackground(.hidden)
           .scrollIndicators(.hidden)
+          .refreshable {
+            await refreshExchangeRates()
+          }
         }
       }
       .background(
@@ -153,6 +157,30 @@ struct SubscriptionListView: View {
         print("Error calculating monthly total: \(error)")
       }
     }
+  }
+
+  /// 刷新汇率数据并重新计算总计
+  @MainActor
+  private func refreshExchangeRates() async {
+    guard !subscriptions.isEmpty else { return }
+
+    isRefreshing = true
+
+    do {
+      // 强制刷新汇率数据
+      let baseCurrency = CurrencyTotalService.shared.baseCurrency
+      _ = try await ExchangeRateService.shared.refreshExchangeRates(baseCurrency: baseCurrency)
+
+      // 重新计算总计
+      let total = try await subscriptions.monthlyTotal()
+      monthlyTotal = total
+
+      print("汇率数据已刷新，总计已更新")
+    } catch {
+      print("刷新汇率数据失败: \(error)")
+    }
+
+    isRefreshing = false
   }
 
   private func binding(for subscription: Subscription) -> Binding<Subscription> {

@@ -158,7 +158,7 @@ struct CurrencyConversion {
 
 // MARK: - Exchange Rate Cache
 
-struct ExchangeRateCache {
+struct ExchangeRateCache: Codable {
   let rates: [String: Decimal]
   let baseCurrency: String
   let timestamp: Date

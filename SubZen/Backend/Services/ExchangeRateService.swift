@@ -13,12 +13,37 @@ class ExchangeRateService: ObservableObject {
 
   @Published var isLoading = false
 
-  private init() {}
+  // MARK: - Cache Properties
+  private var memoryCache: [String: ExchangeRateCache] = [:]
+  private let cacheKey = "ExchangeRateCache"
 
-  /// 获取汇率数据
+  private init() {
+    loadCacheFromDisk()
+  }
+
+  /// 获取汇率数据（带缓存）
   func fetchExchangeRates(baseCurrency: String = ExchangeRateConfig.defaultBaseCurrency)
     async throws -> [String: Decimal]
   {
+    // 检查内存缓存
+    if let cachedData = memoryCache[baseCurrency], !cachedData.isExpired {
+      print("使用内存缓存的汇率数据 - 基准货币: \(baseCurrency)")
+      return cachedData.rates
+    }
+
+    // 从网络获取新数据
+    return try await fetchAndCacheExchangeRates(baseCurrency: baseCurrency)
+  }
+
+  /// 强制刷新汇率数据
+  func refreshExchangeRates(baseCurrency: String = ExchangeRateConfig.defaultBaseCurrency)
+    async throws -> [String: Decimal]
+  {
+    return try await fetchAndCacheExchangeRates(baseCurrency: baseCurrency)
+  }
+
+  /// 从网络获取汇率数据并缓存
+  private func fetchAndCacheExchangeRates(baseCurrency: String) async throws -> [String: Decimal] {
     isLoading = true
     defer { isLoading = false }
 
@@ -53,7 +78,13 @@ class ExchangeRateService: ObservableObject {
         throw ExchangeRateServiceError.apiError("API request failed")
       }
 
-      return exchangeRateResponse.actualRates
+      let rates = exchangeRateResponse.actualRates
+
+      // 缓存数据
+      cacheExchangeRates(rates: rates, baseCurrency: baseCurrency)
+
+      print("从网络获取并缓存汇率数据 - 基准货币: \(baseCurrency)")
+      return rates
     } catch let decodingError as DecodingError {
       print("Decoding error: \(decodingError)")
       // 打印原始JSON以便调试
@@ -86,6 +117,108 @@ class ExchangeRateService: ObservableObject {
     }
 
     return amount  // 找不到汇率时返回原值
+  }
+
+  // MARK: - Cache Management
+
+  /// 缓存汇率数据
+  private func cacheExchangeRates(rates: [String: Decimal], baseCurrency: String) {
+    let now = Date()
+    let expirationDate = now.addingTimeInterval(ExchangeRateConfig.cacheExpirationTime)
+
+    let cache = ExchangeRateCache(
+      rates: rates,
+      baseCurrency: baseCurrency,
+      timestamp: now,
+      expirationDate: expirationDate
+    )
+
+    // 存储到内存缓存
+    memoryCache[baseCurrency] = cache
+
+    // 持久化到磁盘
+    saveCacheToDisk()
+  }
+
+  /// 清除指定货币的缓存
+  func clearCache(for baseCurrency: String? = nil) {
+    if let baseCurrency = baseCurrency {
+      memoryCache.removeValue(forKey: baseCurrency)
+    } else {
+      memoryCache.removeAll()
+    }
+    saveCacheToDisk()
+  }
+
+  /// 检查缓存是否存在且有效
+  func isCacheValid(for baseCurrency: String) -> Bool {
+    guard let cache = memoryCache[baseCurrency] else { return false }
+    return !cache.isExpired
+  }
+
+  /// 获取缓存的时间戳
+  func getCacheTimestamp(for baseCurrency: String) -> Date? {
+    return memoryCache[baseCurrency]?.timestamp
+  }
+
+  /// 获取所有缓存的基准货币
+  var cachedBaseCurrencies: [String] {
+    return Array(memoryCache.keys)
+  }
+
+  /// 获取缓存状态描述
+  func getCacheStatusDescription(for baseCurrency: String) -> String {
+    guard let cache = memoryCache[baseCurrency] else {
+      return "无缓存数据"
+    }
+
+    let formatter = DateFormatter()
+    formatter.dateStyle = .short
+    formatter.timeStyle = .short
+
+    let timeString = formatter.string(from: cache.timestamp)
+
+    if cache.isExpired {
+      return "缓存已过期 (更新于: \(timeString))"
+    } else {
+      let remainingTime = cache.expirationDate.timeIntervalSinceNow
+      let minutes = Int(remainingTime / 60)
+      return "缓存有效 (更新于: \(timeString), 剩余: \(minutes)分钟)"
+    }
+  }
+
+  // MARK: - Disk Cache Persistence
+
+  /// 保存缓存到磁盘
+  private func saveCacheToDisk() {
+    do {
+      let data = try JSONEncoder().encode(Array(memoryCache.values))
+      UserDefaults.standard.set(data, forKey: cacheKey)
+    } catch {
+      print("保存汇率缓存失败: \(error)")
+    }
+  }
+
+  /// 从磁盘加载缓存
+  private func loadCacheFromDisk() {
+    guard let data = UserDefaults.standard.data(forKey: cacheKey) else { return }
+
+    do {
+      let caches = try JSONDecoder().decode([ExchangeRateCache].self, from: data)
+
+      // 只加载未过期的缓存
+      for cache in caches {
+        if !cache.isExpired {
+          memoryCache[cache.baseCurrency] = cache
+        }
+      }
+
+      print("从磁盘加载了 \(memoryCache.count) 个有效的汇率缓存")
+    } catch {
+      print("加载汇率缓存失败: \(error)")
+      // 清除损坏的缓存数据
+      UserDefaults.standard.removeObject(forKey: cacheKey)
+    }
   }
 }
 

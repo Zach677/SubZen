@@ -34,6 +34,5 @@ extension Array where Element == Subscription {
   var hasMultipleCurrencies: Bool {
     usedCurrencies.count > 1
   }
+
 }
-
-
