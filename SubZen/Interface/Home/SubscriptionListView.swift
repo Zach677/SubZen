@@ -85,7 +85,6 @@ struct SubscriptionListView: View {
             }
           }
           .listStyle(.plain)
-          // .background(Color.clear)
           .scrollContentBackground(.hidden)
           .scrollIndicators(.hidden)
         }
