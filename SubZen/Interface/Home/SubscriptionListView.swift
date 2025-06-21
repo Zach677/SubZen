@@ -73,11 +73,11 @@ struct SubscriptionListView: View {
               )
               .listRowBackground(
                 RoundedRectangle(cornerRadius: 15)
-                  .fill(Color(.systemBackground))
-                  .shadow(color: .black.opacity(0.08), radius: 3, x: 0, y: 2)
+                  .fill(Color(.tertiarySystemGroupedBackground))
+                  .shadow(color: .primary.opacity(0.1), radius: 4, x: 0, y: 2)
                   .overlay(
                     RoundedRectangle(cornerRadius: 15)
-                      .stroke(Color(.separator).opacity(0.2), lineWidth: 0.5)
+                      .stroke(Color(.separator).opacity(0.4), lineWidth: 0.8)
                   )
                   .padding(.vertical, 4)
                   .padding(.horizontal, 2)
@@ -91,7 +91,16 @@ struct SubscriptionListView: View {
           .scrollIndicators(.hidden)
         }
       }
-      .background(Color(.systemGroupedBackground))
+      .background(
+        LinearGradient(
+          colors: [
+            Color(.systemBackground),
+            Color(.secondarySystemBackground),
+          ],
+          startPoint: .top,
+          endPoint: .bottom
+        )
+      )
       .toolbar {
         ToolbarItem(placement: .topBarLeading) {
           NavigationLink {
