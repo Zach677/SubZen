@@ -41,7 +41,6 @@ struct SubscriptionListView: View {
           }
           .padding(.vertical, 20)
           .frame(maxWidth: .infinity, alignment: .center)
-          Divider()
         }
 
         if subscriptions.isEmpty {
