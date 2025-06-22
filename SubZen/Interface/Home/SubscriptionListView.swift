@@ -13,6 +13,7 @@ struct SubscriptionListView: View {
   @State private var monthlyTotal: Decimal = 0
   @State private var isCalculatingTotal = false
   @State private var isRefreshing = false
+  @State private var refreshTrigger = UUID()  // 用于强制刷新列表
 
   private let subscriptionsKey = "subscriptions"
 
@@ -91,6 +92,7 @@ struct SubscriptionListView: View {
           .refreshable {
             await refreshExchangeRates()
           }
+          .id(refreshTrigger)  // 当 refreshTrigger 改变时强制重新创建列表
         }
       }
       .background(
@@ -124,6 +126,8 @@ struct SubscriptionListView: View {
       .sheet(item: $subscriptionToEdit) { subscription in
         EditSubscriptionView(subscription: binding(for: subscription)) {
           saveSubscriptions()
+          refreshTrigger = UUID()  // 强制刷新列表
+          calculateMonthlyTotal()
         }
       }
       .onAppear {
