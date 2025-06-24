@@ -148,7 +148,7 @@ struct SubscriptionListView: View {
     isCalculatingTotal = true
     Task {
       do {
-        let total = try await subscriptions.monthlyTotal()
+        let total = try await CurrencyTotalService.shared.calculateMonthlyTotal(for: subscriptions)
         await MainActor.run {
           monthlyTotal = total
           isCalculatingTotal = false
@@ -176,7 +176,7 @@ struct SubscriptionListView: View {
       _ = try await ExchangeRateService.shared.refreshExchangeRates(baseCurrency: baseCurrency)
 
       // 重新计算总计
-      let total = try await subscriptions.monthlyTotal()
+      let total = try await CurrencyTotalService.shared.calculateMonthlyTotal(for: subscriptions)
       monthlyTotal = total
 
       print("汇率数据已刷新，总计已更新")

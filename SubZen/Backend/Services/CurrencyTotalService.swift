@@ -124,4 +124,21 @@ class CurrencyTotalService: ObservableObject {
   private func saveBaseCurrency() {
     UserDefaults.standard.set(baseCurrency, forKey: "BaseCurrency")
   }
+
+  // MARK: - Utility Methods for Subscriptions Array
+
+  /// 按货币分组订阅
+  func groupSubscriptionsByCurrency(_ subscriptions: [Subscription]) -> [String: [Subscription]] {
+    Dictionary(grouping: subscriptions) { $0.currencyCode }
+  }
+
+  /// 获取所有使用的货币代码
+  func getUsedCurrencies(from subscriptions: [Subscription]) -> Set<String> {
+    Set(subscriptions.map { $0.currencyCode })
+  }
+
+  /// 检查是否包含多种货币
+  func hasMultipleCurrencies(in subscriptions: [Subscription]) -> Bool {
+    getUsedCurrencies(from: subscriptions).count > 1
+  }
 }
