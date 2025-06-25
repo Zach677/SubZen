@@ -10,96 +10,96 @@ import SwiftUI
 
 // Define the Cycle enum
 enum Cycle: String, CaseIterable, Identifiable {
-  case monthly = "Monthly"
-  case yearly = "Yearly"
-  case weekly = "Weekly"
-  case daily = "Daily"
+    case monthly = "Monthly"
+    case yearly = "Yearly"
+    case weekly = "Weekly"
+    case daily = "Daily"
 
-  var id: String { self.rawValue }
+    var id: String { rawValue }
 }
 
 struct AddSubView: View {
-  @Environment(\.dismiss) var dismiss
+    @Environment(\.dismiss) var dismiss
 
-  var onSave: (Subscription) -> Void
+    var onSave: (Subscription) -> Void
 
-  @State private var subscriptionName: String = ""
-  @State private var price: Decimal? = nil
-  @State private var cycle: Cycle = .monthly
-  @State private var selectedCurrency: String =
-    CurrencyList.allCurrencies.first?.code ?? "USD"
-  @State private var showingCurrencySelector = false
-  @State private var lastBillingDate: Date = .now
+    @State private var subscriptionName: String = ""
+    @State private var price: Decimal? = nil
+    @State private var cycle: Cycle = .monthly
+    @State private var selectedCurrency: String =
+        CurrencyList.allCurrencies.first?.code ?? "USD"
+    @State private var showingCurrencySelector = false
+    @State private var lastBillingDate: Date = .now
 
-  @State private var showingAlert = false
-  @State private var alertMessage = ""
+    @State private var showingAlert = false
+    @State private var alertMessage = ""
 
-  private var currencySymbol: String {
-    CurrencyList.getSymbol(for: selectedCurrency)
-  }
-
-  var body: some View {
-    Form {
-      Section(header: Text("New Subscription")) {
-        TextField("Name", text: $subscriptionName)
-        HStack {
-          Button(currencySymbol) {
-            showingCurrencySelector = true
-          }
-          .buttonStyle(.bordered)
-          .sheet(isPresented: $showingCurrencySelector) {
-            CurrencySelectionView(
-              selectedCurrency: $selectedCurrency
-            )
-          }
-
-          TextField("0.00", value: $price, format: .number)
-            .keyboardType(.decimalPad)
-        }
-        Picker("Cycle", selection: $cycle) {
-          ForEach(Cycle.allCases) { cycleCase in
-            Text(cycleCase.rawValue.capitalized).tag(cycleCase)
-          }
-        }
-        DatePicker(
-          "Last Billing Date",
-          selection: $lastBillingDate,
-          displayedComponents: .date
-        )
-      }
-      Section {
-        Button("Save") {
-          saveSubscription()
-        }
-        // Disable save button if name or price is empty
-        .disabled(
-          subscriptionName.trimmingCharacters(in: .whitespaces)
-            .isEmpty
-            || price == nil
-            || price ?? 0 <= 0
-        )
-      }
+    private var currencySymbol: String {
+        CurrencyList.getSymbol(for: selectedCurrency)
     }
-    .navigationTitle("Add Subscription")
-    .alert("Error", isPresented: $showingAlert) {
-      Button("OK", role: .cancel) {}
-    } message: {
-      Text(alertMessage)
+
+    var body: some View {
+        Form {
+            Section(header: Text("New Subscription")) {
+                TextField("Name", text: $subscriptionName)
+                HStack {
+                    Button(currencySymbol) {
+                        showingCurrencySelector = true
+                    }
+                    .buttonStyle(.bordered)
+                    .sheet(isPresented: $showingCurrencySelector) {
+                        CurrencySelectionView(
+                            selectedCurrency: $selectedCurrency
+                        )
+                    }
+
+                    TextField("0.00", value: $price, format: .number)
+                        .keyboardType(.decimalPad)
+                }
+                Picker("Cycle", selection: $cycle) {
+                    ForEach(Cycle.allCases) { cycleCase in
+                        Text(cycleCase.rawValue.capitalized).tag(cycleCase)
+                    }
+                }
+                DatePicker(
+                    "Last Billing Date",
+                    selection: $lastBillingDate,
+                    displayedComponents: .date
+                )
+            }
+            Section {
+                Button("Save") {
+                    saveSubscription()
+                }
+                // Disable save button if name or price is empty
+                .disabled(
+                    subscriptionName.trimmingCharacters(in: .whitespaces)
+                        .isEmpty
+                        || price == nil
+                        || price ?? 0 <= 0
+                )
+            }
+        }
+        .navigationTitle("Add Subscription")
+        .alert("Error", isPresented: $showingAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(alertMessage)
+        }
     }
-  }
 
-  private func saveSubscription() {
-    let trimmedName = subscriptionName.trimmingCharacters(in: .whitespaces)
+    private func saveSubscription() {
+        let trimmedName = subscriptionName.trimmingCharacters(in: .whitespaces)
 
-    let newSubscription = Subscription(
-      name: trimmedName,
-      price: price ?? 0.0,
-      cycle: cycle.rawValue,
-			lastBillingDate: lastBillingDate,
-			currencyCode: selectedCurrency,
-    )
+        let newSubscription = Subscription(
+            name: trimmedName,
+            price: price ?? 0.0,
+            cycle: cycle.rawValue,
+            lastBillingDate: lastBillingDate,
+            currencyCode: selectedCurrency,
+        )
 
-    onSave(newSubscription)
-    dismiss()
-  }
+        onSave(newSubscription)
+        dismiss()
+    }
 }

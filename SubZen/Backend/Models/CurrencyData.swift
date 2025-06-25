@@ -15,7 +15,7 @@ struct Currency: Identifiable, Hashable {
 
     // Create id from code for Identifiable protocol
     init(code: String, symbol: String, name: String) {
-        self.id = code
+        id = code
         self.code = code
         self.symbol = symbol
         self.name = name
@@ -37,10 +37,10 @@ enum CurrencyList {
     ]
 
     static func getCurrency(byCode code: String) -> Currency? {
-        return allCurrencies.first { $0.code == code }
+        allCurrencies.first { $0.code == code }
     }
 
     static func getSymbol(for code: String) -> String {
-        return getCurrency(byCode: code)?.symbol ?? code
+        getCurrency(byCode: code)?.symbol ?? code
     }
 }
