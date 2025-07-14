@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-@main
 struct SubZenApp: App {
     @StateObject private var notificationService = NotificationPermissionService.shared
 
