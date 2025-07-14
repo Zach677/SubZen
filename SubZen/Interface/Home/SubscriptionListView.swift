@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import UIKit
 
 struct SubscriptionListView: View {
     @State private var subscriptions: [Subscription] = []
