@@ -17,6 +17,12 @@ SubZen is an iOS subscription management app written in Swift that helps users t
 - **Dependencies**: Pure Apple frameworks (no third-party dependencies)
 - **Compatibility**: iOS 16.0+ support, avoiding iOS 17+ exclusive APIs
 
+## Claude Code Instructions
+
+- If not explicitly asked to write code, avoid writing core business logic code
+- Can assist with architectural planning, documentation, and high-level project guidance
+- Focus on providing strategic insights and best practices when not directly coding
+
 ## Project Structure
 
 ```
