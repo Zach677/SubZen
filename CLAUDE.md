@@ -33,7 +33,7 @@ SubZen/
 │   └── Services/      # Currency conversion, exchange rates
 ├── Interface/         # UIKit view controllers and UI components
 │   ├── ViewControllers/ # Main view controllers
-│   │   ├── Base/      # BaseViewController and common components
+│   │   ├── MainController/      # MainViewController
 │   │   ├── SubscriptionList/  # Main list functionality
 │   │   ├── AddSubscription/   # Add subscription flow
 │   │   └── EditSubscription/  # Edit subscription flow
@@ -171,11 +171,11 @@ private var cancellables = Set<AnyCancellable>()
 // Component-based organization
 class SubscriptionCardComponent: UIView {
     weak var delegate: SubscriptionCardDelegate?
-    
+
     lazy var titleLabel = UILabel().with {
         $0.font = .systemFont(ofSize: 16, weight: .medium)
     }
-    
+
     // Clear lifecycle methods
     override init(frame: CGRect) {
         super.init(frame: frame)
