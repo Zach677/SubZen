@@ -10,15 +10,15 @@
 ### 主要目标
 - **完全UIKit化**: 移除所有SwiftUI依赖，使用纯UIKit实现
 - **向后兼容**: 支持iOS 16.0+，避免使用iOS 17独有API
-- **代码简洁**: 避免过度设计，直接有效的实现
+- **现代Swift模式**: 采用lazy初始化、computed properties、weak delegates等最佳实践
 - **功能完整**: 保持现有所有功能不变
 
 ### 技术目标
-- 使用现代UIKit最佳实践
-- MVVM架构模式
-- 纯代码布局（Auto Layout）
-- Combine响应式编程
-- 委托模式数据传递
+- **现代UIKit实践**: 结合Combine响应式编程
+- **组件化架构**: 一个组件一个目录的模块化设计
+- **MVVM + Reactive**: ViewModels with Combine publishers
+- **Declarative UI**: 内联配置和清晰的生命周期分离
+- **Memory Safe**: Weak references和proper cancellable管理
 
 ## 分阶段实施计划
 
@@ -35,35 +35,33 @@
 
 **文件**: `SubZen/Application/SceneDelegate.swift`
 
-**当前状态**: 已部分修改，需要完善window配置
+**当前状态**: 已实现lazy mainController模式，需要完善导航配置
 
-**需要实现的功能**:
+**现代Swift实现模式**:
 ```swift
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
+    
+    // ✅ 使用lazy初始化（已实现）
+    lazy var mainController = MainController()
 
-    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+    func scene(_ scene: UIScene, willConnectTo _: UISceneSession, options _: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
-        window = UIWindow(windowScene: windowScene)
+        // ✅ 局部变量避免重复解包（已实现）
+        let window = UIWindow(windowScene: windowScene)
+        window.rootViewController = mainController
+        self.window = window
+        window.makeKeyAndVisible()
         
-        // 创建根导航控制器
-        let rootViewController = SubscriptionListViewController()
-        let navigationController = UINavigationController(rootViewController: rootViewController)
-        
-        // 配置导航栏外观
-        setupNavigationBarAppearance()
-        
-        window?.rootViewController = navigationController
-        window?.makeKeyAndVisible()
+        // 配置全局外观
+        setupGlobalAppearance()
     }
     
-    private func setupNavigationBarAppearance() {
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithDefaultBackground()
-        
-        UINavigationBar.appearance().standardAppearance = appearance
-        UINavigationBar.appearance().scrollEdgeAppearance = appearance
+    private func setupGlobalAppearance() {
+        // 现代外观配置模式
+        UINavigationBar.appearance().prefersLargeTitles = false
+        UITableView.appearance().backgroundColor = .systemGroupedBackground
     }
 }
 ```
@@ -72,17 +70,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
 **新建文件**: `SubZen/Interface/ViewControllers/Base/BaseViewController.swift`
 
-**用途**: 提供通用的ViewController基础功能
-
-**实现要点**:
+**采用FlowDown模式的现代实现**:
 ```swift
 import UIKit
 import Combine
 
 class BaseViewController: UIViewController {
     
-    // Combine订阅管理
-    var cancellables = Set<AnyCancellable>()
+    // ✅ 私有cancellables管理
+    private var cancellables = Set<AnyCancellable>()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -91,21 +87,31 @@ class BaseViewController: UIViewController {
         setupBindings()
     }
     
-    // 子类重写的方法
+    // ✅ 子类重写的清晰生命周期方法
     func setupUI() {
         view.backgroundColor = .systemGroupedBackground
     }
     
     func setupConstraints() {
-        // 子类实现约束设置
+        // 子类实现约束设置 - 考虑使用SnapKit提高可读性
     }
     
     func setupBindings() {
-        // 子类实现数据绑定
+        // 子类实现Combine数据绑定
     }
     
+    // ✅ 明确的内存清理
     deinit {
         cancellables.removeAll()
+    }
+}
+
+// ✅ 扩展支持便捷方法
+extension BaseViewController {
+    func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "确定", style: .default))
+        present(alert, animated: true)
     }
 }
 ```
@@ -136,7 +142,7 @@ import Combine
 
 class SubscriptionListViewController: BaseViewController {
     
-    // MARK: - UI Components
+    // MARK: - UI Components (现代Swift lazy模式)
     private lazy var tableView: UITableView = {
         let table = UITableView(frame: .zero, style: .insetGrouped)
         table.translatesAutoresizingMaskIntoConstraints = false
@@ -153,6 +159,16 @@ class SubscriptionListViewController: BaseViewController {
         label.textAlignment = .center
         return label
     }()
+    
+    // ✅ ViewModel采用weak delegate模式
+    private let viewModel = SubscriptionListViewModel()
+    
+    // ✅ 响应式状态管理
+    private var currentSubscriptions: [Subscription] = [] {
+        didSet {
+            updateTableViewAnimated()
+        }
+    }
     
     private lazy var refreshControl: UIRefreshControl = {
         let refresh = UIRefreshControl()
@@ -646,309 +662,19 @@ extension SubscriptionListViewController: SubscriptionListViewModelDelegate {
 ### 目标
 实现添加订阅的表单界面，替换现有的SwiftUI AddSubView
 
-### 具体实施步骤
+### 实施要点
+- 采用 **表单TableView架构**，分组展示不同类型的输入
+- 使用 **组件化表单Cell**，每种输入类型一个Cell类
+- **ViewModel驱动验证**，实时更新保存按钮状态
+- **Delegate回调** 进行数据传递
 
-#### 3.1 创建AddSubscriptionViewController
+### 关键组件
+1. **AddSubscriptionViewController** - 主表单控制器
+2. **AddSubscriptionViewModel** - 表单验证和数据处理
+3. **FormCells** - TextFieldCell, CurrencyCell, DatePickerCell等
+4. **AddSubscriptionSection** - 表单分组枚举
 
-**新建文件**: `SubZen/Interface/ViewControllers/AddSubscriptionViewController.swift`
-
-**实现框架**:
-```swift
-import UIKit
-
-protocol AddSubscriptionViewControllerDelegate: AnyObject {
-    func didAddSubscription(_ subscription: Subscription)
-}
-
-class AddSubscriptionViewController: BaseViewController {
-    
-    // MARK: - Properties
-    weak var delegate: AddSubscriptionViewControllerDelegate?
-    private let viewModel = AddSubscriptionViewModel()
-    
-    // MARK: - UI Components
-    private lazy var tableView: UITableView = {
-        let table = UITableView(frame: .zero, style: .insetGrouped)
-        table.translatesAutoresizingMaskIntoConstraints = false
-        table.delegate = self
-        table.dataSource = self
-        // 注册各种Cell类型
-        table.register(TextFieldTableViewCell.self, forCellReuseIdentifier: "TextFieldCell")
-        table.register(CurrencySelectionTableViewCell.self, forCellReuseIdentifier: "CurrencyCell")
-        table.register(SegmentedControlTableViewCell.self, forCellReuseIdentifier: "SegmentedCell")
-        table.register(DatePickerTableViewCell.self, forCellReuseIdentifier: "DatePickerCell")
-        return table
-    }()
-    
-    // MARK: - Lifecycle
-    override func setupUI() {
-        super.setupUI()
-        
-        title = "添加订阅"
-        
-        // 导航栏按钮
-        navigationItem.leftBarButtonItem = UIBarButtonItem(
-            barButtonSystemItem: .cancel,
-            target: self,
-            action: #selector(cancelTapped)
-        )
-        
-        navigationItem.rightBarButtonItem = UIBarButtonItem(
-            barButtonSystemItem: .save,
-            target: self,
-            action: #selector(saveTapped)
-        )
-        
-        view.addSubview(tableView)
-        
-        // 初始状态下保存按钮禁用
-        navigationItem.rightBarButtonItem?.isEnabled = false
-    }
-    
-    override func setupConstraints() {
-        NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
-    }
-    
-    override func setupBindings() {
-        viewModel.delegate = self
-    }
-    
-    // MARK: - Actions
-    @objc private func cancelTapped() {
-        navigationController?.popViewController(animated: true)
-    }
-    
-    @objc private func saveTapped() {
-        viewModel.saveSubscription()
-    }
-}
-
-// MARK: - UITableViewDataSource
-extension AddSubscriptionViewController: UITableViewDataSource {
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return AddSubscriptionSection.allCases.count
-    }
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let sectionType = AddSubscriptionSection.allCases[section]
-        return sectionType.numberOfRows
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let sectionType = AddSubscriptionSection.allCases[indexPath.section]
-        
-        switch sectionType {
-        case .basicInfo:
-            return configureBasicInfoCell(for: indexPath)
-        case .pricing:
-            return configurePricingCell(for: indexPath)
-        case .schedule:
-            return configureScheduleCell(for: indexPath)
-        }
-    }
-    
-    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return AddSubscriptionSection.allCases[section].title
-    }
-}
-```
-
-#### 3.2 创建表单数据管理
-
-**新建文件**: `SubZen/Interface/ViewModels/AddSubscriptionViewModel.swift`
-
-**实现要点**:
-```swift
-import Foundation
-
-protocol AddSubscriptionViewModelDelegate: AnyObject {
-    func formValidationChanged(_ isValid: Bool)
-    func subscriptionSaved(_ subscription: Subscription)
-    func errorOccurred(_ error: Error)
-}
-
-class AddSubscriptionViewModel {
-    
-    // MARK: - Properties
-    weak var delegate: AddSubscriptionViewModelDelegate?
-    
-    // 表单数据
-    var subscriptionName: String = "" {
-        didSet { validateForm() }
-    }
-    
-    var price: String = "" {
-        didSet { validateForm() }
-    }
-    
-    var selectedCurrency: String = "CNY" {
-        didSet { validateForm() }
-    }
-    
-    var billingCycle: BillingCycle = .monthly {
-        didSet { validateForm() }
-    }
-    
-    var startDate: Date = Date() {
-        didSet { validateForm() }
-    }
-    
-    // MARK: - Validation
-    private func validateForm() {
-        let isNameValid = !subscriptionName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        let isPriceValid = Decimal(string: price) != nil && !price.isEmpty
-        
-        let isValid = isNameValid && isPriceValid
-        delegate?.formValidationChanged(isValid)
-    }
-    
-    // MARK: - Save
-    func saveSubscription() {
-        guard let priceDecimal = Decimal(string: price) else {
-            delegate?.errorOccurred(AddSubscriptionError.invalidPrice)
-            return
-        }
-        
-        let subscription = Subscription(
-            id: UUID(),
-            name: subscriptionName.trimmingCharacters(in: .whitespacesAndNewlines),
-            price: priceDecimal,
-            currency: selectedCurrency,
-            billingCycle: billingCycle,
-            startDate: startDate,
-            isActive: true
-        )
-        
-        delegate?.subscriptionSaved(subscription)
-    }
-}
-
-enum AddSubscriptionError: Error, LocalizedError {
-    case invalidPrice
-    
-    var errorDescription: String? {
-        switch self {
-        case .invalidPrice:
-            return "请输入有效的价格"
-        }
-    }
-}
-
-enum AddSubscriptionSection: CaseIterable {
-    case basicInfo
-    case pricing
-    case schedule
-    
-    var title: String {
-        switch self {
-        case .basicInfo:
-            return "基本信息"
-        case .pricing:
-            return "价格设置"
-        case .schedule:
-            return "计费周期"
-        }
-    }
-    
-    var numberOfRows: Int {
-        switch self {
-        case .basicInfo:
-            return 1 // 订阅名称
-        case .pricing:
-            return 2 // 价格输入 + 货币选择
-        case .schedule:
-            return 2 // 计费周期 + 开始日期
-        }
-    }
-}
-```
-
-#### 3.3 创建表单Cell组件
-
-**新建文件**: `SubZen/Interface/Cells/Form/TextFieldTableViewCell.swift`
-
-```swift
-import UIKit
-
-class TextFieldTableViewCell: UITableViewCell {
-    
-    // MARK: - Properties
-    var textChangedHandler: ((String) -> Void)?
-    
-    // MARK: - UI Components
-    private let titleLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = .systemFont(ofSize: 16, weight: .medium)
-        return label
-    }()
-    
-    private let textField: UITextField = {
-        let field = UITextField()
-        field.translatesAutoresizingMaskIntoConstraints = false
-        field.textAlignment = .right
-        field.font = .systemFont(ofSize: 16)
-        return field
-    }()
-    
-    // MARK: - Initialization
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
-        setupUI()
-        setupConstraints()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    // MARK: - Setup
-    private func setupUI() {
-        contentView.addSubview(titleLabel)
-        contentView.addSubview(textField)
-        
-        textField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
-    }
-    
-    private func setupConstraints() {
-        NSLayoutConstraint.activate([
-            titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            titleLabel.widthAnchor.constraint(equalToConstant: 100),
-            
-            textField.leadingAnchor.constraint(equalTo: titleLabel.trailingAnchor, constant: 8),
-            textField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            textField.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            textField.heightAnchor.constraint(equalToConstant: 44)
-        ])
-    }
-    
-    // MARK: - Configuration
-    func configure(title: String, placeholder: String, text: String = "", keyboardType: UIKeyboardType = .default) {
-        titleLabel.text = title
-        textField.placeholder = placeholder
-        textField.text = text
-        textField.keyboardType = keyboardType
-    }
-    
-    // MARK: - Actions
-    @objc private func textFieldDidChange() {
-        textChangedHandler?(textField.text ?? "")
-    }
-}
-```
-
-类似地，还需要创建其他表单Cell：
-- `CurrencySelectionTableViewCell.swift`
-- `SegmentedControlTableViewCell.swift`  
-- `DatePickerTableViewCell.swift`
-
-#### 3.4 验收标准
+### 验收标准
 - [ ] 表单界面布局正确，与原SwiftUI版本一致
 - [ ] 所有输入控件正常工作
 - [ ] 表单验证逻辑正确
@@ -958,43 +684,19 @@ class TextFieldTableViewCell: UITableViewCell {
 
 ---
 
+---
+
 ## 第四阶段：编辑和货币选择功能
 
-### 目标
-实现编辑订阅和货币选择功能
+### 实施要点
+- **EditSubscriptionViewController** 复用AddSubscription逻辑，预填充数据
+- **CurrencySelectionViewController** 支持搜索和选择状态指示
+- **模态导航** 使用UINavigationController包装模态展示
+- **数据回传** 通过delegate协议传递选择结果
 
-### 具体实施步骤
-
-#### 4.1 创建EditSubscriptionViewController
-
-**新建文件**: `SubZen/Interface/ViewControllers/EditSubscriptionViewController.swift`
-
-**实现策略**: 继承或复用AddSubscriptionViewController的逻辑，预填充数据
-
-#### 4.2 创建CurrencySelectionViewController
-
-**新建文件**: `SubZen/Interface/ViewControllers/CurrencySelectionViewController.swift`
-
-**功能要求**:
-- 显示支持的货币列表
-- 实现搜索功能
-- 支持选择状态指示
-- 模态展示和数据回传
-
-#### 4.3 实现模态导航
-
-**导航流程**:
-```
-SubscriptionListViewController
-├── 长按 → 上下文菜单 → "编辑"
-│   └── Present → EditSubscriptionViewController (Modal)
-│       └── 货币选择 → CurrencySelectionViewController (Modal)
-└── 点击行 → EditSubscriptionViewController (Modal)
-```
-
-#### 4.4 验收标准
-- [ ] 编辑功能完全正常，数据预填充正确
-- [ ] 货币选择界面正确，搜索功能正常
+### 验收标准
+- [ ] 编辑功能正常，数据预填充正确
+- [ ] 货币选择界面正确，搜索功能正常  
 - [ ] 模态导航流畅，数据传递无误
 - [ ] 保存和取消操作正确
 
@@ -1002,164 +704,73 @@ SubscriptionListViewController
 
 ## 第五阶段：清理和优化
 
-### 目标
-移除所有SwiftUI代码，优化性能
-
-### 具体实施步骤
-
-#### 5.1 代码清理
-- [ ] 删除`SubZen/Interface/`下的所有SwiftUI视图文件
-- [ ] 移除SwiftUI相关的import语句
-- [ ] 清理不再使用的UIHostingController相关代码
+### 代码清理
+- [ ] 删除所有SwiftUI视图文件和import语句
+- [ ] 清理UIHostingController相关代码
 - [ ] 更新项目文件引用
 
-#### 5.2 性能优化
-- [ ] 检查TableView滚动性能
-- [ ] 优化内存使用
-- [ ] 确保数据更新的效率
-- [ ] 测试大量订阅数据的性能
-
-#### 5.3 最终测试
+### 性能优化和测试
+- [ ] TableView滚动性能和内存优化
 - [ ] 完整功能回归测试
 - [ ] iOS 16.0设备兼容性测试
 - [ ] 内存泄漏检测
-- [ ] 性能基准测试
 
 ---
 
 ## 技术约束和最佳实践
 
 ### iOS 16.0+兼容性要求
+- ❌ 避免iOS 17+独有API (ContentUnavailableView, UINavigationSplitView)
+- ✅ 使用传统UITableView模式而非DiffableDataSource
+- ✅ 标准Auto Layout约束
+- ✅ Combine响应式编程
 
-#### 避免使用的API
+### 现代Swift实现模式
 ```swift
-// ❌ 避免使用 iOS 17+ 独有API
-if #available(iOS 17.0, *) {
-    // ContentUnavailableView - 使用自定义空状态视图
-    // UINavigationSplitView - 使用传统导航
-}
+// ✅ Lazy initialization
+lazy var tableView = UITableView()
 
-// ❌ 避免使用 iOS 14+ 新特性如果有更兼容的替代方案
-// UITableViewDiffableDataSource - 使用传统DataSource
+// ✅ Computed properties with side effects  
+var isSelected: Bool { didSet { updateUI() } }
+
+// ✅ Weak delegate pattern
+weak var delegate: MyDelegate?
+
+// ✅ Explicit availability
+@available(*, unavailable)
+required init?(coder: NSCoder) { fatalError() }
+
+// ✅ Combine publishers
+@Published private(set) var data: [Model] = []
 ```
 
-#### 推荐使用的模式
-```swift
-// ✅ 使用传统的UITableView模式
-func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int
-func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell
+### 项目组织
+- **ViewControllers/** - 按功能分组，每个主要功能一个目录
+- **Components/** - 可复用UI组件，一个组件一个目录  
+- **ViewModels/** - 对应Controller的业务逻辑层
+- **Cells/** - 表格和集合视图的Cell组件
 
-// ✅ 使用Auto Layout约束
-NSLayoutConstraint.activate([
-    view.topAnchor.constraint(equalTo: superview.topAnchor)
-])
-
-// ✅ 使用Combine进行响应式编程
-publisher
-    .receive(on: DispatchQueue.main)
-    .sink { value in 
-        // 处理更新
-    }
-    .store(in: &cancellables)
-```
-
-### 代码质量标准
-
-#### 命名规范
-```swift
-// ViewController命名
-class SubscriptionListViewController: BaseViewController
-
-// ViewModel命名  
-class SubscriptionListViewModel
-
-// Cell命名
-class SubscriptionTableViewCell: UITableViewCell
-
-// 协议命名
-protocol SubscriptionListViewModelDelegate: AnyObject
-```
-
-#### 文件组织
-```
-Interface/
-├── ViewControllers/
-│   ├── Base/
-│   │   └── BaseViewController.swift
-│   ├── SubscriptionListViewController.swift
-│   ├── AddSubscriptionViewController.swift
-│   ├── EditSubscriptionViewController.swift
-│   └── CurrencySelectionViewController.swift
-├── ViewModels/
-│   ├── SubscriptionListViewModel.swift
-│   └── AddSubscriptionViewModel.swift
-├── Views/
-│   └── CustomViews/
-├── Cells/
-│   ├── SubscriptionTableViewCell.swift
-│   └── Form/
-│       ├── TextFieldTableViewCell.swift
-│       ├── CurrencySelectionTableViewCell.swift
-│       ├── SegmentedControlTableViewCell.swift
-│       └── DatePickerTableViewCell.swift
-```
-
-### 性能优化建议
-
-#### UITableView优化
-```swift
-// 使用Cell重用
-tableView.register(SubscriptionTableViewCell.self, forCellReuseIdentifier: "identifier")
-
-// 避免在cellForRowAt中进行复杂计算
-func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let cell = tableView.dequeueReusableCell(withIdentifier: "identifier") as! SubscriptionTableViewCell
-    cell.configure(with: viewModel.subscriptions[indexPath.row]) // 预处理的数据
-    return cell
-}
-```
-
-#### 内存管理
-```swift
-// 正确使用weak引用避免循环引用
-viewModel.onUpdate = { [weak self] in
-    self?.updateUI()
-}
-
-// Combine订阅管理
-private var cancellables = Set<AnyCancellable>()
-
-deinit {
-    cancellables.removeAll()
-}
-```
-
----
-
-## 常见问题和解决方案
-
-### Q1: 如何保持与现有Backend服务的兼容性？
-**A**: Backend服务层完全不变，只需要在ViewModel中正确调用现有的CurrencyTotalService和ExchangeRateService。
-
-### Q2: 如何处理异步数据更新？
-**A**: 使用Combine框架和委托模式，在主线程更新UI。
-
-### Q3: 如何实现与SwiftUI相同的视觉效果？
-**A**: 使用CAGradientLayer、layer.cornerRadius、layer.shadow等UIKit特性复制SwiftUI的样式。
-
-### Q4: 如何确保iOS 16.0+兼容性？
-**A**: 避免使用@available(iOS 17.0, *)标记的API，使用传统的UIKit模式。
+### 性能优化要点
+- **Cell重用** - 正确注册和复用TableViewCell
+- **预处理数据** - 避免在cellForRowAt中进行复杂计算
+- **内存管理** - weak引用避免循环引用，proper cancellables管理
 
 ---
 
 ## 总结
 
-这个PRD提供了完整的SwiftUI到UIKit重构指导，包含：
+基于FlowDown项目的现代Swift实践，本PRD提供了完整的SwiftUI到UIKit重构指导：
 
-1. **详细的分阶段实施计划**
-2. **具体的代码实现示例**
-3. **完整的文件组织结构**
-4. **兼容性要求和约束**
-5. **质量保证和验收标准**
+### 核心改进
+1. **现代Swift模式** - lazy初始化、computed properties、weak delegates
+2. **组件化架构** - 一个组件一个目录的模块化设计
+3. **响应式数据流** - Combine + @Published实现状态管理
+4. **简洁实用** - 避免过度设计，注重功能实现
 
-按照这个计划逐步实施，可以确保重构过程的可控性和成功率，最终得到一个简洁高效的纯UIKit应用。
+### 实施优势
+- **分阶段执行** - 可控的迭代开发过程
+- **兼容性保障** - iOS 16.0+广泛设备支持
+- **代码质量** - 现代Swift最佳实践
+- **可维护性** - 清晰的架构和组织结构
+
+按照这个计划实施，将得到一个现代化、高效、可维护的纯UIKit应用。

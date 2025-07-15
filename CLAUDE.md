@@ -27,6 +27,14 @@ SubZen/
 │   └── Services/      # Currency conversion, exchange rates
 ├── Interface/         # UIKit view controllers and UI components
 │   ├── ViewControllers/ # Main view controllers
+│   │   ├── Base/      # BaseViewController and common components
+│   │   ├── SubscriptionList/  # Main list functionality
+│   │   ├── AddSubscription/   # Add subscription flow
+│   │   └── EditSubscription/  # Edit subscription flow
+│   ├── Components/    # Reusable UI components (one component per directory)
+│   │   ├── SubscriptionCard/
+│   │   ├── CurrencySelector/
+│   │   └── FormFields/
 │   ├── Views/         # Custom UIView components
 │   └── Cells/         # UITableViewCell and UICollectionViewCell
 └── Resources/         # Assets, Info.plist, launch resources
@@ -65,13 +73,29 @@ Resources/DevKit/      # Development scripts (outside main app bundle)
 
 ## Code Conventions
 
-- Swift coding standards with clear naming conventions
-- Mixed Chinese/English comments (consider localization context)
-- Async/await patterns for asynchronous operations
-- MVVM architecture with clear separation between ViewModels, ViewControllers, and Services
-- Programmatic UI with Auto Layout constraints
-- Delegate pattern for data flow and user interactions
-- iOS 16.0+ compatibility - avoid using iOS 17+ exclusive APIs
+### Swift Modern Patterns
+- **Lazy Initialization**: Use `lazy` properties for expensive or one-time setup (like SceneDelegate.mainController)
+- **Explicit Availability**: Use `@available(*, unavailable)` to disable unwanted initializers
+- **Computed Properties**: Prefer computed properties with side effects for reactive updates
+- **Strong Typing**: Explicit type declarations for UI components and data models
+
+### Architecture Patterns
+- **MVVM + Combine**: ViewModels with reactive updates using Combine framework
+- **Weak Delegate Pattern**: Always use weak references in delegate protocols
+- **Component Modularization**: One major UI component per directory (not just per file)
+- **Protocol-Based Design**: Define clear protocols for component communication
+
+### UI Implementation
+- **Programmatic Layout**: Pure UIKit with Auto Layout constraints (consider SnapKit for complex layouts)
+- **Declarative UI Setup**: Initialize UI components with inline configuration
+- **Lifecycle Separation**: Clear separation between setup, constraints, and bindings
+- **Memory Management**: Proper cancellable management for Combine subscriptions
+
+### Coding Style
+- **English Comments**: Professional documentation following international standards
+- **Descriptive Naming**: Clear, intention-revealing names for methods and properties
+- **Async/Await Integration**: Modern concurrency patterns where appropriate
+- **iOS 16.0+ Compatibility**: Avoid iOS 17+ exclusive APIs, use traditional UIKit patterns
 
 ## Data Models
 
@@ -96,13 +120,79 @@ Resources/DevKit/      # Development scripts (outside main app bundle)
 - `CurrencySelectionViewController`: Currency picker interface
 
 ### Data Flow
-- ViewModel classes handle business logic and data management
-- Delegate protocols for communication between view controllers
-- Combine framework for reactive data updates
-- Traditional UITableViewDataSource and UITableViewDelegate patterns
+- **Reactive ViewModels**: Use Combine publishers for state management and data updates
+- **Weak Delegate Protocols**: Communication between view controllers with proper memory management
+- **Computed Properties**: React to state changes with side effects (like UI updates)
+- **Publisher Chaining**: Connect multiple data sources using Combine operators
+- **Traditional UIKit Patterns**: UITableViewDataSource/Delegate for reliable table management
+
+### Modern Swift Implementation Examples
+
+```swift
+// Lazy initialization pattern (like SceneDelegate)
+lazy var mainController = MainController()
+
+// Explicit unavailable initializer
+@available(*, unavailable)
+required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+}
+
+// Computed property with side effects
+var selectedSubscription: Subscription? {
+    didSet {
+        updateUIForSelection()
+    }
+}
+
+// Weak delegate pattern
+weak var delegate: SubscriptionListDelegate?
+
+// Combine subscription management
+private var cancellables = Set<AnyCancellable>()
+```
 
 ### Compatibility Considerations
-- Target iOS 16.0+ for broad device compatibility
-- Use traditional UIKit APIs instead of iOS 17+ exclusive features
-- Implement custom empty state views instead of ContentUnavailableView
-- Use standard UITableView data source patterns for reliability
+- **iOS 16.0+ Target**: Broad device compatibility with modern features
+- **Traditional UIKit APIs**: Avoid iOS 17+ exclusive features like ContentUnavailableView
+- **Custom Components**: Implement custom empty states, loading views, and transitions
+- **Standard Patterns**: Reliable UITableView data source patterns over diffable data sources
+- **Layout Flexibility**: Consider SnapKit for complex constraint scenarios while maintaining Auto Layout compatibility
+
+### Component Architecture Guidelines
+
+```swift
+// Component-based organization
+class SubscriptionCardComponent: UIView {
+    weak var delegate: SubscriptionCardDelegate?
+    
+    lazy var titleLabel = UILabel().with {
+        $0.font = .systemFont(ofSize: 16, weight: .medium)
+    }
+    
+    // Clear lifecycle methods
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupUI()
+        setupConstraints()
+        setupBindings()
+    }
+}
+```
+
+## Development Best Practices
+
+### Memory Management
+- Use `weak` references in delegates and closures to prevent retain cycles
+- Properly manage Combine cancellables with `Set<AnyCancellable>`
+- Implement proper `deinit` methods for cleanup
+
+### Error Handling
+- Use Result types for asynchronous operations
+- Implement user-friendly error messages
+- Handle network and data parsing errors gracefully
+
+### Performance Optimization
+- Lazy load expensive UI components
+- Use proper cell reuse patterns
+- Minimize main thread blocking operations
