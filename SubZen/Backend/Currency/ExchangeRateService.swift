@@ -7,7 +7,6 @@
 
 import Foundation
 
-@MainActor
 class ExchangeRateService: ObservableObject {
     static let shared = ExchangeRateService()
 

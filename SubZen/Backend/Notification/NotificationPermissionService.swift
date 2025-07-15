@@ -8,7 +8,6 @@
 import Foundation
 import UserNotifications
 
-@MainActor
 class NotificationPermissionService: ObservableObject {
     static let shared = NotificationPermissionService()
 

@@ -7,7 +7,6 @@
 
 import Foundation
 
-@MainActor
 class CurrencyTotalService: ObservableObject {
     static let shared = CurrencyTotalService()
 
