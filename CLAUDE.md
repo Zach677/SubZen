@@ -11,7 +11,7 @@ SubZen is an iOS subscription management app written in Swift that helps users t
 - **Entry Point**: UIKit-based AppDelegate and SceneDelegate with programmatic UI setup
 - **UI Framework**: Pure UIKit implementation with programmatic layout (Auto Layout)
 - **Navigation**: UINavigationController-based navigation hierarchy
-- **Data Management**: ViewModel pattern with Combine for reactive updates
+- **Data Management**: MVC pattern with traditional UIKit patterns
 - **Data Persistence**: UserDefaults with JSON encoding/decoding for subscription data
 - **Backend Services**: Currency conversion and exchange rate fetching
 - **Dependencies**: Pure Apple frameworks (no third-party dependencies)
@@ -62,7 +62,7 @@ Resources/DevKit/      # Development scripts (outside main app bundle)
 
 ### UI Architecture
 - Pure UIKit implementation with programmatic layout
-- MVVM pattern with ViewModel and View Controller separation
+- MVC pattern with Model, View, and Controller separation
 - Auto Layout for responsive design across different screen sizes
 - UITableView for list interfaces with custom cells
 
@@ -86,7 +86,7 @@ Resources/DevKit/      # Development scripts (outside main app bundle)
 - **Strong Typing**: Explicit type declarations for UI components and data models
 
 ### Architecture Patterns
-- **MVVM + Combine**: ViewModels with reactive updates using Combine framework
+- **MVC Pattern**: Classic Model-View-Controller architecture with clear separation of concerns
 - **Weak Delegate Pattern**: Always use weak references in delegate protocols
 - **Component Modularization**: One major UI component per directory (not just per file)
 - **Protocol-Based Design**: Define clear protocols for component communication
@@ -95,7 +95,7 @@ Resources/DevKit/      # Development scripts (outside main app bundle)
 - **Programmatic Layout**: Pure UIKit with Auto Layout constraints (consider SnapKit for complex layouts)
 - **Declarative UI Setup**: Initialize UI components with inline configuration
 - **Lifecycle Separation**: Clear separation between setup, constraints, and bindings
-- **Memory Management**: Proper cancellable management for Combine subscriptions
+- **Memory Management**: Proper delegate and target-action cleanup
 
 ### Coding Style
 - **English Comments**: Professional documentation following international standards
@@ -126,10 +126,11 @@ Resources/DevKit/      # Development scripts (outside main app bundle)
 - `CurrencySelectionViewController`: Currency picker interface
 
 ### Data Flow
-- **Reactive ViewModels**: Use Combine publishers for state management and data updates
+- **Model Layer**: Business logic and data management in dedicated Model classes
+- **View Layer**: Pure UI components without business logic
+- **Controller Layer**: View controllers coordinate between Model and View
 - **Weak Delegate Protocols**: Communication between view controllers with proper memory management
-- **Computed Properties**: React to state changes with side effects (like UI updates)
-- **Publisher Chaining**: Connect multiple data sources using Combine operators
+- **Target-Action Pattern**: Handle user interactions through traditional UIKit patterns
 - **Traditional UIKit Patterns**: UITableViewDataSource/Delegate for reliable table management
 
 ### Modern Swift Implementation Examples
@@ -154,8 +155,13 @@ var selectedSubscription: Subscription? {
 // Weak delegate pattern
 weak var delegate: SubscriptionListDelegate?
 
-// Combine subscription management
-private var cancellables = Set<AnyCancellable>()
+// Model instance for data management
+private let subscriptionManager = SubscriptionManager()
+
+// Target-action pattern for user interactions
+@objc private func saveButtonTapped() {
+    subscriptionManager.saveSubscription()
+}
 ```
 
 ### Compatibility Considerations
@@ -168,8 +174,8 @@ private var cancellables = Set<AnyCancellable>()
 ### Component Architecture Guidelines
 
 ```swift
-// Component-based organization
-class SubscriptionCardComponent: UIView {
+// MVC View Component (no business logic)
+class SubscriptionCardView: UIView {
     weak var delegate: SubscriptionCardDelegate?
 
     lazy var titleLabel = UILabel().with {
@@ -181,7 +187,29 @@ class SubscriptionCardComponent: UIView {
         super.init(frame: frame)
         setupUI()
         setupConstraints()
-        setupBindings()
+        setupActions()
+    }
+    
+    // Update UI with data (called by Controller)
+    func configure(with subscription: Subscription) {
+        titleLabel.text = subscription.name
+    }
+}
+
+// MVC Controller coordinates Model and View
+class SubscriptionListController: UIViewController {
+    private let subscriptionManager = SubscriptionManager() // Model
+    private var subscriptionCards: [SubscriptionCardView] = [] // Views
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupUI()
+        loadSubscriptions()
+    }
+    
+    private func loadSubscriptions() {
+        let subscriptions = subscriptionManager.getAllSubscriptions()
+        updateUI(with: subscriptions)
     }
 }
 ```
