@@ -29,23 +29,20 @@ SubZen is an iOS subscription management app written in Swift that helps users t
 SubZen/
 ├── Application/        # App lifecycle, AppDelegate, SceneDelegate
 ├── Backend/           # Business logic, models, and services
-│   ├── Models/        # Data models (Subscription, Currency, etc.)
-│   └── Services/      # Currency conversion, exchange rates
-├── Interface/         # UIKit view controllers and UI components
-│   ├── ViewControllers/ # Main view controllers
-│   │   ├── MainController/      # MainViewController
-│   │   ├── SubscriptionList/  # Main list functionality
-│   │   ├── AddSubscription/   # Add subscription flow
-│   │   └── EditSubscription/  # Edit subscription flow
-│   ├── Components/    # Reusable UI components (one component per directory)
-│   │   ├── SubscriptionCard/
-│   │   ├── CurrencySelector/
-│   │   └── FormFields/
-│   ├── Views/         # Custom UIView components
-│   └── Cells/         # UITableViewCell and UICollectionViewCell
+│   ├── Currency/
+│   ├── Notification/
+│   └── Subscription/
+├── Interface/
+│   ├── ViewControllers/
+│   │   ├── MainController/
+│   │   ├── SubscriptionController/
+│   │
+│   ├── Components/
+│   │   ├── Currency/
+│   │   ├── Subscription/
+│   │   └── SummaryView/
 └── Resources/         # Assets, Info.plist, launch resources
-
-Resources/DevKit/      # Development scripts (outside main app bundle)
+ Resources/DevKit/      # Development scripts (outside main app bundle)
 ```
 
 ## Key Components
@@ -69,7 +66,7 @@ Resources/DevKit/      # Development scripts (outside main app bundle)
 ## Development Commands
 
 ### Building and Running
-- Open `SubZen.xcodeproj` in Xcode
+- Open `SubZen.xcworkspace` in Xcode
 - Build and run using Xcode's standard build system (⌘+R)
 - No external build tools or package managers required
 
@@ -120,10 +117,9 @@ Resources/DevKit/      # Development scripts (outside main app bundle)
 ## UIKit Implementation Details
 
 ### View Controllers
-- `SubscriptionListViewController`: Main list interface using UITableView
-- `AddSubscriptionViewController`: Form-based subscription creation
-- `EditSubscriptionViewController`: Subscription editing interface
-- `CurrencySelectionViewController`: Currency picker interface
+- `MainController`: Main list interface using UITableView
+- `SubscriptionController+CRUD`: Form-based subscription creation
+<!-- - `CurrencySelectionController`: Currency picker interface -->
 
 ### Data Flow
 - **Model Layer**: Business logic and data management in dedicated Model classes
@@ -189,7 +185,7 @@ class SubscriptionCardView: UIView {
         setupConstraints()
         setupActions()
     }
-    
+
     // Update UI with data (called by Controller)
     func configure(with subscription: Subscription) {
         titleLabel.text = subscription.name
@@ -200,13 +196,13 @@ class SubscriptionCardView: UIView {
 class SubscriptionListController: UIViewController {
     private let subscriptionManager = SubscriptionManager() // Model
     private var subscriptionCards: [SubscriptionCardView] = [] // Views
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
         loadSubscriptions()
     }
-    
+
     private func loadSubscriptions() {
         let subscriptions = subscriptionManager.getAllSubscriptions()
         updateUI(with: subscriptions)
