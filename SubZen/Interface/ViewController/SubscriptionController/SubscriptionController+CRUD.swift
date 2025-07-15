@@ -1,5 +1,5 @@
 //
-//  NewSubController.swift
+//  SubscriptionController+CRUD.swift
 //  SubZen
 //
 //  Created by Star on 2025/7/15.
