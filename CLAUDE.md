@@ -226,3 +226,7 @@ class SubscriptionListController: UIViewController {
 - Lazy load expensive UI components
 - Use proper cell reuse patterns
 - Minimize main thread blocking operations
+
+## Xcode Build Configurations
+
+- Xcode build always use 16 pro

@@ -7,6 +7,4 @@
 
 import UIKit
 
-class NewSubController: UIViewController {
-
-}
+class NewSubController: UIViewController {}

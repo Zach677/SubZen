@@ -37,10 +37,9 @@ struct EditSubscriptionView: View {
                         .keyboardType(.decimalPad)
                 }
                 Picker("Cycle", selection: $subscription.cycle) {
-                    Text("Monthly").tag("Monthly")
-                    Text("Yearly").tag("Yearly")
-                    Text("Weekly").tag("Weekly")
-                    Text("Daily").tag("Daily")
+                    ForEach(BillingCycle.allCases, id: \.self) { cycle in
+                        Text(cycle.rawValue).tag(cycle)
+                    }
                 }
                 DatePicker(
                     "Last Billing Date",

@@ -22,7 +22,7 @@ class CurrencyTotalService: ObservableObject {
 
     // MARK: - Public Methods
 
-    /// 计算月度总计（转换为基准货币）
+    /// Calculate monthly total (converted to base currency)
     func calculateMonthlyTotal(for subscriptions: [Subscription]) async throws -> Decimal {
         isCalculating = true
         lastCalculationError = nil
@@ -39,16 +39,14 @@ class CurrencyTotalService: ObservableObject {
                 )
 
                 let monthlyAmount: Decimal = switch subscription.cycle {
-                case "Monthly":
+                case .monthly:
                     convertedPrice
-                case "Weekly":
+                case .weekly:
                     convertedPrice * Decimal(4)
-                case "Daily":
+                case .daily:
                     convertedPrice * Decimal(30)
-                case "Yearly":
+                case .yearly:
                     convertedPrice / Decimal(12)
-                default:
-                    convertedPrice
                 }
 
                 return total + monthlyAmount
@@ -63,7 +61,7 @@ class CurrencyTotalService: ObservableObject {
         }
     }
 
-    /// 计算年度总计（转换为基准货币）
+    /// Calculate yearly total (converted to base currency)
     func calculateYearlyTotal(for subscriptions: [Subscription]) async throws -> Decimal {
         isCalculating = true
         lastCalculationError = nil
@@ -80,16 +78,14 @@ class CurrencyTotalService: ObservableObject {
                 )
 
                 let yearlyAmount: Decimal = switch subscription.cycle {
-                case "Yearly":
+                case .yearly:
                     convertedPrice
-                case "Monthly":
+                case .monthly:
                     convertedPrice * Decimal(12)
-                case "Weekly":
+                case .weekly:
                     convertedPrice * Decimal(52)
-                case "Daily":
+                case .daily:
                     convertedPrice * Decimal(365)
-                default:
-                    convertedPrice * Decimal(12)
                 }
 
                 return total + yearlyAmount
@@ -104,7 +100,7 @@ class CurrencyTotalService: ObservableObject {
         }
     }
 
-    /// 设置基准货币
+    /// Set base currency
     func setBaseCurrency(_ currency: String) {
         baseCurrency = currency
         saveBaseCurrency()
@@ -124,17 +120,17 @@ class CurrencyTotalService: ObservableObject {
 
     // MARK: - Utility Methods for Subscriptions Array
 
-    /// 按货币分组订阅
+    /// Group subscriptions by currency
     func groupSubscriptionsByCurrency(_ subscriptions: [Subscription]) -> [String: [Subscription]] {
         Dictionary(grouping: subscriptions) { $0.currencyCode }
     }
 
-    /// 获取所有使用的货币代码
+    /// Get all used currency codes
     func getUsedCurrencies(from subscriptions: [Subscription]) -> Set<String> {
         Set(subscriptions.map(\.currencyCode))
     }
 
-    /// 检查是否包含多种货币
+    /// Check if contains multiple currencies
     func hasMultipleCurrencies(in subscriptions: [Subscription]) -> Bool {
         getUsedCurrencies(from: subscriptions).count > 1
     }

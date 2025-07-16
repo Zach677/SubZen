@@ -8,16 +8,6 @@
 import Foundation
 import SwiftUI
 
-// Define the Cycle enum
-enum Cycle: String, CaseIterable, Identifiable {
-    case monthly = "Monthly"
-    case yearly = "Yearly"
-    case weekly = "Weekly"
-    case daily = "Daily"
-
-    var id: String { rawValue }
-}
-
 struct AddSubView: View {
     @Environment(\.dismiss) var dismiss
 
@@ -25,7 +15,7 @@ struct AddSubView: View {
 
     @State private var subscriptionName: String = ""
     @State private var price: Decimal? = nil
-    @State private var cycle: Cycle = .monthly
+    @State private var cycle: BillingCycle = .monthly
     @State private var selectedCurrency: String =
         CurrencyList.allCurrencies.first?.code ?? "USD"
     @State private var showingCurrencySelector = false
@@ -57,8 +47,8 @@ struct AddSubView: View {
                         .keyboardType(.decimalPad)
                 }
                 Picker("Cycle", selection: $cycle) {
-                    ForEach(Cycle.allCases) { cycleCase in
-                        Text(cycleCase.rawValue.capitalized).tag(cycleCase)
+                    ForEach(BillingCycle.allCases, id: \.self) { cycleCase in
+                        Text(cycleCase.rawValue).tag(cycleCase)
                     }
                 }
                 DatePicker(
@@ -91,15 +81,20 @@ struct AddSubView: View {
     private func saveSubscription() {
         let trimmedName = subscriptionName.trimmingCharacters(in: .whitespaces)
 
-        let newSubscription = Subscription(
-            name: trimmedName,
-            price: price ?? 0.0,
-            cycle: cycle.rawValue,
-            lastBillingDate: lastBillingDate,
-            currencyCode: selectedCurrency,
-        )
+        do {
+            let newSubscription = try Subscription(
+                name: trimmedName,
+                price: price ?? 0.0,
+                cycle: cycle,
+                lastBillingDate: lastBillingDate,
+                currencyCode: selectedCurrency
+            )
 
-        onSave(newSubscription)
-        dismiss()
+            onSave(newSubscription)
+            dismiss()
+        } catch {
+            alertMessage = error.localizedDescription
+            showingAlert = true
+        }
     }
 }

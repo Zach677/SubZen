@@ -7,26 +7,102 @@
 
 import Foundation
 
+// MARK: - BillingCycle Enum
+
+enum BillingCycle: String, CaseIterable, Codable {
+    case daily = "Daily"
+    case weekly = "Weekly"
+    case monthly = "Monthly"
+    case yearly = "Yearly"
+
+    /// Returns the calendar component for date calculations
+    var calendarComponent: Calendar.Component {
+        switch self {
+        case .daily: .day
+        case .weekly: .weekOfYear
+        case .monthly: .month
+        case .yearly: .year
+        }
+    }
+
+    /// Returns the value for date calculations
+    var calendarValue: Int { 1 }
+}
+
+// MARK: - SubscriptionValidationError
+
+enum SubscriptionValidationError: LocalizedError {
+    case emptyName
+    case negativePriceQuestionablePrice
+    case invalidCurrency
+    case futureBillingDate
+
+    var errorDescription: String? {
+        switch self {
+        case .emptyName: "Subscription name cannot be empty"
+        case .negativePriceQuestionablePrice: "Subscription price must be greater than 0"
+        case .invalidCurrency: "Invalid currency code"
+        case .futureBillingDate: "Last billing date cannot be in the future"
+        }
+    }
+}
+
+// MARK: - Subscription Model
+
 final class Subscription: Codable, Identifiable, Equatable {
     var id = UUID()
     var name: String
     var price: Decimal
-    var cycle: String
+    var cycle: BillingCycle
     var lastBillingDate: Date
     var currencyCode: String
 
     init(
         name: String = "",
         price: Decimal = 0.0,
-        cycle: String = "Monthly",
+        cycle: BillingCycle = .monthly,
         lastBillingDate: Date = .now,
         currencyCode: String = "USD"
-    ) {
+    ) throws {
+        try Self.validateInputs(name: name, price: price, lastBillingDate: lastBillingDate, currencyCode: currencyCode)
+
         self.name = name
         self.price = price
         self.cycle = cycle
         self.lastBillingDate = lastBillingDate
         self.currencyCode = currencyCode
+    }
+
+    /// Convenience initializer for existing data migration
+    convenience init(
+        name: String = "",
+        price: Decimal = 0.0,
+        cycleString: String = "Monthly",
+        lastBillingDate: Date = .now,
+        currencyCode: String = "USD"
+    ) {
+        let cycle = BillingCycle(rawValue: cycleString) ?? .monthly
+        try! self.init(name: name, price: price, cycle: cycle, lastBillingDate: lastBillingDate, currencyCode: currencyCode)
+    }
+
+    /// Input validation
+    private static func validateInputs(name: String, price: Decimal, lastBillingDate: Date, currencyCode: String) throws {
+        guard !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw SubscriptionValidationError.emptyName
+        }
+
+        guard price > 0 else {
+            throw SubscriptionValidationError.negativePriceQuestionablePrice
+        }
+
+        guard lastBillingDate <= Date() else {
+            throw SubscriptionValidationError.futureBillingDate
+        }
+
+        // Basic currency validation (you can enhance this with Currency enum validation)
+        guard currencyCode.count == 3 else {
+            throw SubscriptionValidationError.invalidCurrency
+        }
     }
 
     enum CodingKeys: String, CodingKey {
@@ -38,7 +114,14 @@ final class Subscription: Codable, Identifiable, Equatable {
         id = try container.decode(UUID.self, forKey: .id)
         name = try container.decode(String.self, forKey: .name)
         price = try container.decode(Decimal.self, forKey: .price)
-        cycle = try container.decode(String.self, forKey: .cycle)
+
+        // Handle backward compatibility for string-based cycle
+        if let cycleString = try? container.decode(String.self, forKey: .cycle) {
+            cycle = BillingCycle(rawValue: cycleString) ?? .monthly
+        } else {
+            cycle = try container.decode(BillingCycle.self, forKey: .cycle)
+        }
+
         lastBillingDate = try container.decode(Date.self, forKey: .lastBillingDate)
         currencyCode = try container.decode(String.self, forKey: .currencyCode)
     }
@@ -48,7 +131,7 @@ final class Subscription: Codable, Identifiable, Equatable {
         try container.encode(id, forKey: .id)
         try container.encode(name, forKey: .name)
         try container.encode(price, forKey: .price)
-        try container.encode(cycle, forKey: .cycle)
+        try container.encode(cycle.rawValue, forKey: .cycle) // Encode as string for compatibility
         try container.encode(lastBillingDate, forKey: .lastBillingDate)
         try container.encode(currencyCode, forKey: .currencyCode)
     }
@@ -56,58 +139,50 @@ final class Subscription: Codable, Identifiable, Equatable {
     // MARK: - Equatable
 
     static func == (lhs: Subscription, rhs: Subscription) -> Bool {
-        lhs.id == rhs.id && lhs.name == rhs.name && lhs.price == rhs.price
-            && lhs.cycle == rhs.cycle && lhs.lastBillingDate == rhs.lastBillingDate
-            && lhs.currencyCode == rhs.currencyCode
+        lhs.id == rhs.id &&
+            lhs.name == rhs.name &&
+            lhs.price == rhs.price &&
+            lhs.cycle == rhs.cycle &&
+            lhs.lastBillingDate == rhs.lastBillingDate &&
+            lhs.currencyCode == rhs.currencyCode
     }
 
     // MARK: - Billing Date Calculations
 
-    /// 计算剩余天数到下一次账单日期
+    /// Calculate remaining days until next billing date
     var remainingDays: Int {
         let nextBillingDate = calculateNextBillingDate()
         let currentDate = Date()
 
-        // 计算从当前日期到下一个账单日期的天数
+        // Calculate days from current date to next billing date
         let calendar = Calendar.current
         let components = calendar.dateComponents([.day], from: currentDate, to: nextBillingDate)
 
-        // 如果已经过了账单日期，返回0（表示需要立即续费）
+        // Return 0 if past billing date (needs immediate renewal)
         return max(0, components.day ?? 0)
     }
 
-    /// 计算下一个账单日期
+    /// Calculate next billing date using precise Calendar calculations
     private func calculateNextBillingDate() -> Date {
         let calendar = Calendar.current
         let currentDate = Date()
 
-        // 获取账单周期天数
-        let cycleDays = getCycleDays()
-
-        // 从最后账单日期开始，找到下一个未来的账单日期
+        // Start from last billing date and find next future billing date
         var nextBillingDate = lastBillingDate
 
         while nextBillingDate <= currentDate {
-            nextBillingDate =
-                calendar.date(byAdding: .day, value: cycleDays, to: nextBillingDate) ?? nextBillingDate
+            nextBillingDate = calendar.date(
+                byAdding: cycle.calendarComponent,
+                value: cycle.calendarValue,
+                to: nextBillingDate
+            ) ?? nextBillingDate
         }
 
         return nextBillingDate
     }
 
-    /// 根据cycle字符串获取对应的天数
-    private func getCycleDays() -> Int {
-        switch cycle {
-        case "Daily":
-            1
-        case "Weekly":
-            7
-        case "Monthly":
-            30 // 简化为30天，你可以根据需要调整为更精确的月份计算
-        case "Yearly":
-            365 // 简化为365天，你可以根据需要调整为更精确的年份计算
-        default:
-            30 // 默认为月度
-        }
+    /// Get next billing date (public accessor)
+    func getNextBillingDate() -> Date {
+        calculateNextBillingDate()
     }
 }
