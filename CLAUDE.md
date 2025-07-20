@@ -28,21 +28,37 @@ SubZen is an iOS subscription management app written in Swift that helps users t
 ```
 SubZen/
 ├── Application/        # App lifecycle, AppDelegate, SceneDelegate
-├── Backend/           # Business logic, models, and services
+├── Backend/           # Business logic, models, and services (Manager Pattern)
 │   ├── Currency/
+│   │   ├── CurrencyManager.swift
+│   │   └── CurrencyManager+Conversion.swift
 │   ├── Notification/
+│   │   ├── NotificationManager.swift
+│   │   └── NotificationManager+Scheduling.swift
 │   └── Subscription/
+│       ├── SubscriptionManager.swift
+│       ├── SubscriptionManager+CRUD.swift
+│       └── SubscriptionManager+Analytics.swift
 ├── Interface/
-│   ├── ViewControllers/
+│   ├── ViewControllers/          # FlowDown-inspired controller hierarchy
 │   │   ├── MainController/
-│   │   ├── SubscriptionController/
-│   │
-│   ├── Components/
+│   │   │   └── MainController.swift
+│   │   ├── SubscriptionController/     # List management
+│   │   │   ├── SubscriptionController.swift
+│   │   │   ├── SubscriptionController+Actions.swift
+│   │   │   └── SubscriptionController+Delegates.swift
+│   │   └── SubscriptionEditorController/  # Single item editing
+│   │       └── SubscriptionEditorController.swift
+│   ├── Components/               # Reusable UI components
 │   │   ├── Currency/
 │   │   ├── Subscription/
 │   │   └── SummaryView/
+│   └── Extension/               # UI utilities and extensions
+│       ├── UIView+Animation.swift
+│       ├── UIView+Layout.swift
+│       └── Withable.swift
 └── Resources/         # Assets, Info.plist, launch resources
- Resources/DevKit/      # Development scripts (outside main app bundle)
+    └── DevKit/        # Development scripts (outside main app bundle)
 ```
 
 ## Key Components
@@ -83,10 +99,29 @@ SubZen/
 - **Strong Typing**: Explicit type declarations for UI components and data models
 
 ### Architecture Patterns
+
+### Core MVC with FlowDown-Inspired Layering
 - **MVC Pattern**: Classic Model-View-Controller architecture with clear separation of concerns
+- **Layered Controller Architecture**: MainController → Feature Controllers → Editor Controllers
+- **Manager Extensions**: Separate business logic using `Manager+Feature.swift` pattern
 - **Weak Delegate Pattern**: Always use weak references in delegate protocols
 - **Component Modularization**: One major UI component per directory (not just per file)
 - **Protocol-Based Design**: Define clear protocols for component communication
+
+### Controller Responsibility Separation (FlowDown Pattern)
+- **List Controllers**: Handle collection display, search, filtering (e.g., `SubscriptionController`)
+- **Editor Controllers**: Handle single item creation/editing (e.g., `SubscriptionEditorController`)
+- **Manager Layer**: Pure business logic without UI dependencies (e.g., `SubscriptionManager+CRUD`)
+- **Extension Files**: Organize by functionality, not convenience (e.g., `+Actions.swift`, `+Delegates.swift`)
+
+### Data Flow Architecture
+```
+UI Action → Controller → Manager → Storage
+         ← Delegate  ← Manager ← Storage
+```
+- Controllers never directly manipulate data storage
+- Managers handle all business logic and data operations
+- UI updates through delegate pattern or reactive bindings
 
 ### UI Implementation
 - **Programmatic Layout**: Pure UIKit with Auto Layout constraints (consider SnapKit for complex layouts)
@@ -116,23 +151,95 @@ SubZen/
 
 ## UIKit Implementation Details
 
-### View Controllers
-- `MainController`: Main list interface using UITableView
-- `SubscriptionController+CRUD`: Form-based subscription creation
-<!-- - `CurrencySelectionController`: Currency picker interface -->
+### FlowDown-Inspired Controller Architecture
 
-### Data Flow
-- **Model Layer**: Business logic and data management in dedicated Model classes
-- **View Layer**: Pure UI components without business logic
-- **Controller Layer**: View controllers coordinate between Model and View
-- **Weak Delegate Protocols**: Communication between view controllers with proper memory management
-- **Target-Action Pattern**: Handle user interactions through traditional UIKit patterns
-- **Traditional UIKit Patterns**: UITableViewDataSource/Delegate for reliable table management
+#### Main Controllers
+- `MainController`: Root navigation controller, coordinates high-level app flow
+- `SubscriptionController`: List management, search, filtering of subscriptions
+- `SubscriptionEditorController`: Single subscription creation and editing
+
+#### Manager Layer (Business Logic)
+- `SubscriptionManager`: Core subscription data management
+- `SubscriptionManager+CRUD`: Create, read, update, delete operations  
+- `SubscriptionManager+Analytics`: Statistics and reporting (future)
+- `CurrencyManager+Conversion`: Exchange rate calculations
+
+#### Extension Organization
+- `SubscriptionController+Actions`: User interaction handling
+- `SubscriptionController+Delegates`: Protocol conformance and callbacks
+- `MainController+Layout`: View hierarchy and constraints
+
+### Data Flow Patterns
+- **Manager Layer**: Pure business logic, no UI dependencies
+- **Controller Layer**: UI coordination, never direct data manipulation
+- **Delegate Communication**: Clean inter-controller communication
+- **Protocol-Based Updates**: UI updates through delegate pattern
+- **Single Responsibility**: Each file has one clear purpose
 
 ### Modern Swift Implementation Examples
 
+#### FlowDown-Style Manager Extension Pattern
 ```swift
-// Lazy initialization pattern (like SceneDelegate)
+// Backend/Subscription/SubscriptionManager+CRUD.swift
+extension SubscriptionManager {
+    func createSubscription(name: String, price: Decimal, cycle: BillingCycle) throws -> Subscription {
+        let subscription = try Subscription(name: name, price: price, cycle: cycle)
+        addSubscription(subscription)
+        return subscription
+    }
+    
+    func updateSubscription(_ subscription: Subscription, name: String? = nil) throws {
+        // Pure business logic, no UI dependencies
+    }
+}
+```
+
+#### Controller Responsibility Separation
+```swift
+// Interface/ViewController/SubscriptionController/SubscriptionController.swift
+class SubscriptionController: UIViewController {
+    private let subscriptionManager = SubscriptionManager.shared // Manager reference
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupUI() // UI setup only
+        loadSubscriptions() // Data loading
+    }
+}
+
+// Interface/ViewController/SubscriptionController/SubscriptionController+Actions.swift
+extension SubscriptionController {
+    @objc func addButtonTapped() {
+        presentSubscriptionEditor() // UI action handling
+    }
+    
+    func presentSubscriptionEditor(for subscription: Subscription? = nil) {
+        let editor = SubscriptionEditorController(subscription: subscription)
+        editor.delegate = self
+        present(UINavigationController(rootViewController: editor), animated: true)
+    }
+}
+```
+
+#### Delegate Communication Pattern
+```swift
+// Protocol-based communication (FlowDown style)
+protocol SubscriptionEditorDelegate: AnyObject {
+    func subscriptionEditor(_ editor: SubscriptionEditorController, didSave subscription: Subscription)
+    func subscriptionEditor(_ editor: SubscriptionEditorController, didUpdate subscription: Subscription)
+}
+
+// Implementation with single responsibility
+extension SubscriptionController: SubscriptionEditorDelegate {
+    func subscriptionEditor(_ editor: SubscriptionEditorController, didSave subscription: Subscription) {
+        refreshSubscriptionsList() // Only UI refresh, no business logic
+    }
+}
+```
+
+#### Initialization and Memory Management
+```swift
+// Lazy initialization for expensive operations
 lazy var mainController = MainController()
 
 // Explicit unavailable initializer
@@ -141,23 +248,8 @@ required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
 }
 
-// Computed property with side effects
-var selectedSubscription: Subscription? {
-    didSet {
-        updateUIForSelection()
-    }
-}
-
-// Weak delegate pattern
-weak var delegate: SubscriptionListDelegate?
-
-// Model instance for data management
-private let subscriptionManager = SubscriptionManager()
-
-// Target-action pattern for user interactions
-@objc private func saveButtonTapped() {
-    subscriptionManager.saveSubscription()
-}
+// Manager instance (FlowDown pattern)
+private let subscriptionManager = SubscriptionManager.shared
 ```
 
 ### Compatibility Considerations
@@ -210,6 +302,42 @@ class SubscriptionListController: UIViewController {
 }
 ```
 
+## FlowDown Architecture Best Practices
+
+### Manager Layer Design
+- **Single Responsibility**: Each Manager handles one domain (Subscription, Currency, Notification)
+- **Extension Separation**: Use `Manager+Feature.swift` to separate concerns
+- **No UI Dependencies**: Managers should never import UIKit or reference UI elements
+- **Data Consistency**: All data mutations go through Manager layer
+
+### Controller Organization
+- **Feature Controllers**: One controller per major feature (list, editor, settings)
+- **Extension Files**: Separate by functionality (`+Actions.swift`, `+Delegates.swift`, `+Layout.swift`)
+- **Clear Hierarchy**: MainController → Feature Controllers → Modal Controllers
+- **Delegate Communication**: Use protocols for inter-controller communication
+
+### File Naming Conventions (FlowDown Style)
+```
+Manager Layer:
+- SubscriptionManager.swift           # Core functionality
+- SubscriptionManager+CRUD.swift      # Data operations  
+- SubscriptionManager+Analytics.swift # Additional features
+
+Controller Layer:
+- SubscriptionController.swift        # Main controller
+- SubscriptionController+Actions.swift # User interactions
+- SubscriptionController+Delegates.swift # Protocol conformance
+
+Editor Layer:  
+- SubscriptionEditorController.swift  # Single responsibility editing
+```
+
+### Code Organization Principles
+- **One Responsibility Per File**: Each file should have a single, clear purpose
+- **Logical Grouping**: Related functionality in same directory
+- **Extension Hierarchy**: Main class in base file, extensions in separate files
+- **Import Minimization**: Only import what's needed in each file
+
 ## Development Best Practices
 
 ### Memory Management
@@ -227,6 +355,28 @@ class SubscriptionListController: UIViewController {
 - Use proper cell reuse patterns
 - Minimize main thread blocking operations
 
+### Architecture Validation
+- Controllers should never directly access storage
+- Managers should be UI-agnostic and testable
+- Each extension file should have a clear purpose
+- Delegate protocols should be specific and minimal
+
 ## Xcode Build Configurations
 
 - Xcode build always use 16 pro
+
+## Development Commands
+
+- Run the command:"swiftformat . --swiftversion 6.0 --indent 4" When changed code
+
+## Architecture Summary
+
+SubZen follows a **FlowDown-inspired layered architecture** that prioritizes:
+
+1. **Clear Separation**: Business logic (Managers) completely separated from UI (Controllers)
+2. **Single Responsibility**: Each file and class has one clear purpose
+3. **Scalable Organization**: Easy to add new features without affecting existing code
+4. **Testable Design**: Pure business logic can be tested independently
+5. **Team Collaboration**: Multiple developers can work on different layers simultaneously
+
+This architecture ensures SubZen remains maintainable as it grows, following patterns proven in successful commercial iOS applications.

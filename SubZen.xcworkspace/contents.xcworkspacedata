@@ -4,4 +4,7 @@
    <FileRef
       location = "group:SubZen.xcodeproj">
    </FileRef>
+   <FileRef
+      location = "group:Refactor.md">
+   </FileRef>
 </Workspace>
