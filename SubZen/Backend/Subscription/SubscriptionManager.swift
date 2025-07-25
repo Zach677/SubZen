@@ -8,15 +8,13 @@
 import Foundation
 
 class SubscriptionManager {
-		static let shared = SubscriptionManager()
-		
-		var subscriptions: [Subscription] = []
-		let userDefaults = UserDefaults.standard
-		let subscriptionsKey = "subscriptions"
-		
-		private init() {
-				scanAll()
-		}
+    static let shared = SubscriptionManager()
+
+    var subscriptions: [Subscription] = []
+    let userDefaults = UserDefaults.standard
+    let subscriptionsKey = "subscriptions"
+
+    private init() {
+        scanAll()
+    }
 }
-
-

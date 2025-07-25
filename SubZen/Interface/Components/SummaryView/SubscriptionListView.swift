@@ -36,8 +36,8 @@ struct SubscriptionListView: View {
                                 .scaleEffect(0.8)
                         }
                         Text(currencyFormatter.string(from: monthlyTotal as NSNumber) ?? "$0.00")
-                        .font(.largeTitle)
-                        .foregroundColor(.primary)
+                            .font(.largeTitle)
+                            .foregroundColor(.primary)
                     }
                     .padding(.vertical, 20)
                     .frame(maxWidth: .infinity, alignment: .center)
@@ -113,7 +113,7 @@ struct SubscriptionListView: View {
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     NavigationLink {
-                        AddSubView { subscription in
+                        AddSubView { _ in
                             // SubscriptionManager 在 createSubscription 中已经处理了保存
                             loadSubscriptions() // 重新加载以同步状态
                         }
@@ -197,13 +197,13 @@ struct SubscriptionListView: View {
         return $subscriptions[index]
     }
 
-    private func addSubscription(_ subscription: Subscription) {
+    private func addSubscription(_: Subscription) {
         // Manager 会自动处理保存
         subscriptions = subscriptionManager.subscriptions
     }
 
-		private func deleteSubscription(_ subscription: Subscription) {
-				subscriptionManager.removeSubscription(identifier: subscription.id)
+    private func deleteSubscription(_ subscription: Subscription) {
+        subscriptionManager.removeSubscription(identifier: subscription.id)
         subscriptions = subscriptionManager.subscriptions
     }
 
