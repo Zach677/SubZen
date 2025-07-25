@@ -12,6 +12,7 @@ struct AddSubView: View {
     @Environment(\.dismiss) var dismiss
 
     var onSave: (Subscription) -> Void
+    private let subscriptionManager = SubscriptionManager.shared
 
     @State private var subscriptionName: String = ""
     @State private var price: Decimal? = nil
@@ -82,7 +83,7 @@ struct AddSubView: View {
         let trimmedName = subscriptionName.trimmingCharacters(in: .whitespaces)
 
         do {
-            let newSubscription = try Subscription(
+            let newSubscription = try subscriptionManager.createSubscription(
                 name: trimmedName,
                 price: price ?? 0.0,
                 cycle: cycle,

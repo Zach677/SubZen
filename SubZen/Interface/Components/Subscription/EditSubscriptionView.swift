@@ -13,6 +13,7 @@ struct EditSubscriptionView: View {
     var onSave: () -> Void
 
     @State private var showingCurrencySelector = false
+    private let subscriptionManager = SubscriptionManager.shared
 
     private var currencySymbol: String {
         CurrencyList.getSymbol(for: subscription.currencyCode)
@@ -54,6 +55,12 @@ struct EditSubscriptionView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
+                        // 使用 SubscriptionManager 的编辑功能
+                        subscriptionManager.subscriptionEdit(identifier: subscription.id) { subscriptions in
+                            if let index = subscriptions.firstIndex(where: { $0.id == subscription.id }) {
+                                subscriptions[index] = subscription
+                            }
+                        }
                         onSave()
                         dismiss()
                     }

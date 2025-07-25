@@ -8,6 +8,15 @@
 import Foundation
 
 extension SubscriptionManager {
+		func scanAll() {
+				guard let data = userDefaults.data(forKey: subscriptionsKey),
+							let loadedSubscriptions = try? JSONDecoder().decode([Subscription].self, from: data) else {
+						return
+				}
+				subscriptions = loadedSubscriptions
+				print("[+] scanned \(subscriptions.count) subscriptions")
+		}
+		
 		func createSubscription(
 				name: String,
 				price: Decimal,
@@ -23,12 +32,21 @@ extension SubscriptionManager {
 						currencyCode: currencyCode
 				)
 				
-				newSubscription(subscription)
+				subscriptions.append(subscription)
+				saveSubscriptions()
+				scanAll()
+				
+				print("[+] created a new subscription with: \(subscription.name)")
+				NotificationCenter.default.post(name: .newSubCreated, object: subscription.id)
 				return subscription
 		}
 		
-		func subscription(withId id: UUID) -> Subscription? {
-				return subscriptions.first { $0.id == id }
+		func subscription(identifier: UUID) -> Subscription? {
+				guard let subscription = subscriptions.first(where: { $0.id == identifier }) else {
+						print("[-] subscription not found with id: \(identifier)")
+						return nil
+				}
+				return subscription
 		}
 		
 		func subscriptions(for currency: String) -> [Subscription] {
@@ -39,41 +57,19 @@ extension SubscriptionManager {
 				return subscriptions.filter { $0.cycle == cycle }
 		}
 		
-		
-		func updateSubscription(
-				_ subscription: Subscription,
-				name: String? = nil,
-				price: Decimal? = nil,
-				cycle: BillingCycle? = nil,
-				lastBillingDate: Date? = nil,
-				currencyCode: String? = nil
-		) throws {
-				var updatedSubscription = subscription
-				
-				if let name = name {
-						updatedSubscription.name = name }
-				if let price = price {
-						updatedSubscription.price = price }
-				if let cycle = cycle {
-						updatedSubscription.cycle = cycle }
-				if let lastBillingDate = lastBillingDate {
-						updatedSubscription.lastBillingDate = lastBillingDate }
-				if let currencyCode = currencyCode {
-						updatedSubscription.currencyCode = currencyCode }
-				
-				// Update in storage
-				if let index = subscriptions.firstIndex(where: { $0.id == subscription.id }) {
-						subscriptions[index] = updatedSubscription
-						saveSubscriptions()
-				}
+		func removeSubscription(identifier: UUID) {
+				subscriptions.removeAll { $0.id == identifier }
+				saveSubscriptions()
+				scanAll()
 		}
 		
-		func removeSubscription(withId id: UUID) {
-				subscriptions.removeAll { $0.id == id }
+		func eraseAll() {
+				subscriptions.removeAll()
 				saveSubscriptions()
 		}
-				
-		func removeSubscription(_ subscription: Subscription) {
-				removeSubscription(withId: subscription.id)
-		}
 }
+
+extension Notification.Name {
+		static let newSubCreated = Notification.Name("newSubCreated")
+}
+

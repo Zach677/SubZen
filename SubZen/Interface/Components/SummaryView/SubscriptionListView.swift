@@ -15,7 +15,7 @@ struct SubscriptionListView: View {
     @State private var isRefreshing = false
     @State private var refreshTrigger = UUID() // 用于强制刷新列表
 
-    private let subscriptionsKey = "subscriptions"
+    private let subscriptionManager = SubscriptionManager.shared
 
     private var currencyFormatter: NumberFormatter {
         let formatter = NumberFormatter()
@@ -35,9 +35,7 @@ struct SubscriptionListView: View {
                             ProgressView()
                                 .scaleEffect(0.8)
                         }
-                        Text(
-                            "\(monthlyTotal as NSNumber, formatter: currencyFormatter)"
-                        )
+                        Text(currencyFormatter.string(from: monthlyTotal as NSNumber) ?? "$0.00")
                         .font(.largeTitle)
                         .foregroundColor(.primary)
                     }
@@ -115,8 +113,9 @@ struct SubscriptionListView: View {
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     NavigationLink {
-                        AddSubView { newSubscription in
-                            addSubscription(newSubscription)
+                        AddSubView { subscription in
+                            // SubscriptionManager 在 createSubscription 中已经处理了保存
+                            loadSubscriptions() // 重新加载以同步状态
                         }
                     } label: {
                         Image(systemName: "plus")
@@ -199,46 +198,24 @@ struct SubscriptionListView: View {
     }
 
     private func addSubscription(_ subscription: Subscription) {
-        subscriptions.append(subscription)
-        saveSubscriptions()
+        // Manager 会自动处理保存
+        subscriptions = subscriptionManager.subscriptions
     }
 
-    private func deleteSubscription(_ subscription: Subscription) {
-        print("Executing delete for \(subscription.name)")
-        if let index = subscriptions.firstIndex(where: {
-            $0.id == subscription.id
-        }) {
-            subscriptions.remove(at: index)
-            saveSubscriptions()
-        }
+		private func deleteSubscription(_ subscription: Subscription) {
+				subscriptionManager.removeSubscription(identifier: subscription.id)
+        subscriptions = subscriptionManager.subscriptions
     }
 
     private func loadSubscriptions() {
-        if let savedData = UserDefaults.standard.data(forKey: subscriptionsKey) {
-            let decoder = JSONDecoder()
-            if let loadedSubscriptions = try? decoder.decode(
-                [Subscription].self,
-                from: savedData
-            ) {
-                subscriptions = loadedSubscriptions
-                subscriptions.sort { $0.lastBillingDate > $1.lastBillingDate }
-                print(
-                    "Loaded \(subscriptions.count) subscriptions from UserDefaults"
-                )
-                return
-            }
-        }
-        subscriptions = []
-        print("No saved subscriptions found or decoding failed.")
+        subscriptions = subscriptionManager.subscriptions
+        subscriptions.sort { $0.lastBillingDate > $1.lastBillingDate }
+        print("Loaded \(subscriptions.count) subscriptions from SubscriptionManager")
     }
 
     private func saveSubscriptions() {
-        let encoder = JSONEncoder()
-        if let encoded = try? encoder.encode(subscriptions) {
-            UserDefaults.standard.set(encoded, forKey: subscriptionsKey)
-            print("Saved \(subscriptions.count) subscriptions to UserDefaults")
-        } else {
-            print("Failed to save subscriptions.")
-        }
+        // SubscriptionManager 会自动处理保存，这里只需要更新本地状态
+        subscriptions = subscriptionManager.subscriptions
+        print("Updated local subscriptions from SubscriptionManager")
     }
 }
