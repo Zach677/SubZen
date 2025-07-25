@@ -14,17 +14,6 @@
     fclose(stderr)
 #endif
 
-import os
-
-let logger = Logger(subsystem: "SubZen", category: "finance")
-logger.info("SubZen application starting...")
-
-_ = CurrencyTotalService.shared
-_ = ExchangeRateService.shared
-_ = NotificationPermissionService.shared
-
-logger.info("Core services initialized")
-
 DispatchQueue.global().async {
     let tempCleanup = FileManager.default
         .temporaryDirectory
