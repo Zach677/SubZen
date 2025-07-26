@@ -203,7 +203,7 @@ struct SubscriptionListView: View {
     }
 
     private func deleteSubscription(_ subscription: Subscription) {
-        subscriptionManager.removeSubscription(identifier: subscription.id)
+        subscriptionManager.deleteSubscription(identifier: subscription.id)
         subscriptions = subscriptionManager.subscriptions
     }
 

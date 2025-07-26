@@ -8,15 +8,6 @@
 import Foundation
 
 extension SubscriptionManager {
-    func scanAll() {
-        guard let data = userDefaults.data(forKey: subscriptionsKey),
-              let loadedSubscriptions = try? JSONDecoder().decode([Subscription].self, from: data)
-        else {
-            return
-        }
-        subscriptions = loadedSubscriptions
-        print("[+] scanned \(subscriptions.count) subscriptions")
-    }
 
     func createSubscription(
         name: String,
@@ -48,7 +39,7 @@ extension SubscriptionManager {
         return subscription
     }
 
-    func removeSubscription(identifier: UUID) {
+    func deleteSubscription(identifier: UUID) {
         subscriptions.removeAll { $0.id == identifier }
         saveSubscriptions()
     }
