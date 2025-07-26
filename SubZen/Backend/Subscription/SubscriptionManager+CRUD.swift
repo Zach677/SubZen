@@ -44,18 +44,9 @@ extension SubscriptionManager {
 
     func subscription(identifier: UUID) -> Subscription? {
         guard let subscription = subscriptions.first(where: { $0.id == identifier }) else {
-            print("[-] subscription not found with id: \(identifier)")
             return nil
         }
         return subscription
-    }
-
-    func subscriptions(for currency: String) -> [Subscription] {
-        subscriptions.filter { $0.currencyCode == currency }
-    }
-
-    func subscriptions(for cycle: BillingCycle) -> [Subscription] {
-        subscriptions.filter { $0.cycle == cycle }
     }
 
     func removeSubscription(identifier: UUID) {
