@@ -55,11 +55,8 @@ struct EditSubscriptionView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
-                        // 使用 SubscriptionManager 的编辑功能
-                        subscriptionManager.subscriptionEdit(identifier: subscription.id) { subscriptions in
-                            if let index = subscriptions.firstIndex(where: { $0.id == subscription.id }) {
-                                subscriptions[index] = subscription
-                            }
+                        subscriptionManager.subscriptionEdit(identifier: subscription.id) { sub in
+                            sub = subscription
                         }
                         onSave()
                         dismiss()

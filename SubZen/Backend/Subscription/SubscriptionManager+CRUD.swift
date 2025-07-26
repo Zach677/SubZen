@@ -35,7 +35,6 @@ extension SubscriptionManager {
 
         subscriptions.append(subscription)
         saveSubscriptions()
-        scanAll()
 
         print("[+] created a new subscription with: \(subscription.name)")
         NotificationCenter.default.post(name: .newSubCreated, object: subscription.id)
@@ -52,7 +51,6 @@ extension SubscriptionManager {
     func removeSubscription(identifier: UUID) {
         subscriptions.removeAll { $0.id == identifier }
         saveSubscriptions()
-        scanAll()
     }
 
     func eraseAll() {

@@ -17,8 +17,9 @@ extension SubscriptionManager {
         }
     }
 
-    func subscriptionEdit(identifier _: UUID, _ block: @escaping (inout [Subscription]) -> Void) {
-        block(&subscriptions)
+    func subscriptionEdit(identifier: UUID, _ block: @escaping (inout Subscription) -> Void) {
+        guard let index = subscriptions.firstIndex(where: { $0.id == identifier }) else { return }
+        block(&subscriptions[index])
         saveSubscriptions()
     }
 }
