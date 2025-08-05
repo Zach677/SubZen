@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		F8C67C382E4235DD00EEC073 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = F8C67C372E4235DD00EEC073 /* SnapKit */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		F882CE902D982DE2000E2FB7 /* SubZen.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SubZen.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -36,6 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F8C67C382E4235DD00EEC073 /* SnapKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +83,7 @@
 			);
 			name = SubZen;
 			packageProductDependencies = (
+				F8C67C372E4235DD00EEC073 /* SnapKit */,
 			);
 			productName = SubZen;
 			productReference = F882CE902D982DE2000E2FB7 /* SubZen.app */;
@@ -108,6 +114,7 @@
 			mainGroup = F882CE872D982DE2000E2FB7;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				F8C67C362E4235DD00EEC073 /* XCRemoteSwiftPackageReference "SnapKit" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = F882CE912D982DE2000E2FB7 /* Products */;
@@ -357,6 +364,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		F8C67C362E4235DD00EEC073 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.7.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		F8C67C372E4235DD00EEC073 /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F8C67C362E4235DD00EEC073 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = F882CE882D982DE2000E2FB7 /* Project object */;
 }
