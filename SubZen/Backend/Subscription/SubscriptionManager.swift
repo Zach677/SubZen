@@ -17,29 +17,29 @@ class SubscriptionManager {
     private init() {
         scanAll()
     }
-		
-		func scanAll() {
-				guard let data = userDefaults.data(forKey: subscriptionsKey),
-							let loadedSubscriptions = try? JSONDecoder().decode([Subscription].self, from: data)
-				else {
-						return
-				}
-				subscriptions = loadedSubscriptions
-				print("[+] scanned \(subscriptions.count) subscriptions")
-		}
-		
-		func saveSubscriptions() {
-				do {
-						let data = try JSONEncoder().encode(subscriptions)
-						userDefaults.set(data, forKey: subscriptionsKey)
-				} catch {
-						print("[*] failed to save subscriptions: \(error)")
-				}
-		}
 
-		func subscriptionEdit(identifier: UUID, _ block: @escaping (inout Subscription) -> Void) {
-				guard let index = subscriptions.firstIndex(where: { $0.id == identifier }) else { return }
-				block(&subscriptions[index])
-				saveSubscriptions()
-		}
+    func scanAll() {
+        guard let data = userDefaults.data(forKey: subscriptionsKey),
+              let loadedSubscriptions = try? JSONDecoder().decode([Subscription].self, from: data)
+        else {
+            return
+        }
+        subscriptions = loadedSubscriptions
+        print("[+] scanned \(subscriptions.count) subscriptions")
+    }
+
+    func saveSubscriptions() {
+        do {
+            let data = try JSONEncoder().encode(subscriptions)
+            userDefaults.set(data, forKey: subscriptionsKey)
+        } catch {
+            print("[*] failed to save subscriptions: \(error)")
+        }
+    }
+
+    func subscriptionEdit(identifier: UUID, _ block: @escaping (inout Subscription) -> Void) {
+        guard let index = subscriptions.firstIndex(where: { $0.id == identifier }) else { return }
+        block(&subscriptions[index])
+        saveSubscriptions()
+    }
 }

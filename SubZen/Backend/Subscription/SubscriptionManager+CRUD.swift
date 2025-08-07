@@ -8,7 +8,6 @@
 import Foundation
 
 extension SubscriptionManager {
-
     func createSubscription(
         name: String,
         price: Decimal,
