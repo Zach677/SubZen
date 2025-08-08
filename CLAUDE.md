@@ -28,37 +28,47 @@ SubZen is an iOS subscription management app written in Swift that helps users t
 ```
 SubZen/
 ├── Application/        # App lifecycle, AppDelegate, SceneDelegate
-├── Backend/           # Business logic, models, and services (Manager Pattern)
+│   ├── AppDelegate.swift
+│   └── SceneDelegate.swift
+├── Backend/           # Business logic, models, and services
 │   ├── Currency/
-│   │   ├── CurrencyManager.swift
-│   │   └── CurrencyManager+Conversion.swift
+│   │   ├── CurrencyData.swift
+│   │   ├── CurrencyTotalService.swift
+│   │   ├── ExchangeRateModels.swift
+│   │   └── ExchangeRateService.swift
 │   ├── Notification/
-│   │   ├── NotificationManager.swift
-│   │   └── NotificationManager+Scheduling.swift
+│   │   └── NotificationPermissionService.swift
 │   └── Subscription/
+│       ├── Subscription.swift
 │       ├── SubscriptionManager.swift
-│       ├── SubscriptionManager+CRUD.swift
-│       └── SubscriptionManager+Analytics.swift
+│       └── SubscriptionManager+CRUD.swift
 ├── Interface/
-│   ├── ViewControllers/          # FlowDown-inspired controller hierarchy
+│   ├── ViewController/           # Controller hierarchy
 │   │   ├── MainController/
 │   │   │   └── MainController.swift
-│   │   ├── SubscriptionController/     # List management
-│   │   │   ├── SubscriptionController.swift
-│   │   │   ├── SubscriptionController+Actions.swift
-│   │   │   └── SubscriptionController+Delegates.swift
-│   │   └── SubscriptionEditorController/  # Single item editing
+│   │   └── SubscriptionController/
+│   │       ├── AddSubView.swift
+│   │       ├── SubscriptionController+Actions.swift
+│   │       ├── SubscriptionController.swift
 │   │       └── SubscriptionEditorController.swift
-│   ├── Components/               # Reusable UI components
-│   │   ├── Currency/
-│   │   ├── Subscription/
-│   │   └── SummaryView/
-│   └── Extension/               # UI utilities and extensions
-│       ├── UIView+Animation.swift
-│       ├── UIView+Layout.swift
-│       └── Withable.swift
-└── Resources/         # Assets, Info.plist, launch resources
-    └── DevKit/        # Development scripts (outside main app bundle)
+│   └── Components/               # Reusable UI components
+│       ├── Currency/
+│       │   └── CurrencySelectionView.swift
+│       ├── Subscription/
+│       │   ├── EditSubscriptionView.swift
+│       │   ├── SubscriptionCardView.swift
+│       │   └── SubscriptionRowView.swift
+│       └── SummaryView/
+│           └── SubscriptionListView.swift
+├── Extension/                   # UI utilities and extensions  
+│   ├── UIView.swift
+│   └── Withable.swift
+├── Resources/                   # Assets, Info.plist
+│   ├── Assets.xcassets/
+│   ├── Base.lproj/
+│   └── InfoPlist/
+│       └── Info.plist
+└── main.swift
 ```
 
 ## Key Components
