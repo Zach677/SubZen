@@ -5,48 +5,48 @@
 //  Created by Star on 2025/7/14.
 //
 
-import UIKit
 import SnapKit
+import UIKit
 
 class MainController: UIViewController {
     let contentView = UIView().with {
         $0.backgroundColor = .systemBackground
     }
-    
+
     let subscriptionController = SubscriptionController().with {
         $0.view.translatesAutoresizingMaskIntoConstraints = false
     }
-    
+
     init() {
         super.init(nibName: nil, bundle: nil)
     }
-    
+
     @available(*, unavailable)
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         view.backgroundColor = .systemBackground
-        
+
         view.addSubview(contentView)
         contentView.addSubview(subscriptionController.view)
-        
+
         addChild(subscriptionController)
         subscriptionController.didMove(toParent: self)
-        
+
         setupViews()
         setupNotificationPermission()
     }
-    
+
     private func setupViews() {
         contentView.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide)
             make.leading.trailing.bottom.equalToSuperview()
         }
-        
+
         subscriptionController.view.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
