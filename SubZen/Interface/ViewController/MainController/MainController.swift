@@ -5,37 +5,51 @@
 //  Created by Star on 2025/7/14.
 //
 
-import SwiftUI
 import UIKit
+import SnapKit
 
 class MainController: UIViewController {
+    let contentView = UIView().with {
+        $0.backgroundColor = .systemBackground
+    }
+    
+    let subscriptionController = SubscriptionController().with {
+        $0.view.translatesAutoresizingMaskIntoConstraints = false
+    }
+    
+    init() {
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("MainController: viewDidLoad called")
-        setupSwiftUIView()
+        
+        view.backgroundColor = .systemBackground
+        
+        view.addSubview(contentView)
+        contentView.addSubview(subscriptionController.view)
+        
+        addChild(subscriptionController)
+        subscriptionController.didMove(toParent: self)
+        
+        setupViews()
         setupNotificationPermission()
     }
-
-    private func setupSwiftUIView() {
-        // 创建SwiftUI视图
-        let subscriptionListView = SubscriptionListView()
-        let hostingController = UIHostingController(rootView: subscriptionListView)
-
-        // 添加为子视图控制器
-        addChild(hostingController)
-        view.addSubview(hostingController.view)
-        hostingController.didMove(toParent: self)
-
-        // 设置自动布局约束
-        hostingController.view.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            hostingController.view.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            hostingController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            hostingController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            hostingController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-        ])
-
-        print("SwiftUI view setup completed")
+    
+    private func setupViews() {
+        contentView.snp.makeConstraints { make in
+            make.top.equalTo(view.safeAreaLayoutGuide)
+            make.leading.trailing.bottom.equalToSuperview()
+        }
+        
+        subscriptionController.view.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
     }
 
     private func setupNotificationPermission() {
