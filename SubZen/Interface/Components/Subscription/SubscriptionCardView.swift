@@ -10,7 +10,7 @@ import UIKit
 
 class SubscriptionCardView: UIView {
     private let titleLabel = UILabel().with {
-        $0.text = "icloud"
+        $0.text = "Apple Music"
         $0.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
         $0.textColor = UIColor.label
     }
@@ -41,18 +41,18 @@ class SubscriptionCardView: UIView {
         addSubview(daysLabel)
 
         titleLabel.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(16)
+						make.centerY.equalToSuperview()
             make.leading.equalToSuperview().offset(16)
             make.trailing.lessThanOrEqualTo(priceLabel.snp.leading).offset(-8)
         }
 
         priceLabel.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(16)
+            make.top.equalToSuperview().offset(20)
             make.trailing.equalToSuperview().offset(-16)
         }
 
         daysLabel.snp.makeConstraints { make in
-            make.top.equalTo(titleLabel.snp.bottom).offset(8)
+            make.top.equalTo(priceLabel.snp.bottom).offset(8)
             make.trailing.equalToSuperview().offset(-16)
             make.bottom.equalToSuperview().offset(-16)
         }
