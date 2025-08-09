@@ -9,21 +9,25 @@ import SnapKit
 import UIKit
 
 class SubscriptionCardView: UIView {
-    private let titleLabel = UILabel().with {
-        $0.text = "Apple Music"
+		
+		func configure(with subscription: Subscription) {
+				titleLabel.text = subscription.name
+				priceLabel.text = subscription.formattedPrice
+				daysLabel.text = "\(subscription.remainingDays) days left"
+		}
+		
+    let titleLabel = UILabel().with {
         $0.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
         $0.textColor = UIColor.label
     }
 
-    private let priceLabel = UILabel().with {
-        $0.text = "TRY ₺249,99 / month"
-        $0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+    let priceLabel = UILabel().with {
+				$0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         $0.textColor = UIColor.secondaryLabel
         $0.textAlignment = .right
     }
 
-    private let daysLabel = UILabel().with {
-        $0.text = "7 days free left"
+    let daysLabel = UILabel().with {
         $0.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
         $0.textColor = UIColor.systemBlue
         $0.textAlignment = .right
