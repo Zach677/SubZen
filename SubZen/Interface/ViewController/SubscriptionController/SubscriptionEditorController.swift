@@ -8,4 +8,3 @@
 import UIKit
 
 class SubscriptionEditorController: UIViewController {}
-

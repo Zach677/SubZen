@@ -9,20 +9,19 @@ import SnapKit
 import UIKit
 
 class SubscriptionCardView: UIView {
-		
-		func configure(with subscription: Subscription) {
-				titleLabel.text = subscription.name
-				priceLabel.text = subscription.formattedPrice
-				daysLabel.text = "\(subscription.remainingDays) days left"
-		}
-		
+    func configure(with subscription: Subscription) {
+        titleLabel.text = subscription.name
+        priceLabel.text = subscription.formattedPrice
+        daysLabel.text = "\(subscription.remainingDays) days left"
+    }
+
     let titleLabel = UILabel().with {
         $0.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
         $0.textColor = UIColor.label
     }
 
     let priceLabel = UILabel().with {
-				$0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        $0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         $0.textColor = UIColor.secondaryLabel
         $0.textAlignment = .right
     }
@@ -45,7 +44,7 @@ class SubscriptionCardView: UIView {
         addSubview(daysLabel)
 
         titleLabel.snp.makeConstraints { make in
-						make.centerY.equalToSuperview()
+            make.centerY.equalToSuperview()
             make.leading.equalToSuperview().offset(16)
             make.trailing.lessThanOrEqualTo(priceLabel.snp.leading).offset(-8)
         }
@@ -68,6 +67,6 @@ class SubscriptionCardView: UIView {
 
     @available(*, unavailable)
     required init?(coder _: NSCoder) {
-				fatalError()
+        fatalError()
     }
 }

@@ -146,15 +146,15 @@ final class Subscription: Codable, Identifiable, Equatable {
             lhs.lastBillingDate == rhs.lastBillingDate &&
             lhs.currencyCode == rhs.currencyCode
     }
-		
-		// MARK: - priceLabel formatting
-		
-		var formattedPrice: String {
-				let formatter = NumberFormatter()
-				formatter.numberStyle = .currency
-				formatter.currencyCode = currencyCode
-				return formatter.string(from: price as NSDecimalNumber) ?? "\(price)"
-		}
+
+    // MARK: - priceLabel formatting
+
+    var formattedPrice: String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.currencyCode = currencyCode
+        return formatter.string(from: price as NSDecimalNumber) ?? "\(price)"
+    }
 
     // MARK: - Billing Date Calculations
 

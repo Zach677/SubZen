@@ -23,7 +23,7 @@ class MainController: UIViewController {
 
     @available(*, unavailable)
     required init?(coder _: NSCoder) {
-				fatalError()
+        fatalError()
     }
 
     override func viewDidLoad() {
