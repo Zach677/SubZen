@@ -6,25 +6,49 @@
 //
 
 import UIKit
+import SnapKit
 
 class SubscriptionController: UIViewController {
-    private let subscriptionCard = SubscriptionCardView()
+    private let subscriptionListView = SubscriptionListView()
+		internal let subscriptionManager = SubscriptionManager.shared
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        view.backgroundColor = UIColor.systemBackground
-
         setupUI()
+				setupNavigationBar()
+				loadSubscriptions()
     }
+		
+		override func viewWillAppear(_ animated: Bool) {
+				super.viewWillAppear(animated)
+				loadSubscriptions()
+		}
 
     private func setupUI() {
-        view.addSubview(subscriptionCard)
+				view.backgroundColor = .systemGroupedBackground
+				
+				subscriptionListView.delegate = self
+				
+        view.addSubview(subscriptionListView)
 
-        subscriptionCard.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide).offset(100)
-            make.leading.equalToSuperview().offset(20)
-            make.trailing.equalToSuperview().offset(-20)
+        subscriptionListView.snp.makeConstraints { make in
+						make.edges.equalTo(view.safeAreaLayoutGuide)
         }
     }
+		
+		private func setupNavigationBar() {
+				title = "Subscriptions"
+				navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addSubscriptionTapped))
+		}
+		
+		internal func loadSubscriptions() {
+				let subscriptions = subscriptionManager.getAllSubscriptions()
+				subscriptionListView.updateSubscriptions(subscriptions)
+		}
+}
+
+extension SubscriptionController: SubscriptionListViewDelegate {
+		func subscriptionListViewDidSelectSubscription(_ subscription: Subscription) {
+				presentSubscriptionEditor(for: subscription)
+		}
 }

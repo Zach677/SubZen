@@ -68,6 +68,6 @@ class SubscriptionCardView: UIView {
 
     @available(*, unavailable)
     required init?(coder _: NSCoder) {
-        fatalError()
+				fatalError()
     }
 }

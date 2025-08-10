@@ -36,6 +36,10 @@ class SubscriptionManager {
             print("[*] failed to save subscriptions: \(error)")
         }
     }
+		
+		func getAllSubscriptions() -> [Subscription] {
+				return subscriptions
+		}
 
     func subscriptionEdit(identifier: UUID, _ block: @escaping (inout Subscription) -> Void) {
         guard let index = subscriptions.firstIndex(where: { $0.id == identifier }) else { return }
