@@ -11,7 +11,7 @@ extension SubscriptionListView {
     class SubscriptionTableViewCell: UITableViewCell {
         static let reuseIdentifier = "SubscriptionListViewCell"
 
-        private let cardView = SubscriptionCardView()
+        private let cardView = SubscriptionListRowView()
 
         override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
             super.init(style: style, reuseIdentifier: reuseIdentifier)

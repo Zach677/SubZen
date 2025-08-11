@@ -1,5 +1,5 @@
 //
-//  SubscriptionCardView.swift
+//  SubscriptionListRowView.swift
 //  SubZen
 //
 //  Created by Star on 2025/7/26.
@@ -8,7 +8,7 @@
 import SnapKit
 import UIKit
 
-class SubscriptionCardView: UIView {
+class SubscriptionListRowView: UIView {
     func configure(with subscription: Subscription) {
         titleLabel.text = subscription.name
         priceLabel.text = subscription.formattedPrice
