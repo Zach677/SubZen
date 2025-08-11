@@ -40,7 +40,7 @@ class SubscriptionListView: UIView {
 
         tableView.dataSource = self
         tableView.delegate = self
-        tableView.register(SubscriptionListView.SubscriptionTableViewCell.self, forCellReuseIdentifier: "SubscriptionListView.SubscriptionTableViewCell.reuseIdentifier")
+        tableView.register(SubscriptionListView.SubscriptionTableViewCell.self, forCellReuseIdentifier: SubscriptionListView.SubscriptionTableViewCell.reuseIdentifier)
 
         addSubview(tableView)
         tableView.snp.makeConstraints { make in
@@ -69,7 +69,7 @@ extension SubscriptionListView: UITableViewDataSource {
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "SubscriptionTableViewCell.reuseIdentifier", for: indexPath) as! SubscriptionTableViewCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: SubscriptionListView.SubscriptionTableViewCell.reuseIdentifier, for: indexPath) as! SubscriptionListView.SubscriptionTableViewCell
         cell.configure(with: subscriptions[indexPath.row])
         return cell
     }
