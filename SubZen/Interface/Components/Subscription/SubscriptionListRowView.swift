@@ -50,18 +50,18 @@ class SubscriptionListRowView: UIView {
         }
 
         priceLabel.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(20)
+            make.top.equalToSuperview().offset(12)
             make.trailing.equalToSuperview().offset(-16)
         }
 
         daysLabel.snp.makeConstraints { make in
-            make.top.equalTo(priceLabel.snp.bottom).offset(8)
+            make.top.equalTo(priceLabel.snp.bottom).offset(4)
             make.trailing.equalToSuperview().offset(-16)
-            make.bottom.equalToSuperview().offset(-16)
+            make.bottom.equalToSuperview().offset(-12)
         }
 
         snp.makeConstraints { make in
-            make.height.greaterThanOrEqualTo(80)
+            make.height.greaterThanOrEqualTo(60)
         }
     }
 
