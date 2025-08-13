@@ -14,7 +14,7 @@ class SubscriptionController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemGroupedBackground
+        view.backgroundColor = .background
 
         subscriptionListView.delegate = self
 

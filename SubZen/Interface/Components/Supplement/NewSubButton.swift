@@ -17,19 +17,13 @@ class NewSubButton: UIButton {
     init() {
         super.init(frame: .zero)
         setImage(UIImage(systemName: "plus"), for: .normal)
-        backgroundColor = .label
-        tintColor = .systemBackground
-        layer.cornerRadius = 25
-        setupActions()
+        tintColor = .label
+				addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
     }
 
     @available(*, unavailable)
     required init?(coder _: NSCoder) {
         fatalError()
-    }
-
-    private func setupActions() {
-        addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
     }
 
     @objc private func buttonTapped() {

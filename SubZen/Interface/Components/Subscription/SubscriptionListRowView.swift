@@ -17,18 +17,18 @@ class SubscriptionListRowView: UIView {
 
     let titleLabel = UILabel().with {
         $0.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
-        $0.textColor = UIColor.label
+        $0.textColor = .label
     }
 
     let priceLabel = UILabel().with {
         $0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        $0.textColor = UIColor.secondaryLabel
+        $0.textColor = .secondaryLabel
         $0.textAlignment = .right
     }
 
     let daysLabel = UILabel().with {
         $0.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
-        $0.textColor = UIColor.systemBlue
+        $0.textColor = .systemBlue.withAlphaComponent(0.7)
         $0.textAlignment = .right
     }
 
@@ -44,7 +44,7 @@ class SubscriptionListRowView: UIView {
     init() {
         super.init(frame: .zero)
 
-        backgroundColor = UIColor.secondarySystemGroupedBackground
+				backgroundColor = .accent.withAlphaComponent(0.1)
         layer.cornerRadius = 12
         layer.masksToBounds = true
 

@@ -34,7 +34,7 @@ class SubscriptionListView: UIView {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = .systemGroupedBackground
+        backgroundColor = .background
 
         titleBar.delegate = self
 
@@ -107,8 +107,8 @@ extension SubscriptionListView {
         weak var delegate: TitleBarDelegate?
 
         private let titleLabel = UILabel().with {
-            $0.text = "Subscriptions"
-            $0.font = UIFont.systemFont(ofSize: 34, weight: .bold)
+            $0.text = "SubZen"
+            $0.font = UIFont.systemFont(ofSize: 25, weight: .bold)
             $0.textColor = .label
         }
 
@@ -116,7 +116,7 @@ extension SubscriptionListView {
 
         init() {
             super.init(frame: .zero)
-            backgroundColor = .systemGroupedBackground
+            backgroundColor = .background
 
             addButton.delegate = self
 
@@ -124,7 +124,7 @@ extension SubscriptionListView {
             addSubview(addButton)
 
             titleLabel.snp.makeConstraints { make in
-                make.leading.equalToSuperview().offset(20)
+                make.leading.equalToSuperview().offset(40)
                 make.centerY.equalToSuperview()
             }
 
