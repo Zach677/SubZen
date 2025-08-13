@@ -17,7 +17,7 @@ Manage subscriptions without surprises. SubZen helps you **track renewals**, **s
 
 SubZen is licensed under AGPL-3.0. You can find the full license text in the [LICENSE](./LICENSE) file or within each library it depends on.
 
-Artwork and resources are not licensed for use for any purpose. Commercial license for SubZen is available case by case. Please contact us.
+Artwork and resources are not licensed for use for any purpose. Commercial license for SubZen is available case by case. Please contact me.
 
 ---
 
