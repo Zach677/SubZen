@@ -32,6 +32,15 @@ class SubscriptionListRowView: UIView {
         $0.textAlignment = .right
     }
 
+    lazy var rightStackView = UIStackView().with {
+        $0.axis = .vertical
+        $0.spacing = 4
+        $0.alignment = .trailing
+        $0.distribution = .fill
+        $0.addArrangedSubview(priceLabel)
+        $0.addArrangedSubview(daysLabel)
+    }
+
     init() {
         super.init(frame: .zero)
 
@@ -40,28 +49,20 @@ class SubscriptionListRowView: UIView {
         layer.masksToBounds = true
 
         addSubview(titleLabel)
-        addSubview(priceLabel)
-        addSubview(daysLabel)
+        addSubview(rightStackView)
 
         titleLabel.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
             make.leading.equalToSuperview().offset(16)
-            make.trailing.lessThanOrEqualTo(priceLabel.snp.leading).offset(-8)
+            make.trailing.lessThanOrEqualTo(rightStackView.snp.leading).offset(-8)
         }
 
-        priceLabel.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(12)
+        rightStackView.snp.makeConstraints { make in
+            make.top.greaterThanOrEqualToSuperview().offset(12)
+            make.bottom.lessThanOrEqualToSuperview().offset(-12)
+            make.centerY.equalToSuperview()
             make.trailing.equalToSuperview().offset(-16)
-        }
-
-        daysLabel.snp.makeConstraints { make in
-            make.top.equalTo(priceLabel.snp.bottom).offset(4)
-            make.trailing.equalToSuperview().offset(-16)
-            make.bottom.equalToSuperview().offset(-12)
-        }
-
-        snp.makeConstraints { make in
-            make.height.greaterThanOrEqualTo(60)
+            make.leading.greaterThanOrEqualTo(titleLabel.snp.trailing).offset(8)
         }
     }
 
