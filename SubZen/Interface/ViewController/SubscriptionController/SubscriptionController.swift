@@ -15,7 +15,6 @@ class SubscriptionController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        setupNavigationBar()
         loadSubscriptions()
     }
 
@@ -36,11 +35,6 @@ class SubscriptionController: UIViewController {
         }
     }
 
-    private func setupNavigationBar() {
-        title = "Subscriptions"
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addSubscriptionTapped))
-    }
-
     func loadSubscriptions() {
         let subscriptions = subscriptionManager.getAllSubscriptions()
         subscriptionListView.updateSubscriptions(subscriptions)
@@ -48,6 +42,10 @@ class SubscriptionController: UIViewController {
 }
 
 extension SubscriptionController: SubscriptionListViewDelegate {
+		func subscriptionListViewDidTapAddButton() {
+				addSubscriptionTapped()
+		}
+		
     func subscriptionListViewDidSelectSubscription(_ subscription: Subscription) {
         presentSubscriptionEditor(for: subscription)
     }

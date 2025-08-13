@@ -31,13 +31,15 @@ class MainController: UIViewController {
 
         view.backgroundColor = .systemBackground
 
+        addChild(subscriptionController)
+
         view.addSubview(contentView)
         contentView.addSubview(subscriptionController.view)
 
-        addChild(subscriptionController)
+        setupViews()
+
         subscriptionController.didMove(toParent: self)
 
-        setupViews()
         setupNotificationPermission()
     }
 
