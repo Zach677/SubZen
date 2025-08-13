@@ -38,15 +38,6 @@ class EmptyStateView: UIView {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setupViews()
-    }
-
-    @available(*, unavailable)
-    required init?(coder _: NSCoder) {
-        fatalError()
-    }
-
-    func setupViews() {
         addSubview(containerView)
         containerView.addSubview(stackView)
         containerView.snp.makeConstraints { make in
@@ -61,5 +52,10 @@ class EmptyStateView: UIView {
         iconImageView.snp.makeConstraints { make in
             make.width.height.equalTo(88)
         }
+    }
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
+        fatalError()
     }
 }

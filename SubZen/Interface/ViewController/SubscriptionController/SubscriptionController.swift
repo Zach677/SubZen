@@ -14,16 +14,6 @@ class SubscriptionController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupUI()
-        loadSubscriptions()
-    }
-
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        loadSubscriptions()
-    }
-
-    private func setupUI() {
         view.backgroundColor = .systemGroupedBackground
 
         subscriptionListView.delegate = self
@@ -33,6 +23,12 @@ class SubscriptionController: UIViewController {
         subscriptionListView.snp.makeConstraints { make in
             make.edges.equalTo(view.safeAreaLayoutGuide)
         }
+        loadSubscriptions()
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        loadSubscriptions()
     }
 
     func loadSubscriptions() {
@@ -42,10 +38,10 @@ class SubscriptionController: UIViewController {
 }
 
 extension SubscriptionController: SubscriptionListViewDelegate {
-		func subscriptionListViewDidTapAddButton() {
-				addSubscriptionTapped()
-		}
-		
+    func subscriptionListViewDidTapAddButton() {
+        addSubscriptionTapped()
+    }
+
     func subscriptionListViewDidSelectSubscription(_ subscription: Subscription) {
         presentSubscriptionEditor(for: subscription)
     }

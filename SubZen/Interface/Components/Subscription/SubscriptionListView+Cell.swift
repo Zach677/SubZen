@@ -15,15 +15,6 @@ extension SubscriptionListView {
 
         override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
             super.init(style: style, reuseIdentifier: reuseIdentifier)
-            setupUI()
-        }
-
-        @available(*, unavailable)
-        required init?(coder _: NSCoder) {
-            fatalError()
-        }
-
-        private func setupUI() {
             selectionStyle = .none
             backgroundColor = .clear
 
@@ -31,6 +22,11 @@ extension SubscriptionListView {
             cardView.snp.makeConstraints { make in
                 make.edges.equalToSuperview().inset(UIEdgeInsets(top: 6, left: 16, bottom: 6, right: 16))
             }
+        }
+
+        @available(*, unavailable)
+        required init?(coder _: NSCoder) {
+            fatalError()
         }
 
         func configure(with subscription: Subscription) {

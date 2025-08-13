@@ -36,14 +36,6 @@ class MainController: UIViewController {
         view.addSubview(contentView)
         contentView.addSubview(subscriptionController.view)
 
-        setupViews()
-
-        subscriptionController.didMove(toParent: self)
-
-        setupNotificationPermission()
-    }
-
-    private func setupViews() {
         contentView.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide)
             make.leading.trailing.bottom.equalToSuperview()
@@ -52,6 +44,10 @@ class MainController: UIViewController {
         subscriptionController.view.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+
+        subscriptionController.didMove(toParent: self)
+
+        setupNotificationPermission()
     }
 
     private func setupNotificationPermission() {
