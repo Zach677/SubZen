@@ -10,7 +10,7 @@ import UIKit
 
 class MainController: UIViewController {
     let contentView = UIView().with {
-        $0.backgroundColor = .systemBackground
+        $0.backgroundColor = .systemGroupedBackground
     }
 
     let subscriptionController = SubscriptionController().with {
@@ -29,7 +29,7 @@ class MainController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .systemGroupedBackground
 
         addChild(subscriptionController)
 
