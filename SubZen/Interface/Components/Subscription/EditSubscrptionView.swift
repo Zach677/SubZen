@@ -97,16 +97,5 @@ class EditSubscriptionView: UIView {
 				fatalError()
 		}
 }
-
-#if DEBUG && canImport(SwiftUI)
-import SwiftUI
-
-#Preview {
-		UIViewPreview {
-				let view = EditSubscriptionView()
-				return view
-		}
-}
-#endif
 				
 			
