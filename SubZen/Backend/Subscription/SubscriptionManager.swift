@@ -45,5 +45,6 @@ class SubscriptionManager {
         guard let index = subscriptions.firstIndex(where: { $0.id == identifier }) else { return }
         block(&subscriptions[index])
         saveSubscriptions()
+        NotificationCenter.default.post(name: .subscriptionUpdated, object: identifier)
     }
 }

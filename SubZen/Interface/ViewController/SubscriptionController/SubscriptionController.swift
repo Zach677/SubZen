@@ -12,6 +12,10 @@ class SubscriptionController: UIViewController {
     private let subscriptionListView = SubscriptionListView()
     let subscriptionManager = SubscriptionManager.shared
 
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .background
@@ -23,6 +27,20 @@ class SubscriptionController: UIViewController {
         subscriptionListView.snp.makeConstraints { make in
             make.edges.equalTo(view.safeAreaLayoutGuide)
         }
+
+        // Observe creation and update events to keep list fresh
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleSubscriptionsChanged),
+            name: .newSubCreated,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleSubscriptionsChanged),
+            name: .subscriptionUpdated,
+            object: nil
+        )
         loadSubscriptions()
     }
 
@@ -34,6 +52,10 @@ class SubscriptionController: UIViewController {
     func loadSubscriptions() {
         let subscriptions = subscriptionManager.getAllSubscriptions()
         subscriptionListView.updateSubscriptions(subscriptions)
+    }
+
+    @objc private func handleSubscriptionsChanged() {
+        loadSubscriptions()
     }
 }
 

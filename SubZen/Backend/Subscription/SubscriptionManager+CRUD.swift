@@ -51,4 +51,5 @@ extension SubscriptionManager {
 
 extension Notification.Name {
     static let newSubCreated = Notification.Name("newSubCreated")
+    static let subscriptionUpdated = Notification.Name("subscriptionUpdated")
 }
