@@ -18,7 +18,7 @@ class NewSubButton: UIButton {
         super.init(frame: .zero)
         setImage(UIImage(systemName: "plus"), for: .normal)
         tintColor = .label
-				addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
+        addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
     }
 
     @available(*, unavailable)

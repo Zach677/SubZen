@@ -44,7 +44,7 @@ class SubscriptionListRowView: UIView {
     init() {
         super.init(frame: .zero)
 
-				backgroundColor = .accent.withAlphaComponent(0.1)
+        backgroundColor = .accent.withAlphaComponent(0.1)
         layer.cornerRadius = 12
         layer.masksToBounds = true
 

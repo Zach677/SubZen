@@ -11,9 +11,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         UITableView.appearance().backgroundColor = .clear
         UIButton.appearance().tintColor = .accent
-				UITextView.appearance().tintColor = .accent
-				UINavigationBar.appearance().tintColor = .accent
-				UISwitch.appearance().onTintColor = .accent
+        UITextView.appearance().tintColor = .accent
+        UINavigationBar.appearance().tintColor = .accent
+        UISwitch.appearance().onTintColor = .accent
         return true
     }
 

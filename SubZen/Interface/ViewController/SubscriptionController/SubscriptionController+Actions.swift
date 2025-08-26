@@ -12,10 +12,8 @@ extension SubscriptionController {
         presentSubscriptionEditor()
     }
 
-    func presentSubscriptionEditor(for _: Subscription? = nil) {
-        let editorController = SubscriptionEditorController()
-        // editorController.delegate = self
-        
+    func presentSubscriptionEditor(for subscription: Subscription? = nil) {
+        let editorController = SubscriptionEditorController(subscription: subscription)
         present(editorController, animated: true)
     }
 
@@ -39,13 +37,3 @@ extension SubscriptionController {
         loadSubscriptions()
     }
 }
-
-// extension SubscriptionController: SubscriptionEditorDelegate {
-// 		func subscriptionEditor(_ editor: SubscriptionEditorController, didSaveSubscription subscription: Subscription) {
-// 				loadSubscriptions()
-// 		}
-//
-// 		func subscriptionEditor(_ editor: SubscriptionEditorController, didUpdateSubscription subscription: Subscription) {
-// 				loadSubscriptions()
-// 		}
-// }
