@@ -17,4 +17,3 @@ final class NotificationObserver {
         if let token { NotificationCenter.default.removeObserver(token) }
     }
 }
-

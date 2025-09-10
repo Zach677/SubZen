@@ -10,7 +10,7 @@ final class UserDefaultsGuard {
     init(key: String, defaults: UserDefaults = .standard) {
         self.key = key
         self.defaults = defaults
-        self.originalData = defaults.data(forKey: key)
+        originalData = defaults.data(forKey: key)
     }
 
     func clear() {
@@ -26,4 +26,3 @@ final class UserDefaultsGuard {
         }
     }
 }
-

@@ -37,14 +37,14 @@ class EditSubscriptionView: UIView {
         $0.autocapitalizationType = .none
         $0.autocorrectionType = .no
     }
-		
-		let cycleLabel = UILabel().with {
-				$0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-				$0.textColor = .label
-				$0.text = "Cycle"
-		}
-		
-		let cycleSegmentedControl = UISegmentedControl(items: BillingCycle.allCases.map{ $0.rawValue })
+
+    let cycleLabel = UILabel().with {
+        $0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        $0.textColor = .label
+        $0.text = "Cycle"
+    }
+
+    let cycleSegmentedControl = UISegmentedControl(items: BillingCycle.allCases.map(\.rawValue))
 
     let dateLabel = UILabel().with {
         $0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
@@ -78,13 +78,13 @@ class EditSubscriptionView: UIView {
         $0.addArrangedSubview(priceLabel)
         $0.addArrangedSubview(priceTextField)
     }
-		
-		lazy var cycleStackView = UIStackView().with {
-				$0.axis = .vertical
-				$0.spacing = 8
-				$0.addArrangedSubview(cycleLabel)
-				$0.addArrangedSubview(cycleSegmentedControl)
-		}
+
+    lazy var cycleStackView = UIStackView().with {
+        $0.axis = .vertical
+        $0.spacing = 8
+        $0.addArrangedSubview(cycleLabel)
+        $0.addArrangedSubview(cycleSegmentedControl)
+    }
 
     lazy var dateStackView = UIStackView().with {
         $0.axis = .vertical
@@ -101,7 +101,7 @@ class EditSubscriptionView: UIView {
         $0.distribution = .fill
         $0.addArrangedSubview(nameStackView)
         $0.addArrangedSubview(priceStackView)
-				$0.addArrangedSubview(cycleStackView)
+        $0.addArrangedSubview(cycleStackView)
         $0.addArrangedSubview(dateStackView)
         $0.addArrangedSubview(saveButton)
     }

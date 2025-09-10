@@ -1,5 +1,5 @@
-import XCTest
 @testable import SubZen
+import XCTest
 
 final class SubscriptionManagerTests: XCTestCase {
     private var defaultsGuard: UserDefaultsGuard!
@@ -80,4 +80,3 @@ final class SubscriptionManagerTests: XCTestCase {
         XCTAssertEqual(m.getAllSubscriptions().count, 0)
     }
 }
-

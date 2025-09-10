@@ -9,7 +9,7 @@ import SnapKit
 import UIKit
 
 class SubscriptionEditorController: UIViewController {
-		private let cycles = BillingCycle.allCases
+    private let cycles = BillingCycle.allCases
     private let editSubscriptionView = EditSubscriptionView()
     private let subscriptionManager = SubscriptionManager.shared
     private let editSubscription: Subscription?
@@ -37,21 +37,20 @@ class SubscriptionEditorController: UIViewController {
             editSubscriptionView.nameTextField.text = usedSubscription.name
             editSubscriptionView.priceTextField.text = NSDecimalNumber(decimal: usedSubscription.price).stringValue
             editSubscriptionView.datePicker.date = usedSubscription.lastBillingDate
-						editSubscriptionView.cycleSegmentedControl.selectedSegmentIndex = cycles.firstIndex(of: usedSubscription.cycle) ?? 2
-
+            editSubscriptionView.cycleSegmentedControl.selectedSegmentIndex = cycles.firstIndex(of: usedSubscription.cycle) ?? 2
         }
         editSubscriptionView.onSaveTapped = { [weak self] in
             self?.handleSave()
         }
     }
-		
-		private func selectedCycle() -> BillingCycle {
-				let ix = editSubscriptionView.cycleSegmentedControl.selectedSegmentIndex
-				return (0..<cycles.count).contains(ix) ? cycles[ix] : .monthly
-		}
+
+    private func selectedCycle() -> BillingCycle {
+        let ix = editSubscriptionView.cycleSegmentedControl.selectedSegmentIndex
+        return (0 ..< cycles.count).contains(ix) ? cycles[ix] : .monthly
+    }
 
     private func handleSave() {
-				let cycle = selectedCycle()
+        let cycle = selectedCycle()
         view.endEditing(true)
 
         let name = (editSubscriptionView.nameTextField.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
@@ -72,7 +71,7 @@ class SubscriptionEditorController: UIViewController {
                     usedSubscription.name = name
                     usedSubscription.price = price
                     usedSubscription.lastBillingDate = date
-										usedSubscription.cycle = cycle
+                    usedSubscription.cycle = cycle
                 }
             } else {
                 _ = try subscriptionManager.createSubscription(name: name, price: price, cycle: cycle, lastBillingDate: date, currencyCode: "USD")

@@ -1,5 +1,5 @@
-import XCTest
 @testable import SubZen
+import XCTest
 
 final class SubscriptionTests: XCTestCase {
     func testInitValidationEmptyName() {
