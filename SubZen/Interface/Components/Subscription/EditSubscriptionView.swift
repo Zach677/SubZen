@@ -62,6 +62,7 @@ class EditSubscriptionView: UIView {
         $0.setTitle("Save", for: .normal)
         $0.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
         $0.heightAnchor.constraint(equalToConstant: 44).isActive = true
+        $0.contentHorizontalAlignment = .leading
     }
 
     lazy var nameStackView = UIStackView().with {
@@ -88,6 +89,7 @@ class EditSubscriptionView: UIView {
     lazy var dateStackView = UIStackView().with {
         $0.axis = .vertical
         $0.spacing = 8
+        $0.alignment = .leading
         $0.addArrangedSubview(dateLabel)
         $0.addArrangedSubview(datePicker)
     }
@@ -111,7 +113,7 @@ class EditSubscriptionView: UIView {
 
         mainStackView.snp.makeConstraints { make in
             make.top.equalTo(self.safeAreaLayoutGuide).offset(24)
-            make.leading.equalToSuperview().offset(16)
+            make.leading.equalToSuperview().offset(12)
             make.bottom.lessThanOrEqualTo(self.safeAreaLayoutGuide).inset(24)
         }
 
