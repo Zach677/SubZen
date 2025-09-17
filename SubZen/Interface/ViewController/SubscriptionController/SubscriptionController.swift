@@ -8,9 +8,14 @@
 import SnapKit
 import UIKit
 
+protocol SubscriptionControllerSettingDelegate: AnyObject {
+		func subscriptionControllerDidRequestSettings(_ controller: SubscriptionController)
+}
+
 class SubscriptionController: UIViewController {
     private let subscriptionListView = SubscriptionListView()
     let subscriptionManager = SubscriptionManager.shared
+		weak var settingDelegate: SubscriptionControllerSettingDelegate?
 
     deinit {
         NotificationCenter.default.removeObserver(self)
@@ -60,11 +65,15 @@ class SubscriptionController: UIViewController {
 }
 
 extension SubscriptionController: SubscriptionListViewDelegate {
-    func subscriptionListViewDidTapAddButton() {
-        addSubscriptionTapped()
-    }
-
-    func subscriptionListViewDidSelectSubscription(_ subscription: Subscription) {
-        presentSubscriptionEditor(for: subscription)
-    }
+		func subscriptionListViewDidRequestSettings(_ listview: SubscriptionListView) {
+				settingDelegate?.subscriptionControllerDidRequestSettings(self)
+		}
+		
+		func subscriptionListViewDidTapAddButton() {
+				addSubscriptionTapped()
+		}
+		
+		func subscriptionListViewDidSelectSubscription(_ subscription: Subscription) {
+				presentSubscriptionEditor(for: subscription)
+		}
 }

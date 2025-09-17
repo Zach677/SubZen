@@ -11,10 +11,12 @@ import UIKit
 protocol SubscriptionListViewDelegate: AnyObject {
     func subscriptionListViewDidSelectSubscription(_ subscription: Subscription)
     func subscriptionListViewDidTapAddButton()
+		func subscriptionListViewDidRequestSettings(_ listview: SubscriptionListView)
 }
 
 protocol TitleBarDelegate: AnyObject {
     func titleBarDidTapAddButton()
+		func titleBarDidRequestSettings(_ titleBar: SubscriptionListView.TitleBar)
 }
 
 class SubscriptionListView: UIView {
@@ -100,6 +102,9 @@ extension SubscriptionListView: TitleBarDelegate {
     func titleBarDidTapAddButton() {
         delegate?.subscriptionListViewDidTapAddButton()
     }
+		func titleBarDidRequestSettings(_ titleBar: SubscriptionListView.TitleBar) {
+				delegate?.subscriptionListViewDidRequestSettings(self)
+		}
 }
 
 extension SubscriptionListView {
@@ -133,7 +138,19 @@ extension SubscriptionListView {
                 make.centerY.equalToSuperview()
                 make.width.height.equalTo(50)
             }
+						
+						installTitleGestures()
         }
+				
+				private func installTitleGestures() {
+						titleLabel.isUserInteractionEnabled = true
+						let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTitleTap))
+						titleLabel.addGestureRecognizer(tapGesture)
+				}
+				
+				@objc private func handleTitleTap() {
+						delegate?.titleBarDidRequestSettings(self)
+				}
 
         @available(*, unavailable)
         required init?(coder _: NSCoder) {
