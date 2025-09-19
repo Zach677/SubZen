@@ -8,9 +8,7 @@
 import UIKit
 
 class SettingController: UIViewController {
-		
-		override func viewDidLoad() {
-				super.viewDidLoad()
-				view.backgroundColor = .background
-		}
+    override func loadView() {
+        view = SettingView()
+    }
 }
