@@ -20,8 +20,59 @@ class MainController: UIViewController {
         $0.clipsToBounds = true
     }
 
+    private var isShowingSettings = false
+    private let dimmingView = UIView().with {
+        $0.backgroundColor = .background.withAlphaComponent(0.1)
+        $0.alpha = 0.0
+    }
+
     private var settingsLeadingConstraint: Constraint?
+    private var dimmingLeadingConstraint: Constraint?
     private var settingsWidth: CGFloat { view.bounds.width * 0.75 }
+
+    @objc private func hideSettingsTapped() {
+        hideSettings()
+    }
+
+    private func setSettingsVisible(_ visible: Bool, animated: Bool) {
+        isShowingSettings = visible
+        dimmingView.isUserInteractionEnabled = visible
+
+        let animations = { [weak self] in
+            guard let self else { return }
+            settingsLeadingConstraint?.update(offset: visible ? 0 : -settingsWidth)
+            dimmingLeadingConstraint?.update(offset: visible ? settingsWidth : view.bounds.width)
+            view.layoutIfNeeded()
+
+            let translation = visible ? settingsWidth : 0
+            contentView.transform = translation == 0 ? .identity : CGAffineTransform(translationX: translation, y: 0)
+            dimmingView.alpha = visible ? 1.0 : 0.0
+        }
+
+        if animated {
+            UIView.animate(
+                withDuration: 0.3,
+                delay: 0,
+                usingSpringWithDamping: 0.85,
+                initialSpringVelocity: 0.2,
+                options: [.curveEaseOut]
+            ) {
+                animations()
+            }
+        } else {
+            animations()
+        }
+    }
+
+    private func showSettings(animated: Bool = true) {
+        guard !isShowingSettings else { return }
+        setSettingsVisible(true, animated: animated)
+    }
+
+    private func hideSettings(animated: Bool = true) {
+        guard isShowingSettings else { return }
+        setSettingsVisible(false, animated: animated)
+    }
 
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -44,6 +95,7 @@ class MainController: UIViewController {
         }
 
         setupSettingsStack()
+        setupDimmingOverlay()
 
         addChild(subscriptionController)
         subscriptionController.view.translatesAutoresizingMaskIntoConstraints = false
@@ -60,7 +112,7 @@ class MainController: UIViewController {
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        settingsLeadingConstraint?.update(offset: -settingsWidth)
+        setSettingsVisible(isShowingSettings, animated: false)
     }
 
     private func setupSettingsStack() {
@@ -82,6 +134,19 @@ class MainController: UIViewController {
         settingsController.didMove(toParent: self)
     }
 
+    private func setupDimmingOverlay() {
+        view.insertSubview(dimmingView, aboveSubview: contentView)
+        dimmingView.snp.makeConstraints { make in
+            dimmingLeadingConstraint = make.leading.equalTo(view.snp.leading).offset(view.bounds.width).constraint
+            make.top.bottom.equalToSuperview()
+            make.trailing.equalToSuperview()
+        }
+
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(hideSettingsTapped))
+        dimmingView.addGestureRecognizer(tapGesture)
+        dimmingView.isUserInteractionEnabled = false
+    }
+
     private func setupNotificationPermission() {
         let notificationService = NotificationPermissionService.shared
 
@@ -97,5 +162,7 @@ class MainController: UIViewController {
 }
 
 extension MainController: SubscriptionControllerSettingsDelegate {
-    func subscriptionControllerDidRequestSettings(_: SubscriptionController) {}
+    func subscriptionControllerDidRequestSettings(_: SubscriptionController) {
+        showSettings()
+    }
 }
