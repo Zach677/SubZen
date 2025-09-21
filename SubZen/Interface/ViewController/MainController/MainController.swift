@@ -29,14 +29,87 @@ class MainController: UIViewController {
     private var settingsLeadingConstraint: Constraint?
     private var dimmingLeadingConstraint: Constraint?
     private var settingsWidth: CGFloat { view.bounds.width * 0.75 }
+    private var panShowing = false
+    private var panStartX: CGFloat = 0.0
+    private var isHandlingPan = false
+    private var panVisibleX: CGFloat = 0
 
     @objc private func hideSettingsTapped() {
         hideSettings()
     }
 
+    @objc private func handlePanGesture(_ gesture: UIPanGestureRecognizer) {
+        let tx = gesture.translation(in: view).x
+
+        switch gesture.state {
+        case .began:
+            let locationInSettings = gesture.location(in: settingsContainer)
+            if isShowingSettings, settingsContainer.bounds.contains(locationInSettings) {
+                isHandlingPan = false
+                return
+            }
+
+            isHandlingPan = true
+            view.layer.removeAllAnimations()
+
+            panShowing = isShowingSettings
+            panStartX = panShowing ? settingsWidth : 0.0
+            panVisibleX = panStartX
+
+            settingsContainer.isHidden = false
+            settingsLeadingConstraint?.update(offset: panStartX - settingsWidth)
+
+            view.layoutIfNeeded()
+
+        case .changed:
+            guard isHandlingPan else { return }
+
+            var visibleX = panStartX + tx
+            visibleX = min(max(0, visibleX), settingsWidth)
+
+            settingsLeadingConstraint?.update(offset: visibleX - settingsWidth)
+            panVisibleX = visibleX
+            contentView.transform = visibleX == 0 ? .identity : CGAffineTransform(translationX: visibleX, y: 0)
+
+            if visibleX > 0 {
+                dimmingLeadingConstraint?.update(offset: visibleX)
+            } else {
+                dimmingLeadingConstraint?.update(offset: view.bounds.width)
+            }
+            dimmingView.alpha = visibleX / settingsWidth
+
+            view.layoutIfNeeded()
+
+        case .ended, .cancelled, .failed:
+            guard isHandlingPan else { return }
+
+            isHandlingPan = false
+
+            let vx = gesture.velocity(in: view).x
+            let speedThreshold: CGFloat = 300
+            let positionThreshold = settingsWidth * 0.25
+
+            let shouldShow: Bool = if vx > speedThreshold {
+                true
+            } else if vx < -speedThreshold {
+                false
+            } else {
+                panVisibleX > positionThreshold
+            }
+            setSettingsVisible(shouldShow, animated: true)
+
+        default:
+            break
+        }
+    }
+
     private func setSettingsVisible(_ visible: Bool, animated: Bool) {
         isShowingSettings = visible
         dimmingView.isUserInteractionEnabled = visible
+
+        if visible {
+            settingsContainer.isHidden = false
+        }
 
         let animations = { [weak self] in
             guard let self else { return }
@@ -94,6 +167,9 @@ class MainController: UIViewController {
             make.leading.trailing.bottom.equalToSuperview()
         }
 
+        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
+        view.addGestureRecognizer(panGesture)
+
         setupSettingsStack()
         setupDimmingOverlay()
 
@@ -112,6 +188,7 @@ class MainController: UIViewController {
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+        guard !isHandlingPan else { return }
         setSettingsVisible(isShowingSettings, animated: false)
     }
 
