@@ -189,6 +189,11 @@ class ExchangeRateService: ObservableObject {
 
     /// 保存缓存到磁盘
     private func saveCacheToDisk() {
+        if memoryCache.isEmpty {
+            UserDefaults.standard.removeObject(forKey: cacheKey)
+            return
+        }
+
         do {
             let data = try JSONEncoder().encode(Array(memoryCache.values))
             UserDefaults.standard.set(data, forKey: cacheKey)

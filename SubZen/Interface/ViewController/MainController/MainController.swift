@@ -151,6 +151,10 @@ class MainController: UIViewController {
         super.init(nibName: nil, bundle: nil)
     }
 
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
     @available(*, unavailable)
     required init?(coder _: NSCoder) {
         fatalError()
@@ -182,6 +186,13 @@ class MainController: UIViewController {
         subscriptionController.didMove(toParent: self)
 
         subscriptionController.settingsDelegate = self
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleSettingsDidReset),
+            name: .settingsDidReset,
+            object: nil
+        )
 
         setupNotificationPermission()
     }
@@ -222,6 +233,10 @@ class MainController: UIViewController {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(hideSettingsTapped))
         dimmingView.addGestureRecognizer(tapGesture)
         dimmingView.isUserInteractionEnabled = false
+    }
+
+    @objc private func handleSettingsDidReset() {
+        hideSettings(animated: false)
     }
 
     private func setupNotificationPermission() {

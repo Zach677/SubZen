@@ -29,6 +29,11 @@ class SubscriptionManager {
     }
 
     func saveSubscriptions() {
+        if subscriptions.isEmpty {
+            userDefaults.removeObject(forKey: subscriptionsKey)
+            return
+        }
+
         do {
             let data = try JSONEncoder().encode(subscriptions)
             userDefaults.set(data, forKey: subscriptionsKey)

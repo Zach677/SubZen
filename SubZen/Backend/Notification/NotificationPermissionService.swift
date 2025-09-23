@@ -66,6 +66,13 @@ class NotificationPermissionService: ObservableObject {
         }
     }
 
+    /// Reset local tracking flags so the next launch behaves like fresh install
+    func resetRequestTracking() {
+        hasRequestedPermission = false
+        userDefaults.removeObject(forKey: hasRequestedPermissionKey)
+        checkCurrentPermissionStatus()
+    }
+
     // MARK: - Private Methods
 
     private func loadPermissionRequestStatus() {

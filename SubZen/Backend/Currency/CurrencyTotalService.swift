@@ -106,6 +106,12 @@ class CurrencyTotalService: ObservableObject {
         saveBaseCurrency()
     }
 
+    /// Reset to default base currency and drop persisted override
+    func resetBaseCurrency() {
+        baseCurrency = ExchangeRateConfig.defaultBaseCurrency
+        UserDefaults.standard.removeObject(forKey: "BaseCurrency")
+    }
+
     // MARK: - Private Methods
 
     private func loadBaseCurrency() {
