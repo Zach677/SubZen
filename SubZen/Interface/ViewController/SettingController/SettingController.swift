@@ -20,25 +20,6 @@ class SettingController: UIViewController {
         settingView.delegate = self
     }
 
-    private func presentInitialResetPrompt() {
-        let alert = UIAlertController(
-            title: "Reset Application",
-            message: "This will remove all subscriptions and settings.",
-            preferredStyle: .alert
-        )
-
-        let cancel = UIAlertAction(title: "Cancel", style: .cancel)
-
-        let continueAction = UIAlertAction(title: "Continue", style: .default) { [weak self] _ in
-            self?.presentFinalResetPrompt()
-        }
-
-        alert.addAction(cancel)
-        alert.addAction(continueAction)
-
-        present(alert, animated: true)
-    }
-
     private func presentFinalResetPrompt() {
         let alert = UIAlertController(
             title: "Confirm Reset",
@@ -96,6 +77,6 @@ class SettingController: UIViewController {
 
 extension SettingController: SettingViewDelegate {
     func settingViewDidTapReset(_: SettingView) {
-        presentInitialResetPrompt()
+        presentFinalResetPrompt()
     }
 }
