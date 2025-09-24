@@ -178,7 +178,7 @@ enum CurrencyList {
 
         for identifier in Locale.availableIdentifiers {
             let locale = Locale(identifier: identifier)
-            if locale.currencyCode?.uppercased() == code {
+            if locale.currencyIdentifierMatches(code) {
                 formatter.locale = locale
                 if let symbol = formatter.currencySymbol,
                    symbol.caseInsensitiveCompare(code) != .orderedSame
@@ -202,3 +202,14 @@ enum CurrencyList {
 }
 
 private final class CurrencyBundleLocator {}
+
+private extension Locale {
+    func currencyIdentifierMatches(_ code: String) -> Bool {
+        let normalized = code.uppercased()
+        if #available(iOS 16.0, *) {
+            return currency?.identifier.uppercased() == normalized
+        } else {
+            return currencyCode?.uppercased() == normalized
+        }
+    }
+}

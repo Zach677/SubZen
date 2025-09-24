@@ -39,9 +39,21 @@ class EditSubscriptionView: UIView {
     }
 
     let currencyButton = UIButton(type: .system).with {
+        if #available(iOS 15.0, *) {
+            var configuration = UIButton.Configuration.plain()
+            configuration.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16)
+            configuration.titleAlignment = .leading
+            configuration.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
+                var attributes = incoming
+                attributes.font = .systemFont(ofSize: 15, weight: .medium)
+                return attributes
+            }
+            $0.configuration = configuration
+        } else {
+            $0.contentEdgeInsets = UIEdgeInsets(top: 10, left: 16, bottom: 10, right: 16)
+            $0.titleLabel?.font = .systemFont(ofSize: 15, weight: .medium)
+        }
         $0.setTitle("Select", for: .normal)
-        $0.titleLabel?.font = .systemFont(ofSize: 15, weight: .medium)
-        $0.contentEdgeInsets = UIEdgeInsets(top: 10, left: 16, bottom: 10, right: 16)
         $0.layer.cornerRadius = 8
         $0.layer.borderWidth = 1
         $0.layer.borderColor = UIColor.separator.cgColor
