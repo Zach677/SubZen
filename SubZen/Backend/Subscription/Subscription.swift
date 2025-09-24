@@ -27,6 +27,16 @@ enum BillingCycle: String, CaseIterable, Codable {
 
     /// Returns the value for date calculations
     var calendarValue: Int { 1 }
+
+    /// Returns a short display name for UI labels
+    var displayUnit: String {
+        switch self {
+        case .daily: "day"
+        case .weekly: "week"
+        case .monthly: "month"
+        case .yearly: "year"
+        }
+    }
 }
 
 // MARK: - SubscriptionValidationError

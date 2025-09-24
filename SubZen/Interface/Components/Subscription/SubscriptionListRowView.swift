@@ -15,7 +15,7 @@ class SubscriptionListRowView: UIView {
         let currency = CurrencyList.getCurrency(byCode: code)
         let decimals = currency?.decimalDigits ?? 2
         let symbol = CurrencyList.displaySymbol(for: code)
-        let cycleText = subscription.cycle.rawValue
+        let cycleDisplayUnit = subscription.cycle.displayUnit
 
         let amount = SubscriptionListRowView.amountFormatter(for: decimals)
             .string(from: subscription.price as NSDecimalNumber) ?? "\(subscription.price)"
@@ -43,7 +43,7 @@ class SubscriptionListRowView: UIView {
         )
         attributed.append(
             NSAttributedString(
-                string: " /\(cycleText)",
+                string: " / \(cycleDisplayUnit)",
                 attributes: [
                     .font: metaFont,
                     .foregroundColor: color.withAlphaComponent(0.7),
@@ -52,7 +52,7 @@ class SubscriptionListRowView: UIView {
         )
 
         priceLabel.attributedText = attributed
-        priceLabel.accessibilityLabel = "\(code) \(symbol) \(amount) per \(cycleText)"
+        priceLabel.accessibilityLabel = "\(code) \(symbol) \(amount) per \(cycleDisplayUnit)"
         daysLabel.text = "\(subscription.remainingDays) days left"
     }
 
