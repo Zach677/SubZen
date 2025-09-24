@@ -163,7 +163,7 @@ private final class ResetActionControl: UIControl {
         }
 
         contentStack.axis = .vertical
-        contentStack.spacing = 6
+        contentStack.spacing = 0
         contentStack.alignment = .fill
         contentStack.isUserInteractionEnabled = false
         addSubview(contentStack)
@@ -191,20 +191,25 @@ private final class ResetActionControl: UIControl {
         activityIndicator.color = .systemBlue
         activityIndicator.isHidden = true
 
-        let headerStack = UIStackView(arrangedSubviews: [iconView, titleLabel, spacer, activityIndicator])
-        headerStack.axis = .horizontal
-        headerStack.spacing = 8
-        headerStack.alignment = .center
-        activityIndicator.setContentHuggingPriority(.required, for: .horizontal)
-        activityIndicator.setContentCompressionResistancePriority(.required, for: .horizontal)
-
         descriptionLabel.font = UIFont.systemFont(ofSize: 14, weight: .regular)
         descriptionLabel.textColor = .secondaryLabel
         descriptionLabel.numberOfLines = 0
         descriptionLabel.text = "If you encounter any issues, try resetting the app. This removes all content and resets the entire database."
 
-        contentStack.addArrangedSubview(headerStack)
-        contentStack.addArrangedSubview(descriptionLabel)
+        let textStack = UIStackView(arrangedSubviews: [titleLabel, descriptionLabel])
+        textStack.axis = .vertical
+        textStack.spacing = 4
+        textStack.alignment = .leading
+
+        activityIndicator.setContentHuggingPriority(.required, for: .horizontal)
+        activityIndicator.setContentCompressionResistancePriority(.required, for: .horizontal)
+
+        let mainStack = UIStackView(arrangedSubviews: [iconView, textStack, spacer, activityIndicator])
+        mainStack.axis = .horizontal
+        mainStack.spacing = 12
+        mainStack.alignment = .top
+
+        contentStack.addArrangedSubview(mainStack)
 
         updateHighlight(animated: false)
     }
