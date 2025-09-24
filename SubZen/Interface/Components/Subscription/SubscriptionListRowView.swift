@@ -14,7 +14,7 @@ class SubscriptionListRowView: UIView {
         let code = subscription.currencyCode.uppercased()
         let currency = CurrencyList.getCurrency(byCode: code)
         let decimals = currency?.decimalDigits ?? 2
-        let symbol = currency?.symbol ?? CurrencyList.getSymbol(for: code)
+        let symbol = CurrencyList.displaySymbol(for: code)
         let cycleText = subscription.cycle.rawValue
 
         let amount = SubscriptionListRowView.amountFormatter(for: decimals)

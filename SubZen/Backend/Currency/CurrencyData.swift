@@ -58,11 +58,34 @@ enum CurrencyList {
     }
 
     static func getSymbol(for code: String) -> String {
-        getCurrency(byCode: code)?.symbol ?? code
+        displaySymbol(for: code)
     }
 
     static func supports(code: String) -> Bool {
         supportedCurrencyCodes.contains(code.uppercased())
+    }
+
+    static func displaySymbol(for code: String) -> String {
+        let normalized = code.uppercased()
+
+        if let cached = displaySymbolCache[normalized] {
+            return cached
+        }
+
+        if let currency = getCurrency(byCode: normalized),
+           currency.symbol.caseInsensitiveCompare(normalized) != .orderedSame
+        {
+            displaySymbolCache[normalized] = currency.symbol
+            return currency.symbol
+        }
+
+        if let localeSymbol = localeDerivedSymbol(for: normalized) {
+            displaySymbolCache[normalized] = localeSymbol
+            return localeSymbol
+        }
+
+        displaySymbolCache[normalized] = normalized
+        return normalized
     }
 
     private static func loadCurrencies() -> [Currency] {
@@ -137,6 +160,45 @@ enum CurrencyList {
 
         return nil
     }
+
+    private static func localeDerivedSymbol(for code: String) -> String? {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.currencyCode = code
+
+        let preferredLocales = Locale.preferredLanguages.map(Locale.init(identifier:))
+        for locale in preferredLocales {
+            formatter.locale = locale
+            if let symbol = formatter.currencySymbol,
+               symbol.caseInsensitiveCompare(code) != .orderedSame
+            {
+                return symbol
+            }
+        }
+
+        for identifier in Locale.availableIdentifiers {
+            let locale = Locale(identifier: identifier)
+            if locale.currencyCode?.uppercased() == code {
+                formatter.locale = locale
+                if let symbol = formatter.currencySymbol,
+                   symbol.caseInsensitiveCompare(code) != .orderedSame
+                {
+                    return symbol
+                }
+            }
+        }
+
+        formatter.locale = Locale.current
+        if let symbol = formatter.currencySymbol,
+           symbol.caseInsensitiveCompare(code) != .orderedSame
+        {
+            return symbol
+        }
+
+        return nil
+    }
+
+    private static var displaySymbolCache: [String: String] = [:]
 }
 
 private final class CurrencyBundleLocator {}

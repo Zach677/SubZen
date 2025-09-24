@@ -158,14 +158,8 @@ class EditSubscriptionView: UIView {
 
     func updateSelectedCurrencyDisplay(with currency: Currency) {
         let code = currency.code
-        let symbol = currency.symbol
-        var parts: [String] = [currency.name]
-        if symbol.caseInsensitiveCompare(code) != .orderedSame {
-            parts.append(symbol)
-        }
-        parts.append(code)
-
-        let title = parts.joined(separator: " ")
+        let symbol = CurrencyList.displaySymbol(for: code)
+        let title = "\(currency.name) \(symbol) \(code)"
         currencyButton.setTitle(title, for: .normal)
         currencyButton.accessibilityLabel = "Selected currency: \(currency.name) \(code)"
     }

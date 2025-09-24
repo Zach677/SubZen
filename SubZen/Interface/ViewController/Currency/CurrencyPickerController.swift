@@ -63,9 +63,10 @@ final class CurrencyPickerController: UITableViewController {
 
         var content = UIListContentConfiguration.subtitleCell()
         content.text = currency.name
-        let symbolPart = currency.symbol.caseInsensitiveCompare(currency.code) == .orderedSame
+        let displaySymbol = CurrencyList.displaySymbol(for: currency.code)
+        let symbolPart = displaySymbol.caseInsensitiveCompare(currency.code) == .orderedSame
             ? currency.code
-            : "\(currency.symbol) \(currency.code)"
+            : "\(displaySymbol) \(currency.code)"
         content.secondaryText = symbolPart
         content.textProperties.font = .systemFont(ofSize: 17, weight: .semibold)
         content.secondaryTextProperties.color = .secondaryLabel
@@ -97,9 +98,10 @@ final class CurrencyPickerController: UITableViewController {
 
         let lowercasedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         filteredCurrencies = allCurrencies.filter { currency in
-            currency.code.lowercased().contains(lowercasedQuery) ||
-                currency.name.lowercased().contains(lowercasedQuery) ||
-                currency.symbol.lowercased().contains(lowercasedQuery)
+            let codeMatch = currency.code.lowercased().contains(lowercasedQuery)
+            let nameMatch = currency.name.lowercased().contains(lowercasedQuery)
+            let symbolMatch = CurrencyList.displaySymbol(for: currency.code).lowercased().contains(lowercasedQuery)
+            return codeMatch || nameMatch || symbolMatch
         }
         tableView.reloadData()
     }

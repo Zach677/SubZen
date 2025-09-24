@@ -23,4 +23,9 @@ final class CurrencyListTests: XCTestCase {
         XCTAssertTrue(CurrencyList.supports(code: "EUR"))
         XCTAssertFalse(CurrencyList.supports(code: "ZZZ"))
     }
+
+    func testDisplaySymbolFallsBackToLocaleMapping() {
+        let symbol = CurrencyList.displaySymbol(for: "AED")
+        XCTAssertNotEqual(symbol.uppercased(), "AED", "Expected localized symbol for AED, got \(symbol)")
+    }
 }
