@@ -7,40 +7,136 @@
 
 import Foundation
 
-struct Currency: Identifiable, Hashable {
+struct Currency: Identifiable, Hashable, Decodable {
     let id: String
     let code: String
-    let symbol: String
+    let numeric: String?
     let name: String
+    let symbol: String
+    let decimalDigits: Int
 
-    // Create id from code for Identifiable protocol
-    init(code: String, symbol: String, name: String) {
+    init(code: String, numeric: String?, name: String, symbol: String, decimalDigits: Int) {
         id = code
         self.code = code
-        self.symbol = symbol
+        self.numeric = numeric
         self.name = name
+        self.symbol = symbol
+        self.decimalDigits = decimalDigits
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case code
+        case numeric
+        case name
+        case symbol
+        case decimalDigits
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let decodedCode = try container.decode(String.self, forKey: .code)
+        code = decodedCode
+        id = decodedCode
+        numeric = try container.decodeIfPresent(String.self, forKey: .numeric)
+        name = try container.decode(String.self, forKey: .name)
+        symbol = try container.decode(String.self, forKey: .symbol)
+        decimalDigits = try container.decode(Int.self, forKey: .decimalDigits)
     }
 }
 
 enum CurrencyList {
-    static let allCurrencies: [Currency] = [
-        Currency(code: "USD", symbol: "$", name: "US Dollar"),
-        Currency(code: "EUR", symbol: "€", name: "Euro"),
-        Currency(code: "GBP", symbol: "£", name: "British Pound"),
-        Currency(code: "TRY", symbol: "₺", name: "Turkish Lira"),
-        Currency(code: "TWD", symbol: "NT$", name: "Taiwan Dollar"),
-        Currency(code: "UAH", symbol: "₴", name: "Ukrainian Hryvnia"),
-        Currency(code: "UYU", symbol: "$", name: "Uruguayan Peso"),
-        Currency(code: "VND", symbol: "₫", name: "Vietnamese Dong"),
-        Currency(code: "XPF", symbol: "CFP", name: "CFP Franc"),
-        // Add more currencies as needed
-    ]
+    private static let currencyFileName = "iso4217"
+    private static let currencyFileExtension = "json"
+    private static let currencyDirectoryName = "Currency"
+
+    static let allCurrencies: [Currency] = loadCurrencies()
+    static let supportedCurrencyCodes: Set<String> = Set(allCurrencies.map(\.code))
 
     static func getCurrency(byCode code: String) -> Currency? {
-        allCurrencies.first { $0.code == code }
+        let uppercasedCode = code.uppercased()
+        return allCurrencies.first { $0.code == uppercasedCode }
     }
 
     static func getSymbol(for code: String) -> String {
         getCurrency(byCode: code)?.symbol ?? code
     }
+
+    static func supports(code: String) -> Bool {
+        supportedCurrencyCodes.contains(code.uppercased())
+    }
+
+    private static func loadCurrencies() -> [Currency] {
+        guard let data = loadCurrenciesData() else {
+            assertionFailure("Currency data file is missing.")
+            return []
+        }
+
+        do {
+            let currencies = try JSONDecoder().decode([Currency].self, from: data)
+            return currencies
+        } catch {
+            assertionFailure("Failed to decode currency data: \(error)")
+            return []
+        }
+    }
+
+    private static func loadCurrenciesData() -> Data? {
+        let bundleCandidates = [Bundle.main, Bundle(for: CurrencyBundleLocator.self)]
+        for bundle in bundleCandidates {
+            if let data = dataFromBundle(bundle) {
+                return data
+            }
+        }
+
+        let fallbackPaths = [
+            "Resources/\(currencyDirectoryName)/\(currencyFileName).\(currencyFileExtension)",
+            "SubZen/Resources/\(currencyDirectoryName)/\(currencyFileName).\(currencyFileExtension)",
+        ]
+
+        for relativePath in fallbackPaths {
+            let url = URL(fileURLWithPath: relativePath, relativeTo: URL(fileURLWithPath: FileManager.default.currentDirectoryPath))
+            if FileManager.default.fileExists(atPath: url.path),
+               let data = try? Data(contentsOf: url)
+            {
+                return data
+            }
+        }
+
+        return nil
+    }
+
+    private static func dataFromBundle(_ bundle: Bundle) -> Data? {
+        let resourceCandidates: [URL?] = [
+            bundle.url(forResource: currencyFileName, withExtension: currencyFileExtension, subdirectory: currencyDirectoryName),
+            bundle.url(forResource: "\(currencyDirectoryName)/\(currencyFileName)", withExtension: currencyFileExtension),
+            bundle.url(forResource: currencyFileName, withExtension: currencyFileExtension),
+        ]
+
+        let fileManager = FileManager.default
+        for candidate in resourceCandidates {
+            guard let url = candidate else { continue }
+            if fileManager.fileExists(atPath: url.path),
+               let data = try? Data(contentsOf: url)
+            {
+                return data
+            }
+        }
+
+    #if DEBUG
+        if let resourceURL = bundle.resourceURL {
+            let debugURL = resourceURL
+                .appendingPathComponent(currencyDirectoryName, isDirectory: true)
+                .appendingPathComponent("\(currencyFileName).\(currencyFileExtension)")
+            if fileManager.fileExists(atPath: debugURL.path),
+               let data = try? Data(contentsOf: debugURL)
+            {
+                return data
+            }
+        }
+    #endif
+
+        return nil
+    }
 }
+
+private final class CurrencyBundleLocator {}

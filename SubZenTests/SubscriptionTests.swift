@@ -20,6 +20,12 @@ final class SubscriptionTests: XCTestCase {
         }
     }
 
+    func testInitValidationUnsupportedCurrencyCode() {
+        XCTAssertThrowsError(try Subscription(name: "Disney+", price: 9.99, cycle: .monthly, lastBillingDate: .now, currencyCode: "ZZZ")) { error in
+            XCTAssertEqual(error as? SubscriptionValidationError, .invalidCurrency)
+        }
+    }
+
     func testInitValidationFutureBillingDate() {
         let future = Date().addingTimeInterval(24 * 60 * 60)
         XCTAssertThrowsError(try Subscription(name: "iCloud", price: 1.0, cycle: .monthly, lastBillingDate: future, currencyCode: "USD")) { error in

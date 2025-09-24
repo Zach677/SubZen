@@ -11,8 +11,64 @@ import UIKit
 class SubscriptionListRowView: UIView {
     func configure(with subscription: Subscription) {
         titleLabel.text = subscription.name
-        priceLabel.text = subscription.formattedPrice
+        let code = subscription.currencyCode.uppercased()
+        let currency = CurrencyList.getCurrency(byCode: code)
+        let decimals = currency?.decimalDigits ?? 2
+        let symbol = currency?.symbol ?? CurrencyList.getSymbol(for: code)
+        let cycleText = subscription.cycle.rawValue
+
+        let amount = SubscriptionListRowView.amountFormatter(for: decimals)
+            .string(from: subscription.price as NSDecimalNumber) ?? "\(subscription.price)"
+
+        let color = priceLabel.textColor ?? .secondaryLabel
+        let priceFont = UIFont.systemFont(ofSize: 16, weight: .semibold)
+        let metaFont = UIFont.systemFont(ofSize: 12, weight: .regular)
+        let prefixAttributes: [NSAttributedString.Key: Any] = [
+            .font: metaFont,
+            .foregroundColor: color.withAlphaComponent(0.7),
+        ]
+
+        let attributed = NSMutableAttributedString(
+            string: "\(code) \(symbol) ",
+            attributes: prefixAttributes
+        )
+        attributed.append(
+            NSAttributedString(
+                string: amount,
+                attributes: [
+                    .font: priceFont,
+                    .foregroundColor: color,
+                ]
+            )
+        )
+        attributed.append(
+            NSAttributedString(
+                string: " /\(cycleText)",
+                attributes: [
+                    .font: metaFont,
+                    .foregroundColor: color.withAlphaComponent(0.7),
+                ]
+            )
+        )
+
+        priceLabel.attributedText = attributed
+        priceLabel.accessibilityLabel = "\(code) \(symbol) \(amount) per \(cycleText)"
         daysLabel.text = "\(subscription.remainingDays) days left"
+    }
+
+    private static var formatterCache: [Int: NumberFormatter] = [:]
+
+    private static func amountFormatter(for decimalDigits: Int) -> NumberFormatter {
+        if let cached = formatterCache[decimalDigits] {
+            return cached
+        }
+        let formatter = NumberFormatter()
+        formatter.locale = .current
+        formatter.numberStyle = .decimal
+        formatter.minimumFractionDigits = decimalDigits
+        formatter.maximumFractionDigits = decimalDigits
+        formatterCache[decimalDigits] = formatter
+        return formatter
     }
 
     let titleLabel = UILabel().with {

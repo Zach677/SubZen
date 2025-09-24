@@ -7,10 +7,25 @@
 
 import Foundation
 
+enum CurrencyTotalServiceError: LocalizedError {
+    case unsupportedBaseCurrency(String)
+    case unsupportedCurrencies([String])
+
+    var errorDescription: String? {
+        switch self {
+        case let .unsupportedBaseCurrency(code):
+            return "Unsupported base currency: \(code)"
+        case let .unsupportedCurrencies(codes):
+            let joined = codes.sorted().joined(separator: ", ")
+            return "Unsupported currency codes: \(joined)"
+        }
+    }
+}
+
 class CurrencyTotalService: ObservableObject {
     static let shared = CurrencyTotalService()
 
-    @Published var baseCurrency: String = "USD"
+    @Published var baseCurrency: String = ExchangeRateConfig.defaultBaseCurrency.uppercased()
     @Published var isCalculating = false
     @Published var lastCalculationError: Error?
 
@@ -28,6 +43,7 @@ class CurrencyTotalService: ObservableObject {
         lastCalculationError = nil
 
         do {
+            try validateCurrencies(for: subscriptions)
             let rates = try await exchangeRateService.fetchExchangeRates(baseCurrency: baseCurrency)
 
             let total = subscriptions.reduce(Decimal.zero) { total, subscription in
@@ -67,6 +83,7 @@ class CurrencyTotalService: ObservableObject {
         lastCalculationError = nil
 
         do {
+            try validateCurrencies(for: subscriptions)
             let rates = try await exchangeRateService.fetchExchangeRates(baseCurrency: baseCurrency)
 
             let total = subscriptions.reduce(Decimal.zero) { total, subscription in
@@ -102,13 +119,18 @@ class CurrencyTotalService: ObservableObject {
 
     /// Set base currency
     func setBaseCurrency(_ currency: String) {
-        baseCurrency = currency
+        let normalized = normalize(code: currency)
+        guard CurrencyList.supports(code: normalized) else {
+            print("[CurrencyTotalService] Attempted to set unsupported base currency: \(currency)")
+            return
+        }
+        baseCurrency = normalized
         saveBaseCurrency()
     }
 
     /// Reset to default base currency and drop persisted override
     func resetBaseCurrency() {
-        baseCurrency = ExchangeRateConfig.defaultBaseCurrency
+        baseCurrency = ExchangeRateConfig.defaultBaseCurrency.uppercased()
         UserDefaults.standard.removeObject(forKey: "BaseCurrency")
     }
 
@@ -116,12 +138,21 @@ class CurrencyTotalService: ObservableObject {
 
     private func loadBaseCurrency() {
         if let savedCurrency = UserDefaults.standard.string(forKey: "BaseCurrency") {
-            baseCurrency = savedCurrency
+            let normalized = normalize(code: savedCurrency)
+            if CurrencyList.supports(code: normalized) {
+                baseCurrency = normalized
+            } else {
+                print("[CurrencyTotalService] Persisted base currency \(savedCurrency) is not supported. Falling back to default.")
+                baseCurrency = ExchangeRateConfig.defaultBaseCurrency.uppercased()
+                UserDefaults.standard.removeObject(forKey: "BaseCurrency")
+            }
+        } else {
+            baseCurrency = ExchangeRateConfig.defaultBaseCurrency.uppercased()
         }
     }
 
     private func saveBaseCurrency() {
-        UserDefaults.standard.set(baseCurrency, forKey: "BaseCurrency")
+        UserDefaults.standard.set(baseCurrency.uppercased(), forKey: "BaseCurrency")
     }
 
     // MARK: - Utility Methods for Subscriptions Array
@@ -139,5 +170,23 @@ class CurrencyTotalService: ObservableObject {
     /// Check if contains multiple currencies
     func hasMultipleCurrencies(in subscriptions: [Subscription]) -> Bool {
         getUsedCurrencies(from: subscriptions).count > 1
+    }
+
+    private func validateCurrencies(for subscriptions: [Subscription]) throws {
+        let normalizedBase = normalize(code: baseCurrency)
+        guard CurrencyList.supports(code: normalizedBase) else {
+            throw CurrencyTotalServiceError.unsupportedBaseCurrency(normalizedBase)
+        }
+
+        let currencyCodes = Set(subscriptions.map { normalize(code: $0.currencyCode) })
+        let unsupported = currencyCodes.filter { !CurrencyList.supports(code: $0) }
+
+        if !unsupported.isEmpty {
+            throw CurrencyTotalServiceError.unsupportedCurrencies(Array(unsupported))
+        }
+    }
+
+    private func normalize(code: String) -> String {
+        code.uppercased()
     }
 }

@@ -38,6 +38,17 @@ class EditSubscriptionView: UIView {
         $0.autocorrectionType = .no
     }
 
+    let currencyButton = UIButton(type: .system).with {
+        $0.setTitle("Select", for: .normal)
+        $0.titleLabel?.font = .systemFont(ofSize: 15, weight: .medium)
+        $0.contentEdgeInsets = UIEdgeInsets(top: 10, left: 16, bottom: 10, right: 16)
+        $0.layer.cornerRadius = 8
+        $0.layer.borderWidth = 1
+        $0.layer.borderColor = UIColor.separator.cgColor
+        $0.setContentCompressionResistancePriority(.required, for: .horizontal)
+        $0.setContentHuggingPriority(.required, for: .horizontal)
+    }
+
     let cycleLabel = UILabel().with {
         $0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         $0.textColor = .label
@@ -72,11 +83,20 @@ class EditSubscriptionView: UIView {
         $0.addArrangedSubview(nameTextField)
     }
 
+    lazy var priceInputStackView = UIStackView().with {
+        $0.axis = .horizontal
+        $0.spacing = 8
+        $0.alignment = .fill
+        $0.distribution = .fill
+        $0.addArrangedSubview(priceTextField)
+        $0.addArrangedSubview(currencyButton)
+    }
+
     lazy var priceStackView = UIStackView().with {
         $0.axis = .vertical
         $0.spacing = 8
         $0.addArrangedSubview(priceLabel)
-        $0.addArrangedSubview(priceTextField)
+        $0.addArrangedSubview(priceInputStackView)
     }
 
     lazy var cycleStackView = UIStackView().with {
@@ -114,16 +134,40 @@ class EditSubscriptionView: UIView {
         mainStackView.snp.makeConstraints { make in
             make.top.equalTo(self.safeAreaLayoutGuide).offset(24)
             make.leading.equalToSuperview().offset(12)
+            make.trailing.equalToSuperview().offset(-12)
             make.bottom.lessThanOrEqualTo(self.safeAreaLayoutGuide).inset(24)
         }
 
         saveButton.addTarget(self, action: #selector(saveTapped), for: .touchUpInside)
+        currencyButton.addTarget(self, action: #selector(currencyTapped), for: .touchUpInside)
+
+        priceTextField.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        priceTextField.setContentHuggingPriority(.defaultLow, for: .horizontal)
     }
 
     var onSaveTapped: (() -> Void)?
+    var onCurrencyTapped: (() -> Void)?
 
     @objc private func saveTapped() {
         onSaveTapped?()
+    }
+
+    @objc private func currencyTapped() {
+        onCurrencyTapped?()
+    }
+
+    func updateSelectedCurrencyDisplay(with currency: Currency) {
+        let code = currency.code
+        let symbol = currency.symbol
+        var parts: [String] = [currency.name]
+        if symbol.caseInsensitiveCompare(code) != .orderedSame {
+            parts.append(symbol)
+        }
+        parts.append(code)
+
+        let title = parts.joined(separator: " ")
+        currencyButton.setTitle(title, for: .normal)
+        currencyButton.accessibilityLabel = "Selected currency: \(currency.name) \(code)"
     }
 
     @available(*, unavailable)

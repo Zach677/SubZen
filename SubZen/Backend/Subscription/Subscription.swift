@@ -64,13 +64,20 @@ final class Subscription: Codable, Identifiable, Equatable {
         lastBillingDate: Date = .now,
         currencyCode: String = "USD"
     ) throws {
-        try Self.validateInputs(name: name, price: price, lastBillingDate: lastBillingDate, currencyCode: currencyCode)
+        let normalizedCurrencyCode = currencyCode.uppercased()
+
+        try Self.validateInputs(
+            name: name,
+            price: price,
+            lastBillingDate: lastBillingDate,
+            currencyCode: normalizedCurrencyCode
+        )
 
         self.name = name
         self.price = price
         self.cycle = cycle
         self.lastBillingDate = lastBillingDate
-        self.currencyCode = currencyCode
+        self.currencyCode = normalizedCurrencyCode
     }
 
     /// Convenience initializer for existing data migration
@@ -103,6 +110,10 @@ final class Subscription: Codable, Identifiable, Equatable {
         guard currencyCode.count == 3 else {
             throw SubscriptionValidationError.invalidCurrency
         }
+
+        guard CurrencyList.supports(code: currencyCode) else {
+            throw SubscriptionValidationError.invalidCurrency
+        }
     }
 
     enum CodingKeys: String, CodingKey {
@@ -123,7 +134,7 @@ final class Subscription: Codable, Identifiable, Equatable {
         }
 
         lastBillingDate = try container.decode(Date.self, forKey: .lastBillingDate)
-        currencyCode = try container.decode(String.self, forKey: .currencyCode)
+        currencyCode = try container.decode(String.self, forKey: .currencyCode).uppercased()
     }
 
     func encode(to encoder: Encoder) throws {

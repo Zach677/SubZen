@@ -13,9 +13,21 @@ class SubscriptionEditorController: UIViewController {
     private let editSubscriptionView = EditSubscriptionView()
     private let subscriptionManager = SubscriptionManager.shared
     private let editSubscription: Subscription?
+    private var selectedCurrency: Currency
 
     init(subscription: Subscription? = nil) {
         editSubscription = subscription
+        if let subscription,
+           let currency = CurrencyList.getCurrency(byCode: subscription.currencyCode)
+        {
+            selectedCurrency = currency
+        } else if let baseCurrency = CurrencyList.getCurrency(byCode: CurrencyTotalService.shared.baseCurrency) {
+            selectedCurrency = baseCurrency
+        } else if let fallback = CurrencyList.allCurrencies.first {
+            selectedCurrency = fallback
+        } else {
+            selectedCurrency = Currency(code: "USD", numeric: "840", name: "US Dollar", symbol: "$", decimalDigits: 2)
+        }
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -39,8 +51,12 @@ class SubscriptionEditorController: UIViewController {
             editSubscriptionView.datePicker.date = usedSubscription.lastBillingDate
             editSubscriptionView.cycleSegmentedControl.selectedSegmentIndex = cycles.firstIndex(of: usedSubscription.cycle) ?? 2
         }
+        editSubscriptionView.updateSelectedCurrencyDisplay(with: selectedCurrency)
         editSubscriptionView.onSaveTapped = { [weak self] in
             self?.handleSave()
+        }
+        editSubscriptionView.onCurrencyTapped = { [weak self] in
+            self?.presentCurrencyPicker()
         }
     }
 
@@ -67,19 +83,44 @@ class SubscriptionEditorController: UIViewController {
 
         do {
             if let editing = editSubscription {
-                subscriptionManager.subscriptionEdit(identifier: editing.id) { usedSubscription in
+                subscriptionManager.subscriptionEdit(identifier: editing.id) { [weak self] usedSubscription in
+                    guard let self else { return }
                     usedSubscription.name = name
                     usedSubscription.price = price
                     usedSubscription.lastBillingDate = date
                     usedSubscription.cycle = cycle
+                    usedSubscription.currencyCode = self.selectedCurrency.code
                 }
             } else {
-                _ = try subscriptionManager.createSubscription(name: name, price: price, cycle: cycle, lastBillingDate: date, currencyCode: "USD")
+                _ = try subscriptionManager.createSubscription(
+                    name: name,
+                    price: price,
+                    cycle: cycle,
+                    lastBillingDate: date,
+                    currencyCode: selectedCurrency.code
+                )
             }
             dismiss(animated: true)
         } catch {
             showAlert(error.localizedDescription)
         }
+    }
+
+    private func presentCurrencyPicker() {
+        let picker = CurrencyPickerController(currencies: CurrencyList.allCurrencies, selectedCode: selectedCurrency.code)
+        picker.onSelectCurrency = { [weak self] currency in
+            self?.selectedCurrency = currency
+            self?.editSubscriptionView.updateSelectedCurrencyDisplay(with: currency)
+        }
+
+        let navigationController = UINavigationController(rootViewController: picker)
+        navigationController.modalPresentationStyle = .pageSheet
+
+        if let sheet = navigationController.sheetPresentationController {
+            sheet.detents = [.medium(), .large()]
+        }
+
+        present(navigationController, animated: true)
     }
 
     private func parsePrice(_ text: String?) -> Decimal? {

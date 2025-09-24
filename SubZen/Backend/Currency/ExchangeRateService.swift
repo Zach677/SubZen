@@ -25,21 +25,26 @@ class ExchangeRateService: ObservableObject {
     func fetchExchangeRates(baseCurrency: String = ExchangeRateConfig.defaultBaseCurrency)
         async throws -> [String: Decimal]
     {
+        let normalizedBase = normalize(code: baseCurrency)
+        guard CurrencyList.supports(code: normalizedBase) else {
+            throw ExchangeRateServiceError.apiError("Unsupported base currency: \(normalizedBase)")
+        }
+
         // 检查内存缓存
-        if let cachedData = memoryCache[baseCurrency], !cachedData.isExpired {
-            print("使用内存缓存的汇率数据 - 基准货币: \(baseCurrency)")
+        if let cachedData = memoryCache[normalizedBase], !cachedData.isExpired {
+            print("使用内存缓存的汇率数据 - 基准货币: \(normalizedBase)")
             return cachedData.rates
         }
 
         // 从网络获取新数据
-        return try await fetchAndCacheExchangeRates(baseCurrency: baseCurrency)
+        return try await fetchAndCacheExchangeRates(baseCurrency: normalizedBase)
     }
 
     /// 强制刷新汇率数据
     func refreshExchangeRates(baseCurrency: String = ExchangeRateConfig.defaultBaseCurrency)
         async throws -> [String: Decimal]
     {
-        try await fetchAndCacheExchangeRates(baseCurrency: baseCurrency)
+        try await fetchAndCacheExchangeRates(baseCurrency: normalize(code: baseCurrency))
     }
 
     /// 从网络获取汇率数据并缓存
@@ -47,12 +52,14 @@ class ExchangeRateService: ObservableObject {
         isLoading = true
         defer { isLoading = false }
 
+        let normalizedBase = normalize(code: baseCurrency)
+
         let urlString = if ExchangeRateConfig.useFreeAPI {
             // 使用免费API
-            "\(ExchangeRateConfig.freeBaseURL)/latest/\(baseCurrency)"
+            "\(ExchangeRateConfig.freeBaseURL)/latest/\(normalizedBase)"
         } else {
             // 使用付费API
-            "\(ExchangeRateConfig.baseURL)/\(ExchangeRateConfig.apiKey)/latest/\(baseCurrency)"
+            "\(ExchangeRateConfig.baseURL)/\(ExchangeRateConfig.apiKey)/latest/\(normalizedBase)"
         }
 
         guard let url = URL(string: urlString) else {
@@ -79,9 +86,9 @@ class ExchangeRateService: ObservableObject {
             let rates = exchangeRateResponse.actualRates
 
             // 缓存数据
-            cacheExchangeRates(rates: rates, baseCurrency: baseCurrency)
+            cacheExchangeRates(rates: rates, baseCurrency: normalizedBase)
 
-            print("从网络获取并缓存汇率数据 - 基准货币: \(baseCurrency)")
+            print("从网络获取并缓存汇率数据 - 基准货币: \(normalizedBase)")
             return rates
         } catch let decodingError as DecodingError {
             print("Decoding error: \(decodingError)")
@@ -101,11 +108,18 @@ class ExchangeRateService: ObservableObject {
     func convertAmount(_ amount: Decimal, from: String, to: String, rates: [String: Decimal])
         -> Decimal
     {
-        if from == to { return amount }
+        let fromCode = normalize(code: from)
+        let toCode = normalize(code: to)
+
+        if fromCode == toCode { return amount }
+
+        guard CurrencyList.supports(code: fromCode), CurrencyList.supports(code: toCode) else {
+            return amount
+        }
 
         // 如果rates是以某个基准货币为基础，需要计算交叉汇率
-        if let toRate = rates[to] {
-            if let fromRate = rates[from] {
+        if let toRate = rates[toCode] {
+            if let fromRate = rates[fromCode] {
                 // 交叉汇率计算
                 return amount * (toRate / fromRate)
             } else {
@@ -124,15 +138,17 @@ class ExchangeRateService: ObservableObject {
         let now = Date()
         let expirationDate = now.addingTimeInterval(ExchangeRateConfig.cacheExpirationTime)
 
+        let normalizedBase = normalize(code: baseCurrency)
+
         let cache = ExchangeRateCache(
             rates: rates,
-            baseCurrency: baseCurrency,
+            baseCurrency: normalizedBase,
             timestamp: now,
             expirationDate: expirationDate
         )
 
         // 存储到内存缓存
-        memoryCache[baseCurrency] = cache
+        memoryCache[normalizedBase] = cache
 
         // 持久化到磁盘
         saveCacheToDisk()
@@ -141,7 +157,7 @@ class ExchangeRateService: ObservableObject {
     /// 清除指定货币的缓存
     func clearCache(for baseCurrency: String? = nil) {
         if let baseCurrency {
-            memoryCache.removeValue(forKey: baseCurrency)
+            memoryCache.removeValue(forKey: normalize(code: baseCurrency))
         } else {
             memoryCache.removeAll()
         }
@@ -150,13 +166,13 @@ class ExchangeRateService: ObservableObject {
 
     /// 检查缓存是否存在且有效
     func isCacheValid(for baseCurrency: String) -> Bool {
-        guard let cache = memoryCache[baseCurrency] else { return false }
+        guard let cache = memoryCache[normalize(code: baseCurrency)] else { return false }
         return !cache.isExpired
     }
 
     /// 获取缓存的时间戳
     func getCacheTimestamp(for baseCurrency: String) -> Date? {
-        memoryCache[baseCurrency]?.timestamp
+        memoryCache[normalize(code: baseCurrency)]?.timestamp
     }
 
     /// 获取所有缓存的基准货币
@@ -166,7 +182,7 @@ class ExchangeRateService: ObservableObject {
 
     /// 获取缓存状态描述
     func getCacheStatusDescription(for baseCurrency: String) -> String {
-        guard let cache = memoryCache[baseCurrency] else {
+        guard let cache = memoryCache[normalize(code: baseCurrency)] else {
             return "无缓存数据"
         }
 
@@ -212,7 +228,8 @@ class ExchangeRateService: ObservableObject {
             // 只加载未过期的缓存
             for cache in caches {
                 if !cache.isExpired {
-                    memoryCache[cache.baseCurrency] = cache
+                    let normalizedBase = normalize(code: cache.baseCurrency)
+                    memoryCache[normalizedBase] = cache
                 }
             }
 
@@ -222,6 +239,10 @@ class ExchangeRateService: ObservableObject {
             // 清除损坏的缓存数据
             UserDefaults.standard.removeObject(forKey: cacheKey)
         }
+    }
+
+    private func normalize(code: String) -> String {
+        code.uppercased()
     }
 }
 
