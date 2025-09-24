@@ -184,9 +184,11 @@ final class Subscription: Codable, Identifiable, Equatable {
         let nextBillingDate = calculateNextBillingDate()
         let currentDate = Date()
 
-        // Calculate days from current date to next billing date
+        // Use startOfDay to avoid truncating partial days when calculating the gap.
         let calendar = Calendar.current
-        let components = calendar.dateComponents([.day], from: currentDate, to: nextBillingDate)
+        let startOfCurrentDay = calendar.startOfDay(for: currentDate)
+        let startOfNextBillingDay = calendar.startOfDay(for: nextBillingDate)
+        let components = calendar.dateComponents([.day], from: startOfCurrentDay, to: startOfNextBillingDay)
 
         // Return 0 if past billing date (needs immediate renewal)
         return max(0, components.day ?? 0)
