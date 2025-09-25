@@ -107,6 +107,7 @@ private final class ResetActionControl: UIControl {
         setup()
     }
 
+    @available(*, unavailable)
     required init?(coder _: NSCoder) {
         fatalError()
     }

@@ -89,7 +89,7 @@ class SubscriptionEditorController: UIViewController {
                     usedSubscription.price = price
                     usedSubscription.lastBillingDate = date
                     usedSubscription.cycle = cycle
-                    usedSubscription.currencyCode = self.selectedCurrency.code
+                    usedSubscription.currencyCode = selectedCurrency.code
                 }
             } else {
                 _ = try subscriptionManager.createSubscription(

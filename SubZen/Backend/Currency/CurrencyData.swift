@@ -145,18 +145,18 @@ enum CurrencyList {
             }
         }
 
-    #if DEBUG
-        if let resourceURL = bundle.resourceURL {
-            let debugURL = resourceURL
-                .appendingPathComponent(currencyDirectoryName, isDirectory: true)
-                .appendingPathComponent("\(currencyFileName).\(currencyFileExtension)")
-            if fileManager.fileExists(atPath: debugURL.path),
-               let data = try? Data(contentsOf: debugURL)
-            {
-                return data
+        #if DEBUG
+            if let resourceURL = bundle.resourceURL {
+                let debugURL = resourceURL
+                    .appendingPathComponent(currencyDirectoryName, isDirectory: true)
+                    .appendingPathComponent("\(currencyFileName).\(currencyFileExtension)")
+                if fileManager.fileExists(atPath: debugURL.path),
+                   let data = try? Data(contentsOf: debugURL)
+                {
+                    return data
+                }
             }
-        }
-    #endif
+        #endif
 
         return nil
     }
@@ -206,6 +206,6 @@ private final class CurrencyBundleLocator {}
 private extension Locale {
     func currencyIdentifierMatches(_ code: String) -> Bool {
         let normalized = code.uppercased()
-            return currency?.identifier.uppercased() == normalized
+        return currency?.identifier.uppercased() == normalized
     }
 }
