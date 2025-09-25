@@ -206,10 +206,6 @@ private final class CurrencyBundleLocator {}
 private extension Locale {
     func currencyIdentifierMatches(_ code: String) -> Bool {
         let normalized = code.uppercased()
-        if #available(iOS 16.0, *) {
             return currency?.identifier.uppercased() == normalized
-        } else {
-            return currencyCode?.uppercased() == normalized
-        }
     }
 }
