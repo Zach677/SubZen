@@ -303,7 +303,7 @@ class EditSubscriptionView: UIView {
 
         [nameTextField, priceTextField].forEach { applyRoundedInputStyle(to: $0) }
 
-        cycleSegmentedControl.selectedSegmentTintColor = UIColor.systemBlue.withAlphaComponent(0.2)
+        cycleSegmentedControl.selectedSegmentTintColor = UIColor.accent.withAlphaComponent(0.22)
         cycleSegmentedControl.backgroundColor = UIColor.secondarySystemBackground.withAlphaComponent(0.7)
         cycleSegmentedControl.layer.cornerRadius = Layout.segmentedCornerRadius
         cycleSegmentedControl.layer.cornerCurve = .continuous
