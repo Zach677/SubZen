@@ -10,6 +10,24 @@ import UIKit
 
 @MainActor
 class EditSubscriptionView: UIView {
+    private enum Layout {
+        static let groupSpacing: CGFloat = 8
+        static let stackSpacing: CGFloat = 20
+        static let textFieldCornerRadius: CGFloat = 18
+        static let textFieldHeight: CGFloat = 52
+        static let textFieldLeftPadding: CGFloat = 16
+        static let textFieldRightPadding: CGFloat = 12
+        static let saveCornerRadius: CGFloat = 28
+        static let saveContentMargins = NSDirectionalEdgeInsets(top: 12, leading: 20, bottom: 20, trailing: 20)
+        static let saveButtonInsets = NSDirectionalEdgeInsets(top: 14, leading: 24, bottom: 14, trailing: 24)
+        static let saveButtonMinHeight: CGFloat = 50
+        static let scrollHorizontalInset: CGFloat = 20
+        static let scrollVerticalInset: CGFloat = 28
+        static let bottomSpacerHeight: CGFloat = 24
+        static let additionalBottomInset: CGFloat = 16
+        static let segmentedCornerRadius: CGFloat = 14
+    }
+
     let nameLabel = UILabel().with {
         $0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         $0.textColor = .label
@@ -94,15 +112,33 @@ class EditSubscriptionView: UIView {
         $0.alwaysBounceVertical = true
         $0.keyboardDismissMode = .interactive
         $0.showsVerticalScrollIndicator = false
+        $0.backgroundColor = .clear
     }
 
-    private let floatingSaveContainer = UIVisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterial)).with {
+    private let floatingSaveContainer = UIView().with {
+        $0.clipsToBounds = false
+        $0.layer.masksToBounds = false
+    }
+
+    private let floatingSaveContentView = UIView().with {
         $0.clipsToBounds = true
-        $0.layer.masksToBounds = true
+        $0.layer.cornerRadius = Layout.saveCornerRadius
+        $0.layer.cornerCurve = .continuous
+        $0.layer.maskedCorners = [
+            .layerMinXMinYCorner, .layerMaxXMinYCorner,
+        ]
+        $0.directionalLayoutMargins = Layout.saveContentMargins
     }
 
-    private let floatingSeparator = UIView().with {
-        $0.backgroundColor = UIColor.separator.withAlphaComponent(0.4)
+    private let floatingSaveBackgroundView = UIVisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterial)).with {
+        $0.clipsToBounds = true
+        $0.layer.cornerRadius = Layout.saveCornerRadius
+        $0.layer.cornerCurve = .continuous
+        $0.layer.maskedCorners = [
+            .layerMinXMinYCorner, .layerMaxXMinYCorner,
+        ]
+        $0.isUserInteractionEnabled = false
+        $0.isHidden = true
     }
 
     private var reduceTransparencyActive = UIAccessibility.isReduceTransparencyEnabled
@@ -110,30 +146,7 @@ class EditSubscriptionView: UIView {
     private var traitChangeRegistrations: [any UITraitChangeRegistration] = []
 
     let saveButton = UIButton(type: .system).with {
-        var configuration = UIButton.Configuration.filled()
-        configuration.cornerStyle = .large
-        configuration.title = "Save"
-        configuration.baseForegroundColor = .tintColor
-        configuration.baseBackgroundColor = UIColor.secondarySystemBackground.withAlphaComponent(0.65)
-        configuration.background.visualEffect = UIBlurEffect(style: .systemUltraThinMaterial)
-        configuration.background.strokeColor = UIColor.separator.withAlphaComponent(0.35)
-        configuration.background.strokeWidth = 1
-        configuration.background.cornerRadius = 24
-        configuration.titleAlignment = .center
-        configuration.contentInsets = NSDirectionalEdgeInsets(top: 16, leading: 22, bottom: 16, trailing: 22)
-        configuration.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
-            var attributes = incoming
-            attributes.font = .systemFont(ofSize: 17, weight: .semibold)
-            return attributes
-        }
-        $0.configuration = configuration
-        $0.layer.cornerRadius = 24
-        $0.layer.cornerCurve = .continuous
-        $0.layer.masksToBounds = false
-        $0.layer.shadowColor = UIColor.black.withAlphaComponent(0.25).cgColor
-        $0.layer.shadowOpacity = 0.22
-        $0.layer.shadowRadius = 18
-        $0.layer.shadowOffset = CGSize(width: 0, height: 8)
+        $0.tintColor = .systemBlue
     }
 
     private let bottomSpacer = UIView().with {
@@ -142,14 +155,14 @@ class EditSubscriptionView: UIView {
 
     lazy var nameStackView = UIStackView().with {
         $0.axis = .vertical
-        $0.spacing = 8
+        $0.spacing = Layout.groupSpacing
         $0.addArrangedSubview(nameLabel)
         $0.addArrangedSubview(nameTextField)
     }
 
     lazy var priceInputStackView = UIStackView().with {
         $0.axis = .horizontal
-        $0.spacing = 8
+        $0.spacing = Layout.groupSpacing
         $0.alignment = .fill
         $0.distribution = .fill
         $0.addArrangedSubview(priceTextField)
@@ -158,21 +171,21 @@ class EditSubscriptionView: UIView {
 
     lazy var priceStackView = UIStackView().with {
         $0.axis = .vertical
-        $0.spacing = 8
+        $0.spacing = Layout.groupSpacing
         $0.addArrangedSubview(priceLabel)
         $0.addArrangedSubview(priceInputStackView)
     }
 
     lazy var cycleStackView = UIStackView().with {
         $0.axis = .vertical
-        $0.spacing = 8
+        $0.spacing = Layout.groupSpacing
         $0.addArrangedSubview(cycleLabel)
         $0.addArrangedSubview(cycleSegmentedControl)
     }
 
     lazy var dateStackView = UIStackView().with {
         $0.axis = .vertical
-        $0.spacing = 8
+        $0.spacing = Layout.groupSpacing
         $0.alignment = .leading
         $0.addArrangedSubview(dateLabel)
         $0.addArrangedSubview(datePicker)
@@ -180,7 +193,7 @@ class EditSubscriptionView: UIView {
 
     lazy var mainStackView = UIStackView().with {
         $0.axis = .vertical
-        $0.spacing = 20
+        $0.spacing = Layout.stackSpacing
         $0.alignment = .fill
         $0.distribution = .fill
         $0.addArrangedSubview(nameStackView)
@@ -193,21 +206,21 @@ class EditSubscriptionView: UIView {
     private func applyRoundedInputStyle(to textField: UITextField) {
         textField.borderStyle = .none
         textField.backgroundColor = UIColor.secondarySystemBackground.withAlphaComponent(0.96)
-        textField.layer.cornerRadius = 18
+        textField.layer.cornerRadius = Layout.textFieldCornerRadius
         textField.layer.cornerCurve = .continuous
         textField.layer.masksToBounds = true
         textField.layer.borderWidth = 1
         textField.layer.borderColor = UIColor.separator.withAlphaComponent(0.18).cgColor
-        textField.heightAnchor.constraint(greaterThanOrEqualToConstant: 52).isActive = true
+        textField.heightAnchor.constraint(greaterThanOrEqualToConstant: Layout.textFieldHeight).isActive = true
         textField.tintColor = .systemBlue
 
         let paddingView = { (width: CGFloat) -> UIView in
             UIView(frame: CGRect(x: 0, y: 0, width: width, height: 0))
         }
 
-        textField.leftView = paddingView(16)
+        textField.leftView = paddingView(Layout.textFieldLeftPadding)
         textField.leftViewMode = .always
-        textField.rightView = paddingView(12)
+        textField.rightView = paddingView(Layout.textFieldRightPadding)
         textField.rightViewMode = .always
 
         if let placeholder = textField.placeholder, !placeholder.isEmpty {
@@ -218,48 +231,113 @@ class EditSubscriptionView: UIView {
         }
     }
 
+    private func configureSaveButton() {
+        if #available(iOS 26.0, *), !reduceTransparencyActive {
+            var configuration = UIButton.Configuration.prominentGlass()
+            configuration.title = "Save"
+            configuration.buttonSize = .large
+            configuration.contentInsets = Layout.saveButtonInsets
+            configuration.baseForegroundColor = .label
+            configuration.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
+                var attributes = incoming
+                attributes.font = .systemFont(ofSize: 17, weight: .semibold)
+                return attributes
+            }
+            saveButton.configuration = configuration
+            saveButton.tintColor = .systemBlue
+        } else {
+            var configuration = UIButton.Configuration.borderedProminent()
+            configuration.title = "Save"
+            configuration.buttonSize = .large
+            configuration.contentInsets = Layout.saveButtonInsets
+            configuration.baseBackgroundColor = .systemBlue
+            configuration.baseForegroundColor = .white
+            configuration.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
+                var attributes = incoming
+                attributes.font = .systemFont(ofSize: 17, weight: .semibold)
+                return attributes
+            }
+            saveButton.configuration = configuration
+            saveButton.tintColor = .systemBlue
+        }
+    }
+
     private func updateMaterialAppearance() {
         let reduceTransparency = UIAccessibility.isReduceTransparencyEnabled
         reduceTransparencyActive = reduceTransparency
 
         if reduceTransparency {
-            floatingSaveContainer.effect = nil
-            floatingSaveContainer.backgroundColor = UIColor.secondarySystemBackground.withAlphaComponent(0.95)
+            let fallbackColor = UIColor.secondarySystemBackground.withAlphaComponent(0.95)
+            floatingSaveBackgroundView.isHidden = false
+            floatingSaveBackgroundView.effect = nil
+            floatingSaveBackgroundView.backgroundColor = fallbackColor
+            floatingSaveBackgroundView.contentView.backgroundColor = fallbackColor
+            floatingSaveContentView.backgroundColor = fallbackColor
         } else {
-            floatingSaveContainer.effect = UIBlurEffect(style: .systemUltraThinMaterial)
-            floatingSaveContainer.backgroundColor = .clear
+            floatingSaveBackgroundView.isHidden = true
+            floatingSaveBackgroundView.effect = nil
+            floatingSaveBackgroundView.backgroundColor = .clear
+            floatingSaveBackgroundView.contentView.backgroundColor = .clear
+            floatingSaveContentView.backgroundColor = .clear
         }
-
-        saveButton.setNeedsUpdateConfiguration()
+        configureSaveButton()
         currencyButton.setNeedsUpdateConfiguration()
     }
 
     init() {
         super.init(frame: .zero)
 
-        backgroundColor = .systemBackground
-        scrollView.backgroundColor = .clear
+        configureView()
+        buildHierarchy()
+        setupConstraints()
+        setupInteractions()
+        registerObservers()
+        updateMaterialAppearance()
+    }
 
+    private func configureView() {
+        backgroundColor = .systemBackground
+
+        priceTextField.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        priceTextField.setContentHuggingPriority(.defaultLow, for: .horizontal)
+
+        [nameTextField, priceTextField].forEach { applyRoundedInputStyle(to: $0) }
+
+        cycleSegmentedControl.selectedSegmentTintColor = UIColor.systemBlue.withAlphaComponent(0.2)
+        cycleSegmentedControl.backgroundColor = UIColor.secondarySystemBackground.withAlphaComponent(0.7)
+        cycleSegmentedControl.layer.cornerRadius = Layout.segmentedCornerRadius
+        cycleSegmentedControl.layer.cornerCurve = .continuous
+        cycleSegmentedControl.layer.masksToBounds = true
+        cycleSegmentedControl.setTitleTextAttributes([
+            .font: UIFont.systemFont(ofSize: 15, weight: .regular),
+            .foregroundColor: UIColor.secondaryLabel,
+        ], for: .normal)
+        cycleSegmentedControl.setTitleTextAttributes([
+            .font: UIFont.systemFont(ofSize: 15, weight: .semibold),
+            .foregroundColor: UIColor.label,
+        ], for: .selected)
+    }
+
+    private func buildHierarchy() {
         addSubview(scrollView)
         addSubview(floatingSaveContainer)
 
         scrollView.addSubview(mainStackView)
-        floatingSaveContainer.contentView.addSubview(floatingSeparator)
-        floatingSaveContainer.contentView.addSubview(saveButton)
+        floatingSaveContainer.addSubview(floatingSaveContentView)
+        floatingSaveContentView.addSubview(floatingSaveBackgroundView)
+        floatingSaveContentView.addSubview(saveButton)
+    }
 
-        floatingSaveContainer.layer.cornerRadius = 28
-        floatingSaveContainer.layer.cornerCurve = .continuous
-        floatingSaveContainer.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-
+    private func setupConstraints() {
         scrollView.snp.makeConstraints { make in
             make.top.leading.trailing.equalToSuperview()
             make.bottom.equalTo(floatingSaveContainer.snp.top)
         }
 
         mainStackView.snp.makeConstraints { make in
-            make.leading.trailing.equalTo(scrollView.frameLayoutGuide).inset(20)
-            make.top.equalTo(scrollView.contentLayoutGuide).offset(28)
-            make.bottom.equalTo(scrollView.contentLayoutGuide).inset(28)
+            make.leading.trailing.equalTo(scrollView.frameLayoutGuide).inset(Layout.scrollHorizontalInset)
+            make.top.equalTo(scrollView.contentLayoutGuide).offset(Layout.scrollVerticalInset)
+            make.bottom.equalTo(scrollView.contentLayoutGuide).inset(Layout.scrollVerticalInset)
         }
 
         floatingSaveContainer.snp.makeConstraints { make in
@@ -267,40 +345,30 @@ class EditSubscriptionView: UIView {
             make.bottom.equalTo(self.keyboardLayoutGuide.snp.top)
         }
 
-        floatingSeparator.snp.makeConstraints { make in
-            make.top.leading.trailing.equalToSuperview()
-            make.height.equalTo(0.5)
+        floatingSaveContentView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+
+        floatingSaveBackgroundView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
         }
 
         saveButton.snp.makeConstraints { make in
-            make.top.equalTo(floatingSaveContainer.contentView.layoutMarginsGuide.snp.top)
-            make.leading.equalTo(floatingSaveContainer.contentView.layoutMarginsGuide.snp.leading)
-            make.trailing.equalTo(floatingSaveContainer.contentView.layoutMarginsGuide.snp.trailing)
-            make.bottom.equalTo(floatingSaveContainer.contentView.layoutMarginsGuide.snp.bottom)
-            make.height.greaterThanOrEqualTo(50)
+            make.top.equalTo(floatingSaveContentView.layoutMarginsGuide.snp.top)
+            make.leading.equalTo(floatingSaveContentView.layoutMarginsGuide.snp.leading)
+            make.trailing.equalTo(floatingSaveContentView.layoutMarginsGuide.snp.trailing)
+            make.bottom.equalTo(floatingSaveContentView.layoutMarginsGuide.snp.bottom)
+            make.height.greaterThanOrEqualTo(Layout.saveButtonMinHeight)
         }
 
+        bottomSpacer.snp.makeConstraints { make in
+            make.height.equalTo(Layout.bottomSpacerHeight)
+        }
+    }
+
+    private func setupInteractions() {
         saveButton.addTarget(self, action: #selector(saveTapped), for: .touchUpInside)
         currencyButton.addTarget(self, action: #selector(currencyTapped), for: .touchUpInside)
-
-        saveButton.configurationUpdateHandler = { [weak self] button in
-            guard var configuration = button.configuration else { return }
-            let reduce = self?.reduceTransparencyActive ?? UIAccessibility.isReduceTransparencyEnabled
-            let isHighlighted = button.isHighlighted
-            let isEnabled = button.isEnabled
-            let foreground = isEnabled ? UIColor.tintColor : UIColor.tertiaryLabel
-            let baseFill = reduce ? UIColor.secondarySystemBackground : UIColor.secondarySystemBackground.withAlphaComponent(0.65)
-            let highlightAdjust: CGFloat = isHighlighted ? 0.8 : 1
-
-            configuration.baseForegroundColor = foreground
-            configuration.baseBackgroundColor = baseFill.withAlphaComponent(reduce ? highlightAdjust : highlightAdjust * 0.9)
-            configuration.background.strokeColor = UIColor.separator.withAlphaComponent(reduce ? 0.5 : (isHighlighted ? 0.4 : 0.35))
-            configuration.background.visualEffect = reduce ? nil : UIBlurEffect(style: .systemUltraThinMaterial)
-
-            button.layer.shadowOpacity = isEnabled ? (reduce ? 0.18 : (isHighlighted ? 0.16 : 0.22)) : 0
-
-            button.configuration = configuration
-        }
 
         currencyButton.configurationUpdateHandler = { [weak self] button in
             guard var configuration = button.configuration else { return }
@@ -320,31 +388,15 @@ class EditSubscriptionView: UIView {
             button.configuration = configuration
         }
 
-        priceTextField.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
-        priceTextField.setContentHuggingPriority(.defaultLow, for: .horizontal)
-
-        [nameTextField, priceTextField].forEach { applyRoundedInputStyle(to: $0) }
-
-        cycleSegmentedControl.selectedSegmentTintColor = UIColor.systemBlue.withAlphaComponent(0.2)
-        cycleSegmentedControl.backgroundColor = UIColor.secondarySystemBackground.withAlphaComponent(0.7)
-        cycleSegmentedControl.layer.cornerRadius = 14
-        cycleSegmentedControl.layer.cornerCurve = .continuous
-        cycleSegmentedControl.layer.masksToBounds = true
-        cycleSegmentedControl.setTitleTextAttributes([
-            .font: UIFont.systemFont(ofSize: 15, weight: .regular),
-            .foregroundColor: UIColor.secondaryLabel,
-        ], for: .normal)
-        cycleSegmentedControl.setTitleTextAttributes([
-            .font: UIFont.systemFont(ofSize: 15, weight: .semibold),
-            .foregroundColor: UIColor.label,
-        ], for: .selected)
-
-        bottomSpacer.snp.makeConstraints { make in
-            make.height.equalTo(24)
+        if #available(iOS 26.0, *) {
+            let interaction = UIScrollEdgeElementContainerInteraction()
+            interaction.scrollView = scrollView
+            interaction.edge = .bottom
+            floatingSaveContainer.addInteraction(interaction)
         }
+    }
 
-        floatingSaveContainer.contentView.directionalLayoutMargins = NSDirectionalEdgeInsets(top: 12, leading: 20, bottom: 20, trailing: 20)
-
+    private func registerObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(handleReduceTransparencyStatusChanged), name: UIAccessibility.reduceTransparencyStatusDidChangeNotification, object: nil)
 
         traitChangeRegistrations.append(registerForTraitChanges([
@@ -353,8 +405,6 @@ class EditSubscriptionView: UIView {
         ]) { (view: EditSubscriptionView, _) in
             view.updateMaterialAppearance()
         })
-
-        updateMaterialAppearance()
     }
 
     var onSaveTapped: (() -> Void)?
@@ -364,16 +414,11 @@ class EditSubscriptionView: UIView {
         super.layoutSubviews()
 
         let containerHeight = floatingSaveContainer.bounds.height
-        let targetInset = containerHeight + 16
+        let targetInset = containerHeight + Layout.additionalBottomInset
 
         if abs(scrollView.contentInset.bottom - targetInset) > 0.5 {
             scrollView.contentInset.bottom = targetInset
             scrollView.verticalScrollIndicatorInsets.bottom = targetInset
-        }
-
-        let shadowPath = UIBezierPath(roundedRect: saveButton.bounds, cornerRadius: saveButton.layer.cornerRadius).cgPath
-        if saveButton.layer.shadowPath == nil || saveButton.layer.shadowPath != shadowPath {
-            saveButton.layer.shadowPath = shadowPath
         }
     }
 
