@@ -245,21 +245,21 @@ class EditSubscriptionView: UIView {
             }
             saveButton.configuration = configuration
             saveButton.tintColor = .accent.withAlphaComponent(0.7)
-				} else {
-						var configuration = UIButton.Configuration.borderedProminent()
-						configuration.title = "Save"
-						configuration.buttonSize = .large
-						configuration.contentInsets = Layout.saveButtonInsets
-						configuration.baseBackgroundColor = .systemBlue
-						configuration.baseForegroundColor = .white
-						configuration.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
-								var attributes = incoming
-								attributes.font = .systemFont(ofSize: 17, weight: .semibold)
-								return attributes
-						}
-						saveButton.configuration = configuration
-						saveButton.tintColor = .accent.withAlphaComponent(0.7)
-				}
+        } else {
+            var configuration = UIButton.Configuration.borderedProminent()
+            configuration.title = "Save"
+            configuration.buttonSize = .large
+            configuration.contentInsets = Layout.saveButtonInsets
+            configuration.baseBackgroundColor = .systemBlue
+            configuration.baseForegroundColor = .white
+            configuration.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
+                var attributes = incoming
+                attributes.font = .systemFont(ofSize: 17, weight: .semibold)
+                return attributes
+            }
+            saveButton.configuration = configuration
+            saveButton.tintColor = .accent.withAlphaComponent(0.7)
+        }
     }
 
     private func updateMaterialAppearance() {
