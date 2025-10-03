@@ -1,27 +1,124 @@
-# Repository Guidelines
+# SubZen Repository Guidelines
+
+## Project Overview
+SubZen is a privacy-first subscription management app for iOS/macOS built with Swift and SwiftUI. The app helps users track subscription renewals, analyze spending, and detect hidden charges with privacy-first design (all data stays on device by default with no sign-up required).
 
 ## Project Structure & Module Organization
-Open `SubZen.xcworkspace` to load all targets. Runtime code lives in `SubZen/`, split into `Application/` (app lifecycle), `Interface/` (SwiftUI), `Backend/` (currency, subscription, notification, settings services), and `BundledResources/` (static payloads). Shared assets, localization, and DevKit scripts sit in `Resources/`. Tests live in `SubZenTests/` with fixtures in `SubZenTests/Support/`.
+- **Workspace**: `SubZen.xcworkspace` contains all targets
+- **Runtime Code** (`SubZen/`):
+  - `Application/` - App lifecycle (SceneDelegate, MainController)
+  - `Interface/` - SwiftUI views and UIKit controllers
+    - `Components/` - Reusable SwiftUI components
+    - `ViewController/` - UIKit view controllers
+  - `Backend/` - Core services
+    - `Subscription/` - Subscription CRUD and management
+    - `Currency/` - Financial calculations and exchange rates
+    - `Notification/` - Reminder and permission services
+    - `Settings/` - App settings and reset functionality
+  - `Extension/` - Platform-specific extensions
+  - `BundledResources/` - Static payloads and assets
+- **Shared Resources** (`Resources/`): Assets, localization, and DevKit scripts
+- **Tests** (`SubZenTests/`): XCTest test suite with fixtures
 
 ## Architecture & Key Services
-Keep domain logic inside the existing services: `SubscriptionManager` drives CRUD and scheduling, `CurrencyTotalService` + `ExchangeRateService` handle financial summaries, `NotificationPermissionService` manages reminders, and `SettingsResetService` wipes local state. Inject dependencies from `SceneDelegate` or SwiftUI environment values instead of inventing new singletons. Fence Catalyst tweaks behind dedicated extensions so views remain platform-agnostic.
+- **SubscriptionManager** (Backend/Subscription/) - Singleton managing subscription CRUD operations, persistence via UserDefaults
+- **CurrencyTotalService** + **ExchangeRateService** - Handle financial summaries and currency conversion
+- **NotificationPermissionService** + **SubscriptionNotificationService** - Manage reminder notifications
+- **SettingsResetService** - Wipes local state
+- **MainController** - Root view controller coordinating between SubscriptionController and Settings
+- **Communication**: NotificationCenter for subscription updates (`.newSubCreated`, `.subscriptionUpdated`)
 
-## Build, Test, and Development Commands
-- `open SubZen.xcworkspace` — launch the shared schemes.
-- `xcodebuild -workspace SubZen.xcworkspace -scheme SubZen -destination 'platform=iOS Simulator,name=iPhone 15' build` — headless smoke build.
-- `xcodebuild -workspace SubZen.xcworkspace -scheme SubZen -destination 'platform=iOS Simulator,name=iPhone 15' test` — run XCTest.
-- `make all` — run the archive pipeline (requires clean git tree, emits `.xcarchive` bundles in `.build/`).
-- `make clean` — drop generated artifacts.
-- `Resources/DevKit/scripts/scan.license.sh` — refresh the license report; pair with `xcbeautify -qq` for cleaner logs.
+**Architecture Principles**:
+- Inject dependencies from SceneDelegate or SwiftUI environment values
+- Keep domain logic within existing services
+- Fence Catalyst tweaks behind dedicated extensions
+- Prefer value types for models, mark classes `final` unless inheritance required
+- Route async work through service types
 
-## Coding Style & Naming Conventions
-Follow Swift API Design Guidelines: 4-space indentation, braces on the same line, `PascalCase` types, `camelCase` members. Use `// MARK:` dividers and extract helpers once files exceed ~150 lines. Prefer value types for models, mark classes `final` unless inheritance is required, and route async work through service types.
+## Development Commands
 
-## Testing Guidelines
-Tests use XCTest. Name files `<Feature>NameTests.swift`, mirror production namespaces, and reuse fixtures in `SubZenTests/Support/`. Run `xcodebuild … test` before opening a PR and capture coverage in Xcode (`Product ▸ Scheme ▸ Test with Coverage`). Note any expected coverage dips in the PR description.
+### Essential Commands
+- `open SubZen.xcworkspace` - Launch development workspace
+- `xcodebuild -workspace SubZen.xcworkspace -scheme SubZen -destination 'platform=iOS Simulator,name=iPhone 15' build` - Headless build verification
+- `xcodebuild -workspace SubZen.xcworkspace -scheme SubZen -destination 'platform=iOS Simulator,name=iPhone 15' test` - Run test suite
+- `make all` - Archive pipeline (requires clean git tree)
+- `make clean` - Remove generated artifacts
 
-## Commit & Pull Request Guidelines
-Commit subjects follow `<type>: <imperative summary>` (e.g., `fix: segmented color`). Group related changes per commit, avoid mixing formatting-only edits with logic, and document migrations. PRs should include a summary, linked issues, simulator or Catalyst screenshots for UI tweaks, the test command run, and manual QA notes when automation is missing.
+### Development Scripts
+- `Resources/DevKit/scripts/scan.license.sh` - Refresh license compliance report
+- `Resources/DevKit/scripts/bump.version.sh` - Version management
+- `Resources/DevKit/scripts/archive.all.sh` - Complete build and archive workflow
 
-## Security & Configuration Tips
-Never commit personal finance data. Keep secrets in the keychain or ignored `.xcconfig` files. When touching currency or notification assets, rerun the relevant DevKit helper to regenerate derived data. Confirm `.gitignore` coverage before adding resources and stick to the archive script so signing and version bumps stay consistent.
+## Coding Standards
+
+### Swift Style Guidelines
+- Follow Swift API Design Guidelines
+- 4-space indentation, braces on same line
+- `PascalCase` for types, `camelCase` for members
+- Use `// MARK:` dividers for code organization
+- Extract helpers when files exceed ~150 lines
+- Route async work through service types
+
+### File Organization
+- Name test files `<Feature>NameTests.swift`
+- Mirror production namespaces in test structure
+- Reuse fixtures from `SubZenTests/Support/`
+- Group related functionality in extensions
+
+## Testing & Quality Assurance
+
+### Testing Strategy
+- Use XCTest framework for all tests
+- Run `xcodebuild … test` before opening PRs
+- Capture coverage in Xcode (`Product ▸ Scheme ▸ Test with Coverage`)
+- Document expected coverage dips in PR descriptions
+
+### Test Organization
+- Unit tests for service logic
+- Integration tests for service interactions
+- UI tests for critical user flows
+- Reuse test fixtures to maintain consistency
+
+## Commit & Pull Request Workflow
+
+### Commit Guidelines
+- Format: `<type>: <imperative summary>` (e.g., `fix: segmented color`, `feat: debug notificationcenter`)
+- Group related changes per commit
+- Avoid mixing formatting-only edits with logic changes
+- Document migrations and breaking changes
+
+### Pull Request Requirements
+- **Summary**: Clear description of changes and motivation
+- **Linked Issues**: Reference related issues or tickets
+- **Visual Evidence**: Simulator or Catalyst screenshots for UI changes
+- **Test Results**: Include `xcodebuild … test` command output
+- **QA Notes**: Manual testing steps when automation is insufficient
+
+## Security & Configuration
+
+### Data Security
+- Never commit personal finance data
+- Store secrets in keychain or ignored `.xcconfig` files
+- All user data remains on device by default
+- Validate data sanitization in tests
+
+### Build Configuration
+- Regenerate derived data when modifying currency/notification assets
+- Confirm `.gitignore` coverage before adding resources
+- Use archive script for consistent signing and version management
+- Maintain license compliance with regular scanning
+
+### Platform Considerations
+- Support both iOS and macOS via Catalyst
+- Keep views platform-agnostic when possible
+- Use dedicated extensions for platform-specific behavior
+- Test on both platforms before release
+
+## Agent Integration Guidelines
+
+When working with AI agents in this repository:
+- Reference existing service patterns rather than creating new singletons
+- Follow established notification patterns for inter-component communication
+- Maintain the privacy-first architecture by keeping data local
+- Preserve the clean separation between UI, business logic, and data persistence
+- Test changes on both iOS simulator and macOS Catalyst before committing
