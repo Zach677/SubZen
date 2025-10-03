@@ -10,6 +10,10 @@ import UIKit
 
 protocol SettingViewDelegate: AnyObject {
     func settingViewDidTapReset(_ view: SettingView)
+
+    #if DEBUG
+        func settingViewDidTapDebugNotification(_ view: SettingView)
+    #endif
 }
 
 class SettingView: UIView {
@@ -43,6 +47,15 @@ class SettingView: UIView {
         $0.numberOfLines = 0
     }
 
+    #if DEBUG
+        private lazy var debugNotificationButton = UIButton(type: .system).with {
+            $0.setTitle("Send Test Expriation Notification", for: .normal)
+            $0.setTitleColor(.systemOrange, for: .normal)
+            $0.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: .semibold)
+            $0.contentHorizontalAlignment = .leading
+        }
+    #endif
+
     init() {
         super.init(frame: .zero)
         backgroundColor = .background
@@ -70,6 +83,13 @@ class SettingView: UIView {
             $0.alignment = .fill
         }
 
+        #if DEBUG
+            contentStack.setCustomSpacing(32, after: infoStack)
+
+            debugNotificationButton.addTarget(self, action: #selector(handleDebugNotificationTapped), for: .touchUpInside)
+            contentStack.addArrangedSubview(debugNotificationButton)
+        #endif
+
         separatorView.snp.makeConstraints { make in
             make.height.equalTo(1)
         }
@@ -86,6 +106,12 @@ class SettingView: UIView {
     @objc private func handleResetTapped() {
         delegate?.settingViewDidTapReset(self)
     }
+
+    #if DEBUG
+        @objc private func handleDebugNotificationTapped() {
+            delegate?.settingViewDidTapDebugNotification(self)
+        }
+    #endif
 
     @available(*, unavailable)
     required init?(coder _: NSCoder) {

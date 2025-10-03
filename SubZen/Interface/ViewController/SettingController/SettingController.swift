@@ -10,6 +10,22 @@ import UIKit
 class SettingController: UIViewController {
     private var settingView: SettingView { view as! SettingView }
     private var isResetInProgress = false
+    private let notificationPermissonService: NotificationPermissionService
+    private let subscriptionNotificationScheduler: SubscriptionNotificationScheduling
+
+    init(
+        notificationPermissonService: NotificationPermissionService = .shared,
+        subscriptionNotificationScheduler: SubscriptionNotificationScheduling = SubscriptionNotificationService()
+    ) {
+        self.notificationPermissonService = notificationPermissonService
+        self.subscriptionNotificationScheduler = subscriptionNotificationScheduler
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
+        fatalError()
+    }
 
     override func loadView() {
         view = SettingView()
@@ -79,4 +95,21 @@ extension SettingController: SettingViewDelegate {
     func settingViewDidTapReset(_: SettingView) {
         presentFinalResetPrompt()
     }
+
+    #if DEBUG
+        func settingViewDidTapDebugNotification(_: SettingView) {
+            Task { [notificationPermissonService, subscriptionNotificationScheduler] in
+                if notificationPermissonService.shouldRequestPermission() {
+                    await notificationPermissonService.requestNotificationPermission()
+                }
+
+                do {
+                    try await subscriptionNotificationScheduler.triggerDebugExprirationPreview()
+                    print("[DebugNotification] Expriration preview scheduled.")
+                } catch {
+                    print("[DebugNotification] Failed to schedule preview: \(error)")
+                }
+            }
+        }
+    #endif
 }

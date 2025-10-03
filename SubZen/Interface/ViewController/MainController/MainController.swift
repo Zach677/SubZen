@@ -14,7 +14,12 @@ class MainController: UIViewController {
     }
 
     private let subscriptionController = SubscriptionController()
-    private let settingsController = SettingController()
+    private let notificationPermissonService = NotificationPermissionService.shared
+    private lazy var subscriptionNotificationService = SubscriptionNotificationService()
+    private lazy var settingsController = SettingController(
+        notificationPermissonService: notificationPermissonService,
+        subscriptionNotificationScheduler: subscriptionNotificationService
+    )
     private let settingsContainer = UIView().with {
         $0.backgroundColor = .background
         $0.clipsToBounds = true
