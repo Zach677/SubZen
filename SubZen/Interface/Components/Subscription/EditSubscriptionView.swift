@@ -471,10 +471,10 @@ class EditSubscriptionView: UIView {
     @objc private func reminderCheckboxTapped(_ sender: UIButton) {
         let days = sender.tag
 
-        if selectedReminderIntervals.contains(days) {
-            selectedReminderIntervals.remove(days)
+        if selectedReminderInterval == days {
+            selectedReminderInterval = nil
         } else {
-            selectedReminderIntervals.insert(days)
+            selectedReminderInterval = days
         }
 
         updateReminderCheckboxAppearance()
@@ -483,7 +483,7 @@ class EditSubscriptionView: UIView {
     private func updateReminderCheckboxAppearance() {
         for checkbox in reminderCheckboxes {
             let days = checkbox.tag
-            let isSelected = selectedReminderIntervals.contains(days)
+            let isSelected = selectedReminderInterval == days
             applyReminderOptionAppearance(to: checkbox, isSelected: isSelected)
         }
     }
@@ -532,12 +532,13 @@ class EditSubscriptionView: UIView {
     }
 
     func setReminderIntervals(_ intervals: [Int]) {
-        selectedReminderIntervals = Set(intervals)
+        selectedReminderInterval = intervals.first
         updateReminderCheckboxAppearance()
     }
 
     func getReminderIntervals() -> [Int] {
-        Array(selectedReminderIntervals).sorted()
+        guard let interval = selectedReminderInterval else { return [] }
+        return [interval]
     }
 
     var onSaveTapped: (() -> Void)?
@@ -546,7 +547,7 @@ class EditSubscriptionView: UIView {
     // Reminder interval options
     private let reminderOptions = [1, 3, 7]
     private var reminderCheckboxes: [UIButton] = []
-    private var selectedReminderIntervals: Set<Int> = []
+    private var selectedReminderInterval: Int?
 
     override func layoutSubviews() {
         super.layoutSubviews()
