@@ -48,8 +48,21 @@ class SubscriptionManager {
 
     func subscriptionEdit(identifier: UUID, _ block: @escaping (inout Subscription) -> Void) {
         guard let index = subscriptions.firstIndex(where: { $0.id == identifier }) else { return }
+
+        // Store old reminder intervals to check if they changed
+        let oldReminderIntervals = subscriptions[index].reminderIntervals
+
         block(&subscriptions[index])
         saveSubscriptions()
+
+        // Update notifications if reminder intervals changed
+        let newReminderIntervals = subscriptions[index].reminderIntervals
+        if oldReminderIntervals != newReminderIntervals {
+            Task {
+                await SubscriptionNotificationManager.shared.handleSubscriptionUpdated(subscriptions[index])
+            }
+        }
+
         NotificationCenter.default.post(name: .subscriptionUpdated, object: identifier)
     }
 }

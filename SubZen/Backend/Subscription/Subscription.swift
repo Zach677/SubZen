@@ -66,13 +66,15 @@ final class Subscription: Codable, Identifiable, Equatable {
     var cycle: BillingCycle
     var lastBillingDate: Date
     var currencyCode: String
+    var reminderIntervals: [Int] // Days before expiration to send reminders (e.g., [1, 7, 14])
 
     init(
         name: String = "",
         price: Decimal = 0.0,
         cycle: BillingCycle = .monthly,
         lastBillingDate: Date = .now,
-        currencyCode: String = "USD"
+        currencyCode: String = "USD",
+        reminderIntervals: [Int] = []
     ) throws {
         let normalizedCurrencyCode = currencyCode.uppercased()
 
@@ -88,6 +90,7 @@ final class Subscription: Codable, Identifiable, Equatable {
         self.cycle = cycle
         self.lastBillingDate = lastBillingDate
         self.currencyCode = normalizedCurrencyCode
+        self.reminderIntervals = reminderIntervals
     }
 
     /// Convenience initializer for existing data migration
@@ -96,10 +99,11 @@ final class Subscription: Codable, Identifiable, Equatable {
         price: Decimal = 0.0,
         cycleString: String = "Monthly",
         lastBillingDate: Date = .now,
-        currencyCode: String = "USD"
+        currencyCode: String = "USD",
+        reminderIntervals: [Int] = []
     ) {
         let cycle = BillingCycle(rawValue: cycleString) ?? .monthly
-        try! self.init(name: name, price: price, cycle: cycle, lastBillingDate: lastBillingDate, currencyCode: currencyCode)
+        try! self.init(name: name, price: price, cycle: cycle, lastBillingDate: lastBillingDate, currencyCode: currencyCode, reminderIntervals: reminderIntervals)
     }
 
     /// Input validation
@@ -127,7 +131,7 @@ final class Subscription: Codable, Identifiable, Equatable {
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, name, price, cycle, lastBillingDate, currencyCode
+        case id, name, price, cycle, lastBillingDate, currencyCode, reminderIntervals
     }
 
     required init(from decoder: Decoder) throws {
@@ -145,6 +149,9 @@ final class Subscription: Codable, Identifiable, Equatable {
 
         lastBillingDate = try container.decode(Date.self, forKey: .lastBillingDate)
         currencyCode = try container.decode(String.self, forKey: .currencyCode).uppercased()
+
+        // Handle backward compatibility for reminderIntervals (default to empty array)
+        reminderIntervals = (try? container.decode([Int].self, forKey: .reminderIntervals)) ?? []
     }
 
     func encode(to encoder: Encoder) throws {
@@ -155,6 +162,7 @@ final class Subscription: Codable, Identifiable, Equatable {
         try container.encode(cycle.rawValue, forKey: .cycle) // Encode as string for compatibility
         try container.encode(lastBillingDate, forKey: .lastBillingDate)
         try container.encode(currencyCode, forKey: .currencyCode)
+        try container.encode(reminderIntervals, forKey: .reminderIntervals)
     }
 
     // MARK: - Equatable
@@ -165,7 +173,8 @@ final class Subscription: Codable, Identifiable, Equatable {
             lhs.price == rhs.price &&
             lhs.cycle == rhs.cycle &&
             lhs.lastBillingDate == rhs.lastBillingDate &&
-            lhs.currencyCode == rhs.currencyCode
+            lhs.currencyCode == rhs.currencyCode &&
+            lhs.reminderIntervals == rhs.reminderIntervals
     }
 
     // MARK: - priceLabel formatting

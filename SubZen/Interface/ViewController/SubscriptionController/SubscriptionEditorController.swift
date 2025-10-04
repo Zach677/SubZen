@@ -50,6 +50,7 @@ class SubscriptionEditorController: UIViewController {
             editSubscriptionView.priceTextField.text = NSDecimalNumber(decimal: usedSubscription.price).stringValue
             editSubscriptionView.datePicker.date = usedSubscription.lastBillingDate
             editSubscriptionView.cycleSegmentedControl.selectedSegmentIndex = cycles.firstIndex(of: usedSubscription.cycle) ?? 2
+            editSubscriptionView.setReminderIntervals(usedSubscription.reminderIntervals)
         }
         editSubscriptionView.updateSelectedCurrencyDisplay(with: selectedCurrency)
         editSubscriptionView.onSaveTapped = { [weak self] in
@@ -82,6 +83,8 @@ class SubscriptionEditorController: UIViewController {
         }
 
         do {
+            let reminderIntervals = editSubscriptionView.getReminderIntervals()
+
             if let editing = editSubscription {
                 subscriptionManager.subscriptionEdit(identifier: editing.id) { [weak self] usedSubscription in
                     guard let self else { return }
@@ -90,6 +93,7 @@ class SubscriptionEditorController: UIViewController {
                     usedSubscription.lastBillingDate = date
                     usedSubscription.cycle = cycle
                     usedSubscription.currencyCode = selectedCurrency.code
+                    usedSubscription.reminderIntervals = reminderIntervals
                 }
             } else {
                 _ = try subscriptionManager.createSubscription(
@@ -97,7 +101,8 @@ class SubscriptionEditorController: UIViewController {
                     price: price,
                     cycle: cycle,
                     lastBillingDate: date,
-                    currencyCode: selectedCurrency.code
+                    currencyCode: selectedCurrency.code,
+                    reminderIntervals: reminderIntervals
                 )
             }
             dismiss(animated: true)

@@ -13,14 +13,16 @@ extension SubscriptionManager {
         price: Decimal,
         cycle: BillingCycle,
         lastBillingDate: Date,
-        currencyCode: String
+        currencyCode: String,
+        reminderIntervals: [Int] = []
     ) throws -> Subscription {
         let subscription = try Subscription(
             name: name,
             price: price,
             cycle: cycle,
             lastBillingDate: lastBillingDate,
-            currencyCode: currencyCode
+            currencyCode: currencyCode,
+            reminderIntervals: reminderIntervals
         )
 
         subscriptions.append(subscription)
@@ -28,6 +30,14 @@ extension SubscriptionManager {
 
         print("[+] created a new subscription with: \(subscription.name)")
         NotificationCenter.default.post(name: .newSubCreated, object: subscription.id)
+
+        // Schedule notifications if reminder intervals are set
+        if !reminderIntervals.isEmpty {
+            Task {
+                await SubscriptionNotificationManager.shared.handleSubscriptionCreated(subscription)
+            }
+        }
+
         return subscription
     }
 
@@ -39,11 +49,23 @@ extension SubscriptionManager {
     }
 
     func deleteSubscription(identifier: UUID) {
+        guard let subscription = subscriptions.first(where: { $0.id == identifier }) else { return }
+
+        // Cancel notifications before deleting
+        Task {
+            await SubscriptionNotificationManager.shared.handleSubscriptionDeleted(subscription)
+        }
+
         subscriptions.removeAll { $0.id == identifier }
         saveSubscriptions()
     }
 
     func eraseAll() {
+        // Cancel all notifications before erasing
+        Task {
+            await SubscriptionNotificationManager.shared.cancelAllNotifications()
+        }
+
         subscriptions.removeAll()
         saveSubscriptions()
     }

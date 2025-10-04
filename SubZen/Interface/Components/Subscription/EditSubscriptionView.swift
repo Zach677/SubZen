@@ -26,6 +26,9 @@ class EditSubscriptionView: UIView {
         static let bottomSpacerHeight: CGFloat = 24
         static let additionalBottomInset: CGFloat = 16
         static let segmentedCornerRadius: CGFloat = 14
+        static let reminderChipSpacing: CGFloat = 12
+        static let reminderChipCornerRadius: CGFloat = 18
+        static let reminderChipContentInsets = NSDirectionalEdgeInsets(top: 10, leading: 18, bottom: 10, trailing: 18)
     }
 
     let nameLabel = UILabel().with {
@@ -191,6 +194,14 @@ class EditSubscriptionView: UIView {
         $0.addArrangedSubview(datePicker)
     }
 
+    lazy var reminderChipsStackView = UIStackView().with {
+        $0.axis = .horizontal
+        $0.alignment = .fill
+        $0.distribution = .fillProportionally
+        $0.spacing = Layout.reminderChipSpacing
+        $0.isLayoutMarginsRelativeArrangement = true
+    }
+
     lazy var mainStackView = UIStackView().with {
         $0.axis = .vertical
         $0.spacing = Layout.stackSpacing
@@ -200,6 +211,7 @@ class EditSubscriptionView: UIView {
         $0.addArrangedSubview(priceStackView)
         $0.addArrangedSubview(cycleStackView)
         $0.addArrangedSubview(dateStackView)
+        $0.addArrangedSubview(reminderChipsStackView)
         $0.addArrangedSubview(bottomSpacer)
     }
 
@@ -282,6 +294,7 @@ class EditSubscriptionView: UIView {
         }
         configureSaveButton()
         currencyButton.setNeedsUpdateConfiguration()
+        updateReminderCheckboxAppearance()
     }
 
     init() {
@@ -293,6 +306,7 @@ class EditSubscriptionView: UIView {
         setupInteractions()
         registerObservers()
         updateMaterialAppearance()
+        createReminderCheckboxes()
     }
 
     private func configureView() {
@@ -407,8 +421,132 @@ class EditSubscriptionView: UIView {
         })
     }
 
+    private func createReminderCheckboxes() {
+        reminderChipsStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        reminderCheckboxes.removeAll()
+
+        for days in reminderOptions {
+            let button = makeReminderChipButton(for: days)
+            reminderChipsStackView.addArrangedSubview(button)
+            reminderCheckboxes.append(button)
+        }
+
+        let spacer = UIView()
+        spacer.setContentHuggingPriority(.fittingSizeLevel, for: .horizontal)
+        reminderChipsStackView.addArrangedSubview(spacer)
+
+        updateReminderCheckboxAppearance()
+    }
+
+    private func makeReminderChipButton(for days: Int) -> UIButton {
+        let button = UIButton(type: .system)
+        button.tag = days
+
+        let title = "\(days) day\(days == 1 ? "" : "s")"
+
+        if #available(iOS 26.0, *), !reduceTransparencyActive {
+            var configuration = UIButton.Configuration.glass()
+            configuration.cornerStyle = .capsule
+            configuration.contentInsets = Layout.reminderChipContentInsets
+            configuration.title = title
+            configuration.baseForegroundColor = .label
+            button.configuration = configuration
+        } else {
+            var configuration = UIButton.Configuration.tinted()
+            configuration.cornerStyle = .capsule
+            configuration.contentInsets = Layout.reminderChipContentInsets
+            configuration.title = title
+            configuration.baseForegroundColor = .label
+            configuration.baseBackgroundColor = UIColor.secondarySystemBackground.withAlphaComponent(0.9)
+            button.configuration = configuration
+        }
+
+        button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        button.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
+        button.addTarget(self, action: #selector(reminderCheckboxTapped(_:)), for: .touchUpInside)
+        button.accessibilityLabel = "\(days)-day reminder"
+        return button
+    }
+
+    @objc private func reminderCheckboxTapped(_ sender: UIButton) {
+        let days = sender.tag
+
+        if selectedReminderIntervals.contains(days) {
+            selectedReminderIntervals.remove(days)
+        } else {
+            selectedReminderIntervals.insert(days)
+        }
+
+        updateReminderCheckboxAppearance()
+    }
+
+    private func updateReminderCheckboxAppearance() {
+        for checkbox in reminderCheckboxes {
+            let days = checkbox.tag
+            let isSelected = selectedReminderIntervals.contains(days)
+            applyReminderOptionAppearance(to: checkbox, isSelected: isSelected)
+        }
+    }
+
+    private func applyReminderOptionAppearance(to button: UIButton, isSelected: Bool) {
+        let title = "\(button.tag) day\(button.tag == 1 ? "" : "s")"
+
+        if #available(iOS 26.0, *), !reduceTransparencyActive {
+            var configuration = UIButton.Configuration.glass()
+            configuration.cornerStyle = .capsule
+            configuration.contentInsets = Layout.reminderChipContentInsets
+            configuration.title = title
+            configuration.baseForegroundColor = isSelected ? .label : .secondaryLabel
+
+            var background = configuration.background
+            background.cornerRadius = Layout.reminderChipCornerRadius
+            background.backgroundColor = isSelected ? UIColor.accent.withAlphaComponent(0.2) : UIColor.clear
+            background.strokeColor = UIColor.accent.withAlphaComponent(isSelected ? 0.4 : 0.18)
+            background.strokeWidth = isSelected ? 1.5 : 1
+            configuration.background = background
+
+            button.configuration = configuration
+        } else {
+            var configuration = UIButton.Configuration.tinted()
+            configuration.cornerStyle = .capsule
+            configuration.contentInsets = Layout.reminderChipContentInsets
+            configuration.title = title
+            configuration.baseForegroundColor = isSelected ? .white : .label
+            configuration.baseBackgroundColor = isSelected ? UIColor.accent : UIColor.secondarySystemBackground.withAlphaComponent(0.92)
+
+            var background = configuration.background
+            background.cornerRadius = Layout.reminderChipCornerRadius
+            background.backgroundColor = configuration.baseBackgroundColor
+            background.strokeColor = UIColor.accent.withAlphaComponent(isSelected ? 0.4 : 0.16)
+            background.strokeWidth = isSelected ? 1.5 : 1
+            configuration.background = background
+
+            button.configuration = configuration
+        }
+
+        if isSelected {
+            button.accessibilityTraits.insert(.selected)
+        } else {
+            button.accessibilityTraits.remove(.selected)
+        }
+    }
+
+    func setReminderIntervals(_ intervals: [Int]) {
+        selectedReminderIntervals = Set(intervals)
+        updateReminderCheckboxAppearance()
+    }
+
+    func getReminderIntervals() -> [Int] {
+        Array(selectedReminderIntervals).sorted()
+    }
+
     var onSaveTapped: (() -> Void)?
     var onCurrencyTapped: (() -> Void)?
+
+    // Reminder interval options
+    private let reminderOptions = [1, 3, 7]
+    private var reminderCheckboxes: [UIButton] = []
+    private var selectedReminderIntervals: Set<Int> = []
 
     override func layoutSubviews() {
         super.layoutSubviews()
