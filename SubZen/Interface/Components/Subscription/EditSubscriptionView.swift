@@ -9,7 +9,7 @@ import SnapKit
 import UIKit
 
 @MainActor
-class EditSubscriptionView: UIView {
+final class EditSubscriptionView: UIView {
     private enum Layout {
         static let groupSpacing: CGFloat = 8
         static let stackSpacing: CGFloat = 20
@@ -17,6 +17,8 @@ class EditSubscriptionView: UIView {
         static let textFieldHeight: CGFloat = 52
         static let textFieldLeftPadding: CGFloat = 16
         static let textFieldRightPadding: CGFloat = 12
+        static let currencyButtonCornerRadius: CGFloat = 18
+        static let currencyButtonContentInsets = NSDirectionalEdgeInsets(top: 12, leading: 18, bottom: 12, trailing: 14)
         static let saveCornerRadius: CGFloat = 28
         static let saveContentMargins = NSDirectionalEdgeInsets(top: 12, leading: 20, bottom: 20, trailing: 20)
         static let saveButtonInsets = NSDirectionalEdgeInsets(top: 14, leading: 24, bottom: 14, trailing: 24)
@@ -30,6 +32,8 @@ class EditSubscriptionView: UIView {
         static let reminderChipCornerRadius: CGFloat = 18
         static let reminderChipContentInsets = NSDirectionalEdgeInsets(top: 10, leading: 18, bottom: 10, trailing: 18)
     }
+
+    private let reminderOptions = [1, 3, 7]
 
     let nameLabel = UILabel().with {
         $0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
@@ -61,28 +65,11 @@ class EditSubscriptionView: UIView {
     }
 
     let currencyButton = UIButton(type: .system).with {
-        var configuration = UIButton.Configuration.tinted()
-        configuration.title = "Select"
-        configuration.cornerStyle = .large
-        configuration.contentInsets = NSDirectionalEdgeInsets(top: 12, leading: 18, bottom: 12, trailing: 14)
-        configuration.titleAlignment = .leading
-        configuration.baseForegroundColor = .label
-        configuration.baseBackgroundColor = UIColor.secondarySystemBackground.withAlphaComponent(0.95)
-        configuration.background.strokeColor = UIColor.separator.withAlphaComponent(0.25)
-        configuration.background.strokeWidth = 1
-        configuration.background.visualEffect = UIBlurEffect(style: .systemChromeMaterial)
-        configuration.imagePlacement = .trailing
-        configuration.imagePadding = 8
-        configuration.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(pointSize: 14, weight: .semibold)
-        configuration.image = UIImage(systemName: "chevron.down")
-        configuration.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
-            var attributes = incoming
-            attributes.font = .systemFont(ofSize: 15, weight: .medium)
-            return attributes
-        }
-        $0.configuration = configuration
+        $0.configuration = EditSubscriptionButtonStyler.makeCurrencyButtonBaseConfiguration(
+            contentInsets: Layout.currencyButtonContentInsets
+        )
         $0.tintColor = .secondaryLabel
-        $0.layer.cornerRadius = 18
+        $0.layer.cornerRadius = Layout.currencyButtonCornerRadius
         $0.layer.cornerCurve = .continuous
         $0.layer.borderWidth = 1
         $0.layer.borderColor = UIColor.separator.withAlphaComponent(0.2).cgColor
@@ -105,6 +92,12 @@ class EditSubscriptionView: UIView {
         $0.text = "Last Billing Date"
     }
 
+    let reminderLabel = UILabel().with {
+        $0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        $0.textColor = .label
+        $0.text = "Remind Me"
+    }
+
     let datePicker = UIDatePicker().with {
         $0.datePickerMode = .date
         $0.preferredDatePickerStyle = .compact
@@ -118,52 +111,24 @@ class EditSubscriptionView: UIView {
         $0.backgroundColor = .clear
     }
 
-    private let floatingSaveContainer = UIView().with {
-        $0.clipsToBounds = false
-        $0.layer.masksToBounds = false
-    }
+    private let floatingSaveBar = FloatingSaveBarView(
+        containerLayoutMargins: Layout.saveContentMargins,
+        buttonContentInsets: Layout.saveButtonInsets,
+        cornerRadius: Layout.saveCornerRadius,
+        minimumButtonHeight: Layout.saveButtonMinHeight
+    )
 
-    private let floatingSaveContentView = UIView().with {
-        $0.clipsToBounds = true
-        $0.layer.cornerRadius = Layout.saveCornerRadius
-        $0.layer.cornerCurve = .continuous
-        $0.layer.maskedCorners = [
-            .layerMinXMinYCorner, .layerMaxXMinYCorner,
-        ]
-        $0.directionalLayoutMargins = Layout.saveContentMargins
-    }
-
-    private let floatingSaveBackgroundView = UIVisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterial)).with {
-        $0.clipsToBounds = true
-        $0.layer.cornerRadius = Layout.saveCornerRadius
-        $0.layer.cornerCurve = .continuous
-        $0.layer.maskedCorners = [
-            .layerMinXMinYCorner, .layerMaxXMinYCorner,
-        ]
-        $0.isUserInteractionEnabled = false
-        $0.isHidden = true
-    }
-
-    private var reduceTransparencyActive = UIAccessibility.isReduceTransparencyEnabled
-
-    private var traitChangeRegistrations: [any UITraitChangeRegistration] = []
-
-    let saveButton = UIButton(type: .system).with {
-        $0.tintColor = .accent
-    }
+    private let reminderPickerView = ReminderChipPickerView(
+        spacing: Layout.reminderChipSpacing,
+        chipContentInsets: Layout.reminderChipContentInsets,
+        chipCornerRadius: Layout.reminderChipCornerRadius
+    )
 
     private let bottomSpacer = UIView().with {
         $0.isUserInteractionEnabled = false
     }
 
-    lazy var nameStackView = UIStackView().with {
-        $0.axis = .vertical
-        $0.spacing = Layout.groupSpacing
-        $0.addArrangedSubview(nameLabel)
-        $0.addArrangedSubview(nameTextField)
-    }
-
-    lazy var priceInputStackView = UIStackView().with {
+    private lazy var priceInputStackView = UIStackView().with {
         $0.axis = .horizontal
         $0.spacing = Layout.groupSpacing
         $0.alignment = .fill
@@ -172,130 +137,29 @@ class EditSubscriptionView: UIView {
         $0.addArrangedSubview(currencyButton)
     }
 
-    lazy var priceStackView = UIStackView().with {
-        $0.axis = .vertical
-        $0.spacing = Layout.groupSpacing
-        $0.addArrangedSubview(priceLabel)
-        $0.addArrangedSubview(priceInputStackView)
-    }
+    private lazy var nameSectionView = makeVerticalFormSection(label: nameLabel, content: nameTextField)
+    private lazy var priceSectionView = makeVerticalFormSection(label: priceLabel, content: priceInputStackView)
+    private lazy var cycleSectionView = makeVerticalFormSection(label: cycleLabel, content: cycleSegmentedControl)
+    private lazy var dateSectionView = makeVerticalFormSection(label: dateLabel, content: datePicker, alignment: .leading)
+    private lazy var reminderSectionView = makeVerticalFormSection(label: reminderLabel, content: reminderPickerView)
 
-    lazy var cycleStackView = UIStackView().with {
-        $0.axis = .vertical
-        $0.spacing = Layout.groupSpacing
-        $0.addArrangedSubview(cycleLabel)
-        $0.addArrangedSubview(cycleSegmentedControl)
-    }
-
-    lazy var dateStackView = UIStackView().with {
-        $0.axis = .vertical
-        $0.spacing = Layout.groupSpacing
-        $0.alignment = .leading
-        $0.addArrangedSubview(dateLabel)
-        $0.addArrangedSubview(datePicker)
-    }
-
-    lazy var reminderChipsStackView = UIStackView().with {
-        $0.axis = .horizontal
-        $0.alignment = .fill
-        $0.distribution = .fillProportionally
-        $0.spacing = Layout.reminderChipSpacing
-        $0.isLayoutMarginsRelativeArrangement = true
-    }
-
-    lazy var mainStackView = UIStackView().with {
+    private lazy var mainStackView = UIStackView().with {
         $0.axis = .vertical
         $0.spacing = Layout.stackSpacing
         $0.alignment = .fill
         $0.distribution = .fill
-        $0.addArrangedSubview(nameStackView)
-        $0.addArrangedSubview(priceStackView)
-        $0.addArrangedSubview(cycleStackView)
-        $0.addArrangedSubview(dateStackView)
-        $0.addArrangedSubview(reminderChipsStackView)
+        $0.addArrangedSubview(nameSectionView)
+        $0.addArrangedSubview(priceSectionView)
+        $0.addArrangedSubview(cycleSectionView)
+        $0.addArrangedSubview(dateSectionView)
+        $0.addArrangedSubview(reminderSectionView)
         $0.addArrangedSubview(bottomSpacer)
     }
 
-    private func applyRoundedInputStyle(to textField: UITextField) {
-        textField.borderStyle = .none
-        textField.backgroundColor = UIColor.secondarySystemBackground.withAlphaComponent(0.96)
-        textField.layer.cornerRadius = Layout.textFieldCornerRadius
-        textField.layer.cornerCurve = .continuous
-        textField.layer.masksToBounds = true
-        textField.layer.borderWidth = 1
-        textField.layer.borderColor = UIColor.separator.withAlphaComponent(0.18).cgColor
-        textField.heightAnchor.constraint(greaterThanOrEqualToConstant: Layout.textFieldHeight).isActive = true
-        textField.tintColor = .systemBlue
+    private var traitChangeRegistrations: [any UITraitChangeRegistration] = []
 
-        let paddingView = { (width: CGFloat) -> UIView in
-            UIView(frame: CGRect(x: 0, y: 0, width: width, height: 0))
-        }
-
-        textField.leftView = paddingView(Layout.textFieldLeftPadding)
-        textField.leftViewMode = .always
-        textField.rightView = paddingView(Layout.textFieldRightPadding)
-        textField.rightViewMode = .always
-
-        if let placeholder = textField.placeholder, !placeholder.isEmpty {
-            textField.attributedPlaceholder = NSAttributedString(string: placeholder, attributes: [
-                .foregroundColor: UIColor.placeholderText,
-                .font: UIFont.systemFont(ofSize: 15, weight: .regular),
-            ])
-        }
-    }
-
-    private func configureSaveButton() {
-        if #available(iOS 26.0, *), !reduceTransparencyActive {
-            var configuration = UIButton.Configuration.prominentGlass()
-            configuration.title = "Save"
-            configuration.buttonSize = .large
-            configuration.contentInsets = Layout.saveButtonInsets
-            configuration.baseForegroundColor = .label
-            configuration.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
-                var attributes = incoming
-                attributes.font = .systemFont(ofSize: 17, weight: .semibold)
-                return attributes
-            }
-            saveButton.configuration = configuration
-            saveButton.tintColor = .accent.withAlphaComponent(0.7)
-        } else {
-            var configuration = UIButton.Configuration.borderedProminent()
-            configuration.title = "Save"
-            configuration.buttonSize = .large
-            configuration.contentInsets = Layout.saveButtonInsets
-            configuration.baseBackgroundColor = .systemBlue
-            configuration.baseForegroundColor = .white
-            configuration.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
-                var attributes = incoming
-                attributes.font = .systemFont(ofSize: 17, weight: .semibold)
-                return attributes
-            }
-            saveButton.configuration = configuration
-            saveButton.tintColor = .accent.withAlphaComponent(0.7)
-        }
-    }
-
-    private func updateMaterialAppearance() {
-        let reduceTransparency = UIAccessibility.isReduceTransparencyEnabled
-        reduceTransparencyActive = reduceTransparency
-
-        if reduceTransparency {
-            let fallbackColor = UIColor.secondarySystemBackground.withAlphaComponent(0.95)
-            floatingSaveBackgroundView.isHidden = false
-            floatingSaveBackgroundView.effect = nil
-            floatingSaveBackgroundView.backgroundColor = fallbackColor
-            floatingSaveBackgroundView.contentView.backgroundColor = fallbackColor
-            floatingSaveContentView.backgroundColor = fallbackColor
-        } else {
-            floatingSaveBackgroundView.isHidden = true
-            floatingSaveBackgroundView.effect = nil
-            floatingSaveBackgroundView.backgroundColor = .clear
-            floatingSaveBackgroundView.contentView.backgroundColor = .clear
-            floatingSaveContentView.backgroundColor = .clear
-        }
-        configureSaveButton()
-        currencyButton.setNeedsUpdateConfiguration()
-        updateReminderCheckboxAppearance()
-    }
+    var onSaveTapped: (() -> Void)?
+    var onCurrencyTapped: (() -> Void)?
 
     init() {
         super.init(frame: .zero)
@@ -305,8 +169,8 @@ class EditSubscriptionView: UIView {
         setupConstraints()
         setupInteractions()
         registerObservers()
+        reminderPickerView.configure(options: reminderOptions)
         updateMaterialAppearance()
-        createReminderCheckboxes()
     }
 
     private func configureView() {
@@ -334,18 +198,15 @@ class EditSubscriptionView: UIView {
 
     private func buildHierarchy() {
         addSubview(scrollView)
-        addSubview(floatingSaveContainer)
+        addSubview(floatingSaveBar)
 
         scrollView.addSubview(mainStackView)
-        floatingSaveContainer.addSubview(floatingSaveContentView)
-        floatingSaveContentView.addSubview(floatingSaveBackgroundView)
-        floatingSaveContentView.addSubview(saveButton)
     }
 
     private func setupConstraints() {
         scrollView.snp.makeConstraints { make in
             make.top.leading.trailing.equalToSuperview()
-            make.bottom.equalTo(floatingSaveContainer.snp.top)
+            make.bottom.equalTo(floatingSaveBar.snp.top)
         }
 
         mainStackView.snp.makeConstraints { make in
@@ -354,25 +215,9 @@ class EditSubscriptionView: UIView {
             make.bottom.equalTo(scrollView.contentLayoutGuide).inset(Layout.scrollVerticalInset)
         }
 
-        floatingSaveContainer.snp.makeConstraints { make in
+        floatingSaveBar.snp.makeConstraints { make in
             make.leading.trailing.equalToSuperview()
-            make.bottom.equalTo(self.keyboardLayoutGuide.snp.top)
-        }
-
-        floatingSaveContentView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-
-        floatingSaveBackgroundView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-
-        saveButton.snp.makeConstraints { make in
-            make.top.equalTo(floatingSaveContentView.layoutMarginsGuide.snp.top)
-            make.leading.equalTo(floatingSaveContentView.layoutMarginsGuide.snp.leading)
-            make.trailing.equalTo(floatingSaveContentView.layoutMarginsGuide.snp.trailing)
-            make.bottom.equalTo(floatingSaveContentView.layoutMarginsGuide.snp.bottom)
-            make.height.greaterThanOrEqualTo(Layout.saveButtonMinHeight)
+            make.bottom.equalTo(keyboardLayoutGuide.snp.top)
         }
 
         bottomSpacer.snp.makeConstraints { make in
@@ -381,178 +226,81 @@ class EditSubscriptionView: UIView {
     }
 
     private func setupInteractions() {
-        saveButton.addTarget(self, action: #selector(saveTapped), for: .touchUpInside)
+        floatingSaveBar.saveButton.addTarget(self, action: #selector(saveTapped), for: .touchUpInside)
         currencyButton.addTarget(self, action: #selector(currencyTapped), for: .touchUpInside)
-
-        currencyButton.configurationUpdateHandler = { [weak self] button in
-            guard var configuration = button.configuration else { return }
-            let reduce = self?.reduceTransparencyActive ?? UIAccessibility.isReduceTransparencyEnabled
-
-            configuration.baseForegroundColor = .label
-            configuration.background.strokeColor = UIColor.separator.withAlphaComponent(reduce ? 0.5 : 0.25)
-
-            if reduce {
-                configuration.baseBackgroundColor = UIColor.secondarySystemBackground
-                configuration.background.visualEffect = nil
-            } else {
-                configuration.baseBackgroundColor = UIColor.secondarySystemBackground.withAlphaComponent(0.95)
-                configuration.background.visualEffect = UIBlurEffect(style: .systemChromeMaterial)
-            }
-
-            button.configuration = configuration
-        }
 
         if #available(iOS 26.0, *) {
             let interaction = UIScrollEdgeElementContainerInteraction()
             interaction.scrollView = scrollView
             interaction.edge = .bottom
-            floatingSaveContainer.addInteraction(interaction)
+            floatingSaveBar.addInteraction(interaction)
         }
     }
 
     private func registerObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(handleReduceTransparencyStatusChanged), name: UIAccessibility.reduceTransparencyStatusDidChangeNotification, object: nil)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleReduceTransparencyStatusChanged),
+            name: UIAccessibility.reduceTransparencyStatusDidChangeNotification,
+            object: nil
+        )
 
-        traitChangeRegistrations.append(registerForTraitChanges([
-            UITraitUserInterfaceStyle.self,
-            UITraitAccessibilityContrast.self,
-        ]) { (view: EditSubscriptionView, _) in
-            view.updateMaterialAppearance()
-        })
+        traitChangeRegistrations.append(
+            registerForTraitChanges([
+                UITraitUserInterfaceStyle.self,
+                UITraitAccessibilityContrast.self,
+            ]) { (view: EditSubscriptionView, _) in
+                view.updateMaterialAppearance()
+            }
+        )
     }
 
-    private func createReminderCheckboxes() {
-        reminderChipsStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
-        reminderCheckboxes.removeAll()
+    private func applyRoundedInputStyle(to textField: UITextField) {
+        textField.borderStyle = .none
+        textField.backgroundColor = UIColor.secondarySystemBackground.withAlphaComponent(0.96)
+        textField.layer.cornerRadius = Layout.textFieldCornerRadius
+        textField.layer.cornerCurve = .continuous
+        textField.layer.masksToBounds = true
+        textField.layer.borderWidth = 1
+        textField.layer.borderColor = UIColor.separator.withAlphaComponent(0.18).cgColor
+        textField.heightAnchor.constraint(greaterThanOrEqualToConstant: Layout.textFieldHeight).isActive = true
+        textField.tintColor = .systemBlue
 
-        for days in reminderOptions {
-            let button = makeReminderChipButton(for: days)
-            reminderChipsStackView.addArrangedSubview(button)
-            reminderCheckboxes.append(button)
+        let paddingView = { (width: CGFloat) -> UIView in
+            UIView(frame: CGRect(x: 0, y: 0, width: width, height: 0))
         }
 
-        let spacer = UIView()
-        spacer.setContentHuggingPriority(.fittingSizeLevel, for: .horizontal)
-        reminderChipsStackView.addArrangedSubview(spacer)
+        textField.leftView = paddingView(Layout.textFieldLeftPadding)
+        textField.leftViewMode = .always
+        textField.rightView = paddingView(Layout.textFieldRightPadding)
+        textField.rightViewMode = .always
 
-        updateReminderCheckboxAppearance()
-    }
-
-    private func makeReminderChipButton(for days: Int) -> UIButton {
-        let button = UIButton(type: .system)
-        button.tag = days
-
-        let title = "\(days) day\(days == 1 ? "" : "s")"
-
-        if #available(iOS 26.0, *), !reduceTransparencyActive {
-            var configuration = UIButton.Configuration.glass()
-            configuration.cornerStyle = .capsule
-            configuration.contentInsets = Layout.reminderChipContentInsets
-            configuration.title = title
-            configuration.baseForegroundColor = .label
-            button.configuration = configuration
-        } else {
-            var configuration = UIButton.Configuration.tinted()
-            configuration.cornerStyle = .capsule
-            configuration.contentInsets = Layout.reminderChipContentInsets
-            configuration.title = title
-            configuration.baseForegroundColor = .label
-            configuration.baseBackgroundColor = UIColor.secondarySystemBackground.withAlphaComponent(0.9)
-            button.configuration = configuration
-        }
-
-        button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-        button.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
-        button.addTarget(self, action: #selector(reminderCheckboxTapped(_:)), for: .touchUpInside)
-        button.accessibilityLabel = "\(days)-day reminder"
-        return button
-    }
-
-    @objc private func reminderCheckboxTapped(_ sender: UIButton) {
-        let days = sender.tag
-
-        if selectedReminderInterval == days {
-            selectedReminderInterval = nil
-        } else {
-            selectedReminderInterval = days
-        }
-
-        updateReminderCheckboxAppearance()
-    }
-
-    private func updateReminderCheckboxAppearance() {
-        for checkbox in reminderCheckboxes {
-            let days = checkbox.tag
-            let isSelected = selectedReminderInterval == days
-            applyReminderOptionAppearance(to: checkbox, isSelected: isSelected)
+        if let placeholder = textField.placeholder, !placeholder.isEmpty {
+            textField.attributedPlaceholder = NSAttributedString(
+                string: placeholder,
+                attributes: [
+                    .foregroundColor: UIColor.placeholderText,
+                    .font: UIFont.systemFont(ofSize: 15, weight: .regular),
+                ]
+            )
         }
     }
 
-    private func applyReminderOptionAppearance(to button: UIButton, isSelected: Bool) {
-        let title = "\(button.tag) day\(button.tag == 1 ? "" : "s")"
-
-        if #available(iOS 26.0, *), !reduceTransparencyActive {
-            var configuration = UIButton.Configuration.glass()
-            configuration.cornerStyle = .capsule
-            configuration.contentInsets = Layout.reminderChipContentInsets
-            configuration.title = title
-            configuration.baseForegroundColor = isSelected ? .label : .secondaryLabel
-
-            var background = configuration.background
-            background.cornerRadius = Layout.reminderChipCornerRadius
-            background.backgroundColor = isSelected ? UIColor.accent.withAlphaComponent(0.2) : UIColor.clear
-            background.strokeColor = UIColor.accent.withAlphaComponent(isSelected ? 0.4 : 0.18)
-            background.strokeWidth = isSelected ? 1.5 : 1
-            configuration.background = background
-
-            button.configuration = configuration
-        } else {
-            var configuration = UIButton.Configuration.tinted()
-            configuration.cornerStyle = .capsule
-            configuration.contentInsets = Layout.reminderChipContentInsets
-            configuration.title = title
-            configuration.baseForegroundColor = isSelected ? .white : .label
-            configuration.baseBackgroundColor = isSelected ? UIColor.accent : UIColor.secondarySystemBackground.withAlphaComponent(0.92)
-
-            var background = configuration.background
-            background.cornerRadius = Layout.reminderChipCornerRadius
-            background.backgroundColor = configuration.baseBackgroundColor
-            background.strokeColor = UIColor.accent.withAlphaComponent(isSelected ? 0.4 : 0.16)
-            background.strokeWidth = isSelected ? 1.5 : 1
-            configuration.background = background
-
-            button.configuration = configuration
-        }
-
-        if isSelected {
-            button.accessibilityTraits.insert(.selected)
-        } else {
-            button.accessibilityTraits.remove(.selected)
-        }
+    private func updateMaterialAppearance() {
+        let reduceTransparency = UIAccessibility.isReduceTransparencyEnabled
+        floatingSaveBar.updateAppearance(reduceTransparencyActive: reduceTransparency)
+        EditSubscriptionButtonStyler.applyCurrencyButtonStyle(
+            to: currencyButton,
+            reduceTransparencyActive: reduceTransparency,
+            contentInsets: Layout.currencyButtonContentInsets
+        )
+        reminderPickerView.updateAppearance(reduceTransparencyActive: reduceTransparency)
     }
-
-    func setReminderIntervals(_ intervals: [Int]) {
-        selectedReminderInterval = intervals.first
-        updateReminderCheckboxAppearance()
-    }
-
-    func getReminderIntervals() -> [Int] {
-        guard let interval = selectedReminderInterval else { return [] }
-        return [interval]
-    }
-
-    var onSaveTapped: (() -> Void)?
-    var onCurrencyTapped: (() -> Void)?
-
-    // Reminder interval options
-    private let reminderOptions = [1, 3, 7]
-    private var reminderCheckboxes: [UIButton] = []
-    private var selectedReminderInterval: Int?
 
     override func layoutSubviews() {
         super.layoutSubviews()
 
-        let containerHeight = floatingSaveContainer.bounds.height
+        let containerHeight = floatingSaveBar.bounds.height
         let targetInset = containerHeight + Layout.additionalBottomInset
 
         if abs(scrollView.contentInset.bottom - targetInset) > 0.5 {
@@ -565,17 +313,21 @@ class EditSubscriptionView: UIView {
         updateMaterialAppearance()
     }
 
-    deinit {
-        NotificationCenter.default.removeObserver(self, name: UIAccessibility.reduceTransparencyStatusDidChangeNotification, object: nil)
-        traitChangeRegistrations.removeAll()
-    }
-
     @objc private func saveTapped() {
         onSaveTapped?()
     }
 
     @objc private func currencyTapped() {
         onCurrencyTapped?()
+    }
+
+    func setReminderIntervals(_ intervals: [Int]) {
+        reminderPickerView.selectedInterval = intervals.first
+    }
+
+    func getReminderIntervals() -> [Int] {
+        guard let interval = reminderPickerView.selectedInterval else { return [] }
+        return [interval]
     }
 
     func updateSelectedCurrencyDisplay(with currency: Currency) {
@@ -586,8 +338,31 @@ class EditSubscriptionView: UIView {
         currencyButton.accessibilityLabel = "Selected currency: \(currency.name) \(code)"
     }
 
+    deinit {
+        NotificationCenter.default.removeObserver(
+            self,
+            name: UIAccessibility.reduceTransparencyStatusDidChangeNotification,
+            object: nil
+        )
+        traitChangeRegistrations.removeAll()
+    }
+
     @available(*, unavailable)
     required init?(coder _: NSCoder) {
         fatalError()
+    }
+
+    private func makeVerticalFormSection(
+        label: UILabel,
+        content: UIView,
+        alignment: UIStackView.Alignment = .fill
+    ) -> UIStackView {
+        UIStackView().with {
+            $0.axis = .vertical
+            $0.spacing = Layout.groupSpacing
+            $0.alignment = alignment
+            $0.addArrangedSubview(label)
+            $0.addArrangedSubview(content)
+        }
     }
 }
