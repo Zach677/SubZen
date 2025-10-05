@@ -100,7 +100,6 @@ enum EditSubscriptionButtonStyler {
         button.configuration = configuration
         button.tintColor = .secondaryLabel
     }
-
 }
 
 enum EditSubscriptionSelectionStyler {

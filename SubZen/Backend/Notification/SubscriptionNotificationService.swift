@@ -131,7 +131,7 @@ class SubscriptionNotificationService: SubscriptionNotificationScheduling {
     /// Cancel all scheduled subscription notifications
     func cancelAllScheduledNotifications() async {
         let pendingRequests = await notificationCenter.pendingNotificationRequests()
-        let subscriptionIdentifiers = pendingRequests.filter { $0.identifier.contains(".expiry.") }.map { $0.identifier }
+        let subscriptionIdentifiers = pendingRequests.filter { $0.identifier.contains(".expiry.") }.map(\.identifier)
 
         if !subscriptionIdentifiers.isEmpty {
             notificationCenter.removePendingNotificationRequests(withIdentifiers: subscriptionIdentifiers)
@@ -142,7 +142,7 @@ class SubscriptionNotificationService: SubscriptionNotificationScheduling {
     /// Cancel notifications for a specific subscription
     func cancelNotifications(for subscription: Subscription) async {
         let pendingRequests = await notificationCenter.pendingNotificationRequests()
-        let subscriptionIdentifiers = pendingRequests.filter { $0.identifier.hasPrefix("\(subscription.id.uuidString).expiry.") }.map { $0.identifier }
+        let subscriptionIdentifiers = pendingRequests.filter { $0.identifier.hasPrefix("\(subscription.id.uuidString).expiry.") }.map(\.identifier)
 
         if !subscriptionIdentifiers.isEmpty {
             notificationCenter.removePendingNotificationRequests(withIdentifiers: subscriptionIdentifiers)
