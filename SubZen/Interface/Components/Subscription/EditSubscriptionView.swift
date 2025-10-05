@@ -28,9 +28,6 @@ final class EditSubscriptionView: UIView {
         static let bottomSpacerHeight: CGFloat = 24
         static let additionalBottomInset: CGFloat = 16
         static let segmentedCornerRadius: CGFloat = 14
-        static let reminderChipSpacing: CGFloat = 12
-        static let reminderChipCornerRadius: CGFloat = 18
-        static let reminderChipContentInsets = NSDirectionalEdgeInsets(top: 10, leading: 18, bottom: 10, trailing: 18)
     }
 
     private let reminderOptions = [1, 3, 7]
@@ -119,9 +116,7 @@ final class EditSubscriptionView: UIView {
     )
 
     private let reminderPickerView = ReminderChipPickerView(
-        spacing: Layout.reminderChipSpacing,
-        chipContentInsets: Layout.reminderChipContentInsets,
-        chipCornerRadius: Layout.reminderChipCornerRadius
+        cornerRadius: Layout.segmentedCornerRadius
     )
 
     private let bottomSpacer = UIView().with {
@@ -180,20 +175,10 @@ final class EditSubscriptionView: UIView {
         priceTextField.setContentHuggingPriority(.defaultLow, for: .horizontal)
 
         [nameTextField, priceTextField].forEach { applyRoundedInputStyle(to: $0) }
-
-        cycleSegmentedControl.selectedSegmentTintColor = UIColor.accent.withAlphaComponent(0.22)
-        cycleSegmentedControl.backgroundColor = UIColor.secondarySystemBackground.withAlphaComponent(0.7)
-        cycleSegmentedControl.layer.cornerRadius = Layout.segmentedCornerRadius
-        cycleSegmentedControl.layer.cornerCurve = .continuous
-        cycleSegmentedControl.layer.masksToBounds = true
-        cycleSegmentedControl.setTitleTextAttributes([
-            .font: UIFont.systemFont(ofSize: 15, weight: .regular),
-            .foregroundColor: UIColor.secondaryLabel,
-        ], for: .normal)
-        cycleSegmentedControl.setTitleTextAttributes([
-            .font: UIFont.systemFont(ofSize: 15, weight: .semibold),
-            .foregroundColor: UIColor.label,
-        ], for: .selected)
+        EditSubscriptionSelectionStyler.configureSegmentedControl(
+            cycleSegmentedControl,
+            cornerRadius: Layout.segmentedCornerRadius
+        )
     }
 
     private func buildHierarchy() {
@@ -293,6 +278,10 @@ final class EditSubscriptionView: UIView {
             to: currencyButton,
             reduceTransparencyActive: reduceTransparency,
             contentInsets: Layout.currencyButtonContentInsets
+        )
+        EditSubscriptionSelectionStyler.applySegmentedStyle(
+            to: cycleSegmentedControl,
+            reduceTransparencyActive: reduceTransparency
         )
         reminderPickerView.updateAppearance(reduceTransparencyActive: reduceTransparency)
     }

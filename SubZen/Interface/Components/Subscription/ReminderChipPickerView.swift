@@ -2,27 +2,19 @@ import SnapKit
 import UIKit
 
 final class ReminderChipPickerView: UIView {
-    private let stackView = UIStackView()
-    private let spacing: CGFloat
-    private let chipContentInsets: NSDirectionalEdgeInsets
-    private let chipCornerRadius: CGFloat
+    private let segmentedControl = UISegmentedControl()
+    private let cornerRadius: CGFloat
 
-    private var buttons: [UIButton] = []
     private var options: [Int] = []
     private var reduceTransparencyActive = UIAccessibility.isReduceTransparencyEnabled
+    private var isProgrammaticSelectionUpdate = false
 
     var selectedInterval: Int? {
-        didSet { updateSelectionAppearance() }
+        didSet { updateSelection() }
     }
 
-    init(
-        spacing: CGFloat,
-        chipContentInsets: NSDirectionalEdgeInsets,
-        chipCornerRadius: CGFloat
-    ) {
-        self.spacing = spacing
-        self.chipContentInsets = chipContentInsets
-        self.chipCornerRadius = chipCornerRadius
+    init(cornerRadius: CGFloat) {
+        self.cornerRadius = cornerRadius
         super.init(frame: .zero)
         configureView()
         buildHierarchy()
@@ -30,19 +22,20 @@ final class ReminderChipPickerView: UIView {
     }
 
     private func configureView() {
-        stackView.axis = .horizontal
-        stackView.alignment = .fill
-        stackView.distribution = .fillProportionally
-        stackView.spacing = spacing
-        stackView.isLayoutMarginsRelativeArrangement = true
+        segmentedControl.selectedSegmentIndex = UISegmentedControl.noSegment
+        segmentedControl.addTarget(self, action: #selector(handleValueChanged(_:)), for: .valueChanged)
+        EditSubscriptionSelectionStyler.configureSegmentedControl(
+            segmentedControl,
+            cornerRadius: cornerRadius
+        )
     }
 
     private func buildHierarchy() {
-        addSubview(stackView)
+        addSubview(segmentedControl)
     }
 
     private func setupConstraints() {
-        stackView.snp.makeConstraints { make in
+        segmentedControl.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
     }
@@ -50,68 +43,58 @@ final class ReminderChipPickerView: UIView {
     func configure(options: [Int]) {
         guard self.options != options else { return }
         self.options = options
-        rebuildButtons()
+
+        segmentedControl.removeAllSegments()
+        for (index, option) in options.enumerated() {
+            segmentedControl.insertSegment(withTitle: Self.title(for: option), at: index, animated: false)
+        }
+
+        if let selected = selectedInterval, !options.contains(selected) {
+            selectedInterval = nil
+        } else {
+            updateSelection()
+        }
+
+        updateAppearance(reduceTransparencyActive: reduceTransparencyActive)
     }
 
     func updateAppearance(reduceTransparencyActive newValue: Bool) {
         reduceTransparencyActive = newValue
-        updateSelectionAppearance()
+        EditSubscriptionSelectionStyler.applySegmentedStyle(
+            to: segmentedControl,
+            reduceTransparencyActive: newValue
+        )
     }
 
-    private func rebuildButtons() {
-        stackView.arrangedSubviews.forEach { view in
-            stackView.removeArrangedSubview(view)
-            view.removeFromSuperview()
+    private func updateSelection() {
+        isProgrammaticSelectionUpdate = true
+        if let selected = selectedInterval, let index = options.firstIndex(of: selected) {
+            segmentedControl.selectedSegmentIndex = index
+        } else {
+            segmentedControl.selectedSegmentIndex = UISegmentedControl.noSegment
         }
-        buttons.removeAll()
+        isProgrammaticSelectionUpdate = false
+    }
 
-        for option in options {
-            let button = makeButton(for: option)
-            stackView.addArrangedSubview(button)
-            buttons.append(button)
+    @objc private func handleValueChanged(_ sender: UISegmentedControl) {
+        guard !isProgrammaticSelectionUpdate else { return }
+
+        let selectedIndex = sender.selectedSegmentIndex
+        guard selectedIndex != UISegmentedControl.noSegment else {
+            selectedInterval = nil
+            return
         }
 
-        let spacer = UIView()
-        spacer.setContentHuggingPriority(.fittingSizeLevel, for: .horizontal)
-        stackView.addArrangedSubview(spacer)
-
-        updateSelectionAppearance()
-    }
-
-    private func makeButton(for days: Int) -> UIButton {
-        let button = UIButton(type: .system)
-        button.tag = days
-        button.accessibilityLabel = "\(days)-day reminder"
-        button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-        button.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
-        button.addTarget(self, action: #selector(handleTap(_:)), for: .touchUpInside)
-        return button
-    }
-
-    private func updateSelectionAppearance() {
-        for button in buttons {
-            let isSelected = button.tag == selectedInterval
-            button.configuration = EditSubscriptionButtonStyler.reminderChipConfiguration(
-                for: button.tag,
-                isSelected: isSelected,
-                reduceTransparencyActive: reduceTransparencyActive,
-                contentInsets: chipContentInsets,
-                cornerRadius: chipCornerRadius
-            )
-            if isSelected {
-                button.accessibilityTraits.insert(.selected)
-            } else {
-                button.accessibilityTraits.remove(.selected)
-            }
-        }
-    }
-
-    @objc private func handleTap(_ sender: UIButton) {
-        if selectedInterval == sender.tag {
+        let value = options[selectedIndex]
+        if selectedInterval == value {
             selectedInterval = nil
         } else {
-            selectedInterval = sender.tag
+            selectedInterval = value
         }
+    }
+
+    private static func title(for days: Int) -> String {
+        "\(days) day\(days == 1 ? "" : "s")"
     }
 
     @available(*, unavailable)

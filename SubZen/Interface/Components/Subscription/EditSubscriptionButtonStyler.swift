@@ -101,44 +101,55 @@ enum EditSubscriptionButtonStyler {
         button.tintColor = .secondaryLabel
     }
 
-    static func reminderChipConfiguration(
-        for days: Int,
-        isSelected: Bool,
-        reduceTransparencyActive: Bool,
-        contentInsets: NSDirectionalEdgeInsets,
-        cornerRadius: CGFloat
-    ) -> UIButton.Configuration {
-        let title = "\(days) day\(days == 1 ? "" : "s")"
+}
 
-        if #available(iOS 26.0, *), !reduceTransparencyActive {
-            var configuration = UIButton.Configuration.glass()
-            configuration.cornerStyle = .capsule
-            configuration.contentInsets = contentInsets
-            configuration.title = title
-            configuration.baseForegroundColor = isSelected ? .label : .secondaryLabel
+enum EditSubscriptionSelectionStyler {
+    struct Palette {
+        let selectedBackgroundColor: UIColor
+        let unselectedBackgroundColor: UIColor
+        let selectedForegroundColor: UIColor
+        let unselectedForegroundColor: UIColor
+    }
 
-            var background = configuration.background
-            background.cornerRadius = cornerRadius
-            background.backgroundColor = isSelected ? UIColor.accent.withAlphaComponent(0.2) : UIColor.clear
-            background.strokeColor = UIColor.accent.withAlphaComponent(isSelected ? 0.4 : 0.18)
-            background.strokeWidth = isSelected ? 1.5 : 1
-            configuration.background = background
-            return configuration
-        } else {
-            var configuration = UIButton.Configuration.tinted()
-            configuration.cornerStyle = .capsule
-            configuration.contentInsets = contentInsets
-            configuration.title = title
-            configuration.baseForegroundColor = isSelected ? .white : .label
-            configuration.baseBackgroundColor = isSelected ? UIColor.accent : UIColor.secondarySystemBackground.withAlphaComponent(0.92)
+    static func palette(reduceTransparencyActive: Bool) -> Palette {
+        let accent = UIColor.accent
+        let selectedBackgroundAlpha: CGFloat = reduceTransparencyActive ? 0.3 : 0.22
+        let unselectedBackgroundAlpha: CGFloat = reduceTransparencyActive ? 1.0 : 0.7
 
-            var background = configuration.background
-            background.cornerRadius = cornerRadius
-            background.backgroundColor = configuration.baseBackgroundColor
-            background.strokeColor = UIColor.accent.withAlphaComponent(isSelected ? 0.4 : 0.16)
-            background.strokeWidth = isSelected ? 1.5 : 1
-            configuration.background = background
-            return configuration
-        }
+        return Palette(
+            selectedBackgroundColor: accent.withAlphaComponent(selectedBackgroundAlpha),
+            unselectedBackgroundColor: UIColor.secondarySystemBackground.withAlphaComponent(unselectedBackgroundAlpha),
+            selectedForegroundColor: .label,
+            unselectedForegroundColor: .secondaryLabel
+        )
+    }
+
+    static func configureSegmentedControl(_ segmentedControl: UISegmentedControl, cornerRadius: CGFloat) {
+        segmentedControl.layer.cornerRadius = cornerRadius
+        segmentedControl.layer.cornerCurve = .continuous
+        segmentedControl.layer.masksToBounds = true
+        segmentedControl.setTitleTextAttributes([
+            .font: UIFont.systemFont(ofSize: 15, weight: .regular),
+        ], for: .normal)
+        segmentedControl.setTitleTextAttributes([
+            .font: UIFont.systemFont(ofSize: 15, weight: .semibold),
+        ], for: .selected)
+    }
+
+    static func applySegmentedStyle(
+        to segmentedControl: UISegmentedControl,
+        reduceTransparencyActive: Bool
+    ) {
+        let palette = palette(reduceTransparencyActive: reduceTransparencyActive)
+        segmentedControl.selectedSegmentTintColor = palette.selectedBackgroundColor
+        segmentedControl.backgroundColor = palette.unselectedBackgroundColor
+        segmentedControl.setTitleTextAttributes([
+            .font: UIFont.systemFont(ofSize: 15, weight: .regular),
+            .foregroundColor: palette.unselectedForegroundColor,
+        ], for: .normal)
+        segmentedControl.setTitleTextAttributes([
+            .font: UIFont.systemFont(ofSize: 15, weight: .semibold),
+            .foregroundColor: palette.selectedForegroundColor,
+        ], for: .selected)
     }
 }
