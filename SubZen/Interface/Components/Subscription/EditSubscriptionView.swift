@@ -28,9 +28,6 @@ final class EditSubscriptionView: UIView {
         static let bottomSpacerHeight: CGFloat = 24
         static let additionalBottomInset: CGFloat = 16
         static let segmentedCornerRadius: CGFloat = 14
-        static let warningCornerRadius: CGFloat = 14
-        static let warningContentInsets = NSDirectionalEdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 14)
-        static let warningSpacing: CGFloat = 10
     }
 
     private let reminderOptions = [1, 3, 7]
@@ -137,40 +134,14 @@ final class EditSubscriptionView: UIView {
         $0.addArrangedSubview(currencyButton)
     }
 
-    private let reminderWarningIconView = UIImageView().with {
-        $0.image = UIImage(systemName: "exclamationmark.triangle.fill")
-        $0.contentMode = .scaleAspectFit
-        $0.tintColor = UIColor.systemOrange
-        $0.setContentHuggingPriority(.required, for: .horizontal)
-        $0.setContentCompressionResistancePriority(.required, for: .horizontal)
-    }
-
-    private let reminderWarningLabel = UILabel().with {
-        $0.font = UIFont.systemFont(ofSize: 14, weight: .regular)
-        $0.textColor = .label
-        $0.numberOfLines = 0
-        $0.text = String(localized: "Enable notifications to receive reminders. Tap to open notification settings.")
-    }
-
-    private lazy var reminderWarningStack = UIStackView(arrangedSubviews: [reminderWarningIconView, reminderWarningLabel]).with {
-        $0.axis = .horizontal
-        $0.spacing = Layout.warningSpacing
-        $0.alignment = .top
-    }
-
-    private lazy var reminderWarningContainer = UIView().with {
-        $0.backgroundColor = UIColor.systemYellow.withAlphaComponent(0.2)
-        $0.layer.cornerRadius = Layout.warningCornerRadius
-        $0.layer.cornerCurve = .continuous
-        $0.isHidden = true
-    }
+    private let reminderBannerView = ReminderPermissionBannerView()
 
     private lazy var reminderContentStack = UIStackView().with {
         $0.axis = .vertical
         $0.spacing = Layout.groupSpacing
         $0.alignment = .fill
         $0.addArrangedSubview(reminderPickerView)
-        $0.addArrangedSubview(reminderWarningContainer)
+        $0.addArrangedSubview(reminderBannerView)
     }
 
     private lazy var nameSectionView = makeVerticalFormSection(label: nameLabel, content: nameTextField)
@@ -197,7 +168,7 @@ final class EditSubscriptionView: UIView {
     var onSaveTapped: (() -> Void)?
     var onCurrencyTapped: (() -> Void)?
     var onReminderSelectionChanged: ((Int?) -> Void)?
-    var onReminderWarningTapped: (() -> Void)?
+    var onReminderBannerTapped: (() -> Void)?
 
     init() {
         super.init(frame: .zero)
@@ -211,24 +182,10 @@ final class EditSubscriptionView: UIView {
         reminderPickerView.onSelectionChanged = { [weak self] selected in
             self?.onReminderSelectionChanged?(selected)
         }
-        configureReminderWarning()
-        updateMaterialAppearance()
-    }
-
-    private func configureReminderWarning() {
-        reminderWarningContainer.isAccessibilityElement = true
-        reminderWarningContainer.accessibilityTraits = [.button]
-        reminderWarningContainer.accessibilityLabel = reminderWarningLabel.text
-        reminderWarningContainer.accessibilityHint = String(localized: "Opens notification settings.")
-
-        reminderWarningContainer.addSubview(reminderWarningStack)
-        reminderWarningStack.snp.makeConstraints { make in
-            make.edges.equalToSuperview().inset(Layout.warningContentInsets)
+        reminderBannerView.onTap = { [weak self] in
+            self?.onReminderBannerTapped?()
         }
-
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleReminderWarningTapped))
-        reminderWarningContainer.addGestureRecognizer(tapGesture)
-        reminderWarningContainer.isUserInteractionEnabled = true
+        updateMaterialAppearance()
     }
 
     private func configureView() {
@@ -373,9 +330,7 @@ final class EditSubscriptionView: UIView {
             reduceTransparencyActive: reduceTransparency
         )
         reminderPickerView.updateAppearance(reduceTransparencyActive: reduceTransparency)
-
-        let warningBackground: UIColor = reduceTransparency ? .systemYellow : UIColor.systemYellow.withAlphaComponent(0.2)
-        reminderWarningContainer.backgroundColor = warningBackground
+        reminderBannerView.updateAppearance(reduceTransparencyActive: reduceTransparency)
     }
 
     override func layoutSubviews() {
@@ -423,17 +378,9 @@ final class EditSubscriptionView: UIView {
         currencyButton.accessibilityLabel = String(localized: "Selected currency: \(currency.name) \(currency.code)")
     }
 
-    func setReminderPermissionWarningVisible(_ isVisible: Bool) {
-        reminderWarningContainer.isHidden = !isVisible
-    }
-
-    func setReminderPermissionWarningMessage(_ message: String) {
-        reminderWarningLabel.text = message
-        reminderWarningContainer.accessibilityLabel = message
-    }
-
-    @objc private func handleReminderWarningTapped() {
-        onReminderWarningTapped?()
+    func updateReminderPermissionBanner(isVisible: Bool, message: String?) {
+        reminderBannerView.update(message: message)
+        reminderBannerView.isHidden = !isVisible
     }
 
     deinit {

@@ -15,13 +15,16 @@ class SubscriptionEditorController: UIViewController {
     private let subscriptionManager = SubscriptionManager.shared
     private let editSubscription: Subscription?
     private let notificationPermissionService: NotificationPermissionService
+    private let reminderPermissionPresenter: ReminderPermissionPresenter
     private var selectedCurrency: Currency
 
     init(
         subscription: Subscription? = nil,
-        notificationPermissionService: NotificationPermissionService = .shared
+        notificationPermissionService: NotificationPermissionService = .shared,
+        reminderPermissionPresenter: ReminderPermissionPresenter? = nil
     ) {
         self.notificationPermissionService = notificationPermissionService
+        self.reminderPermissionPresenter = reminderPermissionPresenter ?? ReminderPermissionPresenter(notificationPermissionService: notificationPermissionService)
         editSubscription = subscription
         if let subscription,
            let currency = CurrencyList.getCurrency(byCode: subscription.currencyCode)
@@ -66,11 +69,11 @@ class SubscriptionEditorController: UIViewController {
         editSubscriptionView.onReminderSelectionChanged = { [weak self] interval in
             self?.handleReminderSelectionChanged(interval)
         }
-        editSubscriptionView.onReminderWarningTapped = { [weak self] in
-            self?.handleReminderWarningTapped()
+        editSubscriptionView.onReminderBannerTapped = { [weak self] in
+            self?.handleReminderBannerTapped()
         }
 
-        updateReminderPermissionWarning()
+        updateReminderPermissionBanner()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -80,7 +83,7 @@ class SubscriptionEditorController: UIViewController {
         Task { [weak self] in
             await Task.yield()
             await MainActor.run {
-                self?.updateReminderPermissionWarning()
+                self?.updateReminderPermissionBanner()
             }
         }
     }
@@ -119,9 +122,8 @@ class SubscriptionEditorController: UIViewController {
 
         let reminderIntervals = editSubscriptionView.getReminderIntervals()
 
-        if !reminderIntervals.isEmpty, notificationPermissionService.shouldRequestPermission() {
+        if reminderPermissionPresenter.shouldRequestPermissionOnSelectionChange(hasReminderSelection: !reminderIntervals.isEmpty) {
             await notificationPermissionService.requestNotificationPermission()
-            updateReminderPermissionWarning()
         }
 
         do {
@@ -150,49 +152,36 @@ class SubscriptionEditorController: UIViewController {
             showAlert(error.localizedDescription)
         }
 
-        updateReminderPermissionWarning()
+        updateReminderPermissionBanner()
     }
 
     @MainActor
     private func handleReminderSelectionChanged(_ interval: Int?) {
-        updateReminderPermissionWarning()
+        let hasSelection = interval != nil
+        updateReminderPermissionBanner()
 
-        guard interval != nil else { return }
-        guard notificationPermissionService.shouldRequestPermission() else { return }
+        guard reminderPermissionPresenter.shouldRequestPermissionOnSelectionChange(hasReminderSelection: hasSelection) else { return }
 
         Task { [notificationPermissionService, weak self] in
             await notificationPermissionService.requestNotificationPermission()
             await MainActor.run {
-                self?.updateReminderPermissionWarning()
+                self?.updateReminderPermissionBanner()
             }
         }
     }
 
     @MainActor
-    private func updateReminderPermissionWarning() {
-        let allowedStatuses: Set<UNAuthorizationStatus> = [.authorized, .provisional, .ephemeral]
+    private func updateReminderPermissionBanner() {
         let hasReminderSelection = !editSubscriptionView.getReminderIntervals().isEmpty
-        let isAuthorized = allowedStatuses.contains(notificationPermissionService.permissionStatus)
-        let shouldShowWarning = hasReminderSelection && notificationPermissionService.hasRequestedPermission && !isAuthorized
-
-        if shouldShowWarning {
-            let message: String
-            switch notificationPermissionService.permissionStatus {
-            case .denied:
-                message = String(localized: "Notifications are turned off. Tap to open notification settings.")
-            case .notDetermined:
-                message = String(localized: "Enable notifications to receive reminders. Tap to open notification settings.")
-            default:
-                message = String(localized: "Enable notifications to receive reminders. Tap to open notification settings.")
-            }
-            editSubscriptionView.setReminderPermissionWarningMessage(message)
-        }
-
-        editSubscriptionView.setReminderPermissionWarningVisible(shouldShowWarning)
+        let viewState = reminderPermissionPresenter.makeViewState(hasReminderSelection: hasReminderSelection)
+        editSubscriptionView.updateReminderPermissionBanner(
+            isVisible: viewState.isBannerVisible,
+            message: viewState.message
+        )
     }
 
     @MainActor
-    private func handleReminderWarningTapped() {
+    private func handleReminderBannerTapped() {
         let application = UIApplication.shared
 
         if let notificationURL = URL(string: UIApplication.openNotificationSettingsURLString),
