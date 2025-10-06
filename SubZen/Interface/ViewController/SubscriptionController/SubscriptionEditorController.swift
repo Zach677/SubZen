@@ -73,21 +73,13 @@ class SubscriptionEditorController: UIViewController {
 
         guard !name.isEmpty else {
             showAlert(
-                String(
-                    localized: "editSubscription.error.emptyName",
-                    defaultValue: "Please enter a valid name.",
-                    comment: "Error message shown when the user leaves the name empty"
-                )
+                String(localized: "editSubscription.error.emptyName")
             )
             return
         }
         guard let price = parsePrice(editSubscriptionView.priceTextField.text) else {
             showAlert(
-                String(
-                    localized: "editSubscription.error.invalidPrice",
-                    defaultValue: "Please enter a valid price.",
-                    comment: "Error message shown when the entered price cannot be parsed"
-                )
+                String(localized: "editSubscription.error.invalidPrice")
             )
             return
         }
@@ -151,21 +143,13 @@ class SubscriptionEditorController: UIViewController {
 
     private func showAlert(_ message: String) {
         let alert = UIAlertController(
-            title: String(
-                localized: "common.error.title",
-                defaultValue: "Error",
-                comment: "Generic error alert title"
-            ),
+            title: String(localized: "common.error.title"),
             message: message,
             preferredStyle: .alert
         )
         alert.addAction(
             UIAlertAction(
-                title: String(
-                    localized: "common.ok",
-                    defaultValue: "OK",
-                    comment: "Default acknowledgement button title"
-                ),
+                title: String(localized: "common.ok"),
                 style: .default
             )
         )

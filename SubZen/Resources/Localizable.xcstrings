@@ -1,0 +1,762 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "billingCycle.name.daily" : {
+      "comment" : "Display name for a daily billing cycle",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Daily"
+          }
+        }
+      }
+    },
+    "billingCycle.name.monthly" : {
+      "comment" : "Display name for a monthly billing cycle",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Monthly"
+          }
+        }
+      }
+    },
+    "billingCycle.name.weekly" : {
+      "comment" : "Display name for a weekly billing cycle",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Weekly"
+          }
+        }
+      }
+    },
+    "billingCycle.name.yearly" : {
+      "comment" : "Display name for a yearly billing cycle",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Yearly"
+          }
+        }
+      }
+    },
+    "billingCycle.unit.daily" : {
+      "comment" : "Singular unit displayed for a daily billing cycle",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "day"
+          }
+        }
+      }
+    },
+    "billingCycle.unit.monthly" : {
+      "comment" : "Singular unit displayed for a monthly billing cycle",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "month"
+          }
+        }
+      }
+    },
+    "billingCycle.unit.weekly" : {
+      "comment" : "Singular unit displayed for a weekly billing cycle",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "week"
+          }
+        }
+      }
+    },
+    "billingCycle.unit.yearly" : {
+      "comment" : "Singular unit displayed for a yearly billing cycle",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "year"
+          }
+        }
+      }
+    },
+    "common.cancel" : {
+      "comment" : "Title for the cancel button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Cancel"
+          }
+        }
+      }
+    },
+    "common.delete" : {
+      "comment" : "Title for the destructive delete button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Delete"
+          }
+        }
+      }
+    },
+    "common.error.title" : {
+      "comment" : "Generic error alert title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Error"
+          }
+        }
+      }
+    },
+    "common.ok" : {
+      "comment" : "Default acknowledgement button title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "OK"
+          }
+        }
+      }
+    },
+    "currencyPicker.search.placeholder" : {
+      "comment" : "Placeholder shown in the currency picker search bar",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Search code or name"
+          }
+        }
+      }
+    },
+    "currencyPicker.title" : {
+      "comment" : "Title for the currency picker screen",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Select Currency"
+          }
+        }
+      }
+    },
+    "editSubscription.currencyButton.accessibility" : {
+      "comment" : "Accessibility label announced after selecting a currency",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Selected currency: %1$@ %2$@"
+          }
+        }
+      }
+    },
+    "editSubscription.currencyButton.selectedTitle" : {
+      "comment" : "Title shown on the currency button once a currency is selected",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@ %3$@"
+          }
+        }
+      }
+    },
+    "editSubscription.currencyButton.title" : {
+      "comment" : "Title shown on the currency selection button before a currency is chosen",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Select"
+          }
+        }
+      }
+    },
+    "editSubscription.cycle.label" : {
+      "comment" : "Label describing the billing cycle segmented control",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Cycle"
+          }
+        }
+      }
+    },
+    "editSubscription.date.label" : {
+      "comment" : "Label describing the last billing date picker",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Last Billing Date"
+          }
+        }
+      }
+    },
+    "editSubscription.error.emptyName" : {
+      "comment" : "Error message shown when the user leaves the name empty",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Please enter a valid name."
+          }
+        }
+      }
+    },
+    "editSubscription.error.invalidPrice" : {
+      "comment" : "Error message shown when the entered price cannot be parsed",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Please enter a valid price."
+          }
+        }
+      }
+    },
+    "editSubscription.name.label" : {
+      "comment" : "Label describing the subscription name text field",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Subscription Name"
+          }
+        }
+      }
+    },
+    "editSubscription.name.placeholder" : {
+      "comment" : "Placeholder shown in the subscription name text field",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Enter subscription name"
+          }
+        }
+      }
+    },
+    "editSubscription.price.label" : {
+      "comment" : "Label describing the subscription price text field",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Price"
+          }
+        }
+      }
+    },
+    "editSubscription.price.placeholder" : {
+      "comment" : "Placeholder shown in the subscription price text field",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Enter price"
+          }
+        }
+      }
+    },
+    "editSubscription.reminder.label" : {
+      "comment" : "Label describing the reminder selection control",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Remind Me"
+          }
+        }
+      }
+    },
+    "editSubscription.reminder.option.generic" : {
+      "comment" : "Fallback reminder option label; placeholder is the number of days before renewal",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%d days before"
+          }
+        }
+      }
+    },
+    "editSubscription.reminder.option.one" : {
+      "comment" : "Label for a reminder option that triggers 1 day before renewal",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "1 day before"
+          }
+        }
+      }
+    },
+    "editSubscription.reminder.option.seven" : {
+      "comment" : "Label for a reminder option that triggers 7 days before renewal",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "7 days before"
+          }
+        }
+      }
+    },
+    "editSubscription.reminder.option.three" : {
+      "comment" : "Label for a reminder option that triggers 3 days before renewal",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "3 days before"
+          }
+        }
+      }
+    },
+    "editSubscription.saveButton.title" : {
+      "comment" : "Title used for the save button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Save"
+          }
+        }
+      }
+    },
+    "notification.subscription.generic.body" : {
+      "comment" : "Generic body for a subscription renewal notification",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ will renew in %2$lld days."
+          }
+        }
+      }
+    },
+    "notification.subscription.generic.title" : {
+      "comment" : "Generic title for a subscription renewal notification",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Subscription Reminder"
+          }
+        }
+      }
+    },
+    "notification.subscription.sevenDays.body" : {
+      "comment" : "Body for a subscription renewal notification scheduled seven days before the billing date",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%@ will renew next week."
+          }
+        }
+      }
+    },
+    "notification.subscription.sevenDays.title" : {
+      "comment" : "Title for a subscription renewal notification scheduled seven days before the billing date",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Subscription Renews Next Week"
+          }
+        }
+      }
+    },
+    "notification.subscription.threeDays.body" : {
+      "comment" : "Body for a subscription renewal notification scheduled three days before the billing date",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%@ will renew in 3 days."
+          }
+        }
+      }
+    },
+    "notification.subscription.threeDays.title" : {
+      "comment" : "Title for a subscription renewal notification scheduled three days before the billing date",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Subscription Renews in 3 Days"
+          }
+        }
+      }
+    },
+    "notification.subscription.tomorrow.body" : {
+      "comment" : "Body for a subscription renewal notification scheduled one day before the billing date",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%@ will renew tomorrow."
+          }
+        }
+      }
+    },
+    "notification.subscription.tomorrow.title" : {
+      "comment" : "Title for a subscription renewal notification scheduled one day before the billing date",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Subscription Renews Tomorrow!"
+          }
+        }
+      }
+    },
+    "notification.subscription.twoWeeks.body" : {
+      "comment" : "Body for a subscription renewal notification scheduled fourteen days before the billing date",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%@ will renew in 2 weeks."
+          }
+        }
+      }
+    },
+    "notification.subscription.twoWeeks.title" : {
+      "comment" : "Title for a subscription renewal notification scheduled fourteen days before the billing date",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Subscription Renews in 2 Weeks"
+          }
+        }
+      }
+    },
+    "settings.debugNotifications" : {
+      "comment" : "Button that triggers debug renewal notification previews",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Send Debug Renewal Notifications"
+          }
+        }
+      }
+    },
+    "settings.reset.accessibility.hint" : {
+      "comment" : "Accessibility hint describing the reset control action",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Resets the application and clears all data."
+          }
+        }
+      }
+    },
+    "settings.reset.accessibility.label" : {
+      "comment" : "Accessibility label for the reset action control",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Reset"
+          }
+        }
+      }
+    },
+    "settings.reset.action.description" : {
+      "comment" : "Description shown beneath the reset action title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "If you encounter any issues, try resetting the app. This removes all content and resets the entire database."
+          }
+        }
+      }
+    },
+    "settings.reset.action.title" : {
+      "comment" : "Title shown inside the reset action control",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Reset"
+          }
+        }
+      }
+    },
+    "settings.reset.confirm" : {
+      "comment" : "Title for the destructive reset confirmation button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Reset"
+          }
+        }
+      }
+    },
+    "settings.reset.failure.title" : {
+      "comment" : "Title shown when the reset operation fails",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Reset Failed"
+          }
+        }
+      }
+    },
+    "settings.reset.prompt.message" : {
+      "comment" : "Message explaining the consequences of performing a full reset",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Tap Reset to erase all data and restart the app."
+          }
+        }
+      }
+    },
+    "settings.reset.prompt.title" : {
+      "comment" : "Title for the alert that confirms a full application reset",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Confirm Reset"
+          }
+        }
+      }
+    },
+    "settings.reset.section.title" : {
+      "comment" : "Title for the settings section that contains the reset controls",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Reset"
+          }
+        }
+      }
+    },
+    "settings.reset.warning" : {
+      "comment" : "Warning message shown beneath the reset controls",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "This action cannot be undone."
+          }
+        }
+      }
+    },
+    "subscription.validation.emptyName" : {
+      "comment" : "Validation error shown when the subscription name is empty",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Subscription name cannot be empty"
+          }
+        }
+      }
+    },
+    "subscription.validation.futureDate" : {
+      "comment" : "Validation error shown when the billing date lies in the future",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Last billing date cannot be in the future"
+          }
+        }
+      }
+    },
+    "subscription.validation.invalidCurrency" : {
+      "comment" : "Validation error shown when the currency code is invalid",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Invalid currency code"
+          }
+        }
+      }
+    },
+    "subscription.validation.negativePrice" : {
+      "comment" : "Validation error shown when the subscription price is invalid",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Subscription price must be greater than 0"
+          }
+        }
+      }
+    },
+    "subscriptions.delete.alert.message" : {
+      "comment" : "Message shown when asking the user to confirm subscription deletion",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Are you sure you want to delete %@?"
+          }
+        }
+      }
+    },
+    "subscriptions.delete.alert.title" : {
+      "comment" : "Title for the delete subscription confirmation alert",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Delete Subscription"
+          }
+        }
+      }
+    },
+    "subscriptions.emptyState.subtitle" : {
+      "comment" : "Subtitle shown when there are no subscriptions",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add your first subscription to get started"
+          }
+        }
+      }
+    },
+    "subscriptions.emptyState.title" : {
+      "comment" : "Title shown when there are no subscriptions",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No Subscriptions"
+          }
+        }
+      }
+    },
+    "subscriptions.row.daysLeft" : {
+      "comment" : "Text describing how many days remain until the subscription renews",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%lld days left"
+          }
+        }
+      }
+    },
+    "subscriptions.row.price.accessibility" : {
+      "comment" : "Accessibility label describing the subscription price and billing cycle",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@ %3$@ per %4$@"
+          }
+        }
+      }
+    },
+    "subscriptions.titleBar.title" : {
+      "comment" : "Title displayed at the top of the subscriptions list",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "SubZen"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.1"
+}

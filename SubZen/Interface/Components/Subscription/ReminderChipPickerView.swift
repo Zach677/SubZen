@@ -96,29 +96,13 @@ final class ReminderChipPickerView: UIView {
     private static func title(for days: Int) -> String {
         switch days {
         case 1:
-            return String(
-                localized: "editSubscription.reminder.option.one",
-                defaultValue: "1 day before",
-                comment: "Label for a reminder option that triggers 1 day before renewal"
-            )
+            return String(localized: "editSubscription.reminder.option.one")
         case 3:
-            return String(
-                localized: "editSubscription.reminder.option.three",
-                defaultValue: "3 days before",
-                comment: "Label for a reminder option that triggers 3 days before renewal"
-            )
+            return String(localized: "editSubscription.reminder.option.three")
         case 7:
-            return String(
-                localized: "editSubscription.reminder.option.seven",
-                defaultValue: "7 days before",
-                comment: "Label for a reminder option that triggers 7 days before renewal"
-            )
+            return String(localized: "editSubscription.reminder.option.seven")
         default:
-            let format = String(
-                localized: "editSubscription.reminder.option.generic",
-                defaultValue: "%d days before",
-                comment: "Fallback reminder option label; placeholder is the number of days before renewal"
-            )
+            let format = String(localized: "editSubscription.reminder.option.generic")
             return String.localizedStringWithFormat(format, days)
         }
     }

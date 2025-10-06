@@ -23,11 +23,7 @@ final class CurrencyPickerController: UITableViewController {
         controller.searchResultsUpdater = self
         controller.searchBar.autocapitalizationType = .allCharacters
         controller.searchBar.autocorrectionType = .no
-        controller.searchBar.placeholder = String(
-            localized: "currencyPicker.search.placeholder",
-            defaultValue: "Search code or name",
-            comment: "Placeholder shown in the currency picker search bar"
-        )
+        controller.searchBar.placeholder = String(localized: "currencyPicker.search.placeholder")
         return controller
     }()
 
@@ -48,11 +44,7 @@ final class CurrencyPickerController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = String(
-            localized: "currencyPicker.title",
-            defaultValue: "Select Currency",
-            comment: "Title for the currency picker screen"
-        )
+        title = String(localized: "currencyPicker.title")
         navigationItem.searchController = searchController
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .close, target: self, action: #selector(handleCloseTapped))
         definesPresentationContext = true

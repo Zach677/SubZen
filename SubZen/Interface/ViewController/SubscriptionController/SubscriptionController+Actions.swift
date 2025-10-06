@@ -19,36 +19,20 @@ extension SubscriptionController {
 
     func deleteSubscription(_ subscription: Subscription) {
         let alert = UIAlertController(
-            title: String(
-                localized: "subscriptions.delete.alert.title",
-                defaultValue: "Delete Subscription",
-                comment: "Title for the delete subscription confirmation alert"
-            ),
-            message: String(
-                localized: "subscriptions.delete.alert.message",
-                defaultValue: "Are you sure you want to delete \(subscription.name)?",
-                comment: "Message shown when asking the user to confirm subscription deletion"
-            ),
+            title: String(localized: "subscriptions.delete.alert.title"),
+            message: String(localized: "subscriptions.delete.alert.message"),
             preferredStyle: .alert
         )
 
         alert.addAction(
             UIAlertAction(
-                title: String(
-                    localized: "common.cancel",
-                    defaultValue: "Cancel",
-                    comment: "Title for the cancel button"
-                ),
+                title: String(localized: "common.cancel"),
                 style: .cancel
             )
         )
         alert.addAction(
             UIAlertAction(
-                title: String(
-                    localized: "common.delete",
-                    defaultValue: "Delete",
-                    comment: "Title for the destructive delete button"
-                ),
+                title: String(localized: "common.delete"),
                 style: .destructive
             ) { [weak self] _ in
                 self?.performDeleteSubscription(subscription)

@@ -32,29 +32,13 @@ enum BillingCycle: String, CaseIterable, Codable {
     var displayUnit: String {
         switch self {
         case .daily:
-            String(
-                localized: "billingCycle.unit.daily",
-                defaultValue: "day",
-                comment: "Singular unit displayed for a daily billing cycle"
-            )
+            String(localized: "billingCycle.unit.daily")
         case .weekly:
-            String(
-                localized: "billingCycle.unit.weekly",
-                defaultValue: "week",
-                comment: "Singular unit displayed for a weekly billing cycle"
-            )
+            String(localized: "billingCycle.unit.weekly")
         case .monthly:
-            String(
-                localized: "billingCycle.unit.monthly",
-                defaultValue: "month",
-                comment: "Singular unit displayed for a monthly billing cycle"
-            )
+            String(localized: "billingCycle.unit.monthly")
         case .yearly:
-            String(
-                localized: "billingCycle.unit.yearly",
-                defaultValue: "year",
-                comment: "Singular unit displayed for a yearly billing cycle"
-            )
+            String(localized: "billingCycle.unit.yearly")
         }
     }
 
@@ -62,29 +46,13 @@ enum BillingCycle: String, CaseIterable, Codable {
     var localizedName: String {
         switch self {
         case .daily:
-            String(
-                localized: "billingCycle.name.daily",
-                defaultValue: "Daily",
-                comment: "Display name for a daily billing cycle"
-            )
+            String(localized: "billingCycle.name.daily")
         case .weekly:
-            String(
-                localized: "billingCycle.name.weekly",
-                defaultValue: "Weekly",
-                comment: "Display name for a weekly billing cycle"
-            )
+            String(localized: "billingCycle.name.weekly")
         case .monthly:
-            String(
-                localized: "billingCycle.name.monthly",
-                defaultValue: "Monthly",
-                comment: "Display name for a monthly billing cycle"
-            )
+            String(localized: "billingCycle.name.monthly")
         case .yearly:
-            String(
-                localized: "billingCycle.name.yearly",
-                defaultValue: "Yearly",
-                comment: "Display name for a yearly billing cycle"
-            )
+            String(localized: "billingCycle.name.yearly")
         }
     }
 }
@@ -100,29 +68,13 @@ enum SubscriptionValidationError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .emptyName:
-            String(
-                localized: "subscription.validation.emptyName",
-                defaultValue: "Subscription name cannot be empty",
-                comment: "Validation error shown when the subscription name is empty"
-            )
+            String(localized: "subscription.validation.emptyName")
         case .negativePriceQuestionablePrice:
-            String(
-                localized: "subscription.validation.negativePrice",
-                defaultValue: "Subscription price must be greater than 0",
-                comment: "Validation error shown when the subscription price is invalid"
-            )
+            String(localized: "subscription.validation.negativePrice")
         case .invalidCurrency:
-            String(
-                localized: "subscription.validation.invalidCurrency",
-                defaultValue: "Invalid currency code",
-                comment: "Validation error shown when the currency code is invalid"
-            )
+            String(localized: "subscription.validation.invalidCurrency")
         case .futureBillingDate:
-            String(
-                localized: "subscription.validation.futureDate",
-                defaultValue: "Last billing date cannot be in the future",
-                comment: "Validation error shown when the billing date lies in the future"
-            )
+            String(localized: "subscription.validation.futureDate")
         }
     }
 }

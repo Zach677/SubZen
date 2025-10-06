@@ -52,33 +52,17 @@ class SettingController: UIViewController {
 
     private func presentFinalResetPrompt() {
         let alert = UIAlertController(
-            title: String(
-                localized: "settings.reset.prompt.title",
-                defaultValue: "Confirm Reset",
-                comment: "Title for the alert that confirms a full application reset"
-            ),
-            message: String(
-                localized: "settings.reset.prompt.message",
-                defaultValue: "Tap Reset to erase all data and restart the app.",
-                comment: "Message explaining the consequences of performing a full reset"
-            ),
+            title: String(localized: "settings.reset.prompt.title"),
+            message: String(localized: "settings.reset.prompt.message"),
             preferredStyle: .alert
         )
 
         let cancel = UIAlertAction(
-            title: String(
-                localized: "common.cancel",
-                defaultValue: "Cancel",
-                comment: "Title for the cancel button"
-            ),
+            title: String(localized: "common.cancel"),
             style: .cancel
         )
         let reset = UIAlertAction(
-            title: String(
-                localized: "settings.reset.confirm",
-                defaultValue: "Reset",
-                comment: "Title for the destructive reset confirmation button"
-            ),
+            title: String(localized: "settings.reset.confirm"),
             style: .destructive
         ) { [weak self] _ in
             self?.performFactoryReset()
@@ -111,21 +95,13 @@ class SettingController: UIViewController {
 
     private func presentResetFailureAlert(error: Error) {
         let alert = UIAlertController(
-            title: String(
-                localized: "settings.reset.failure.title",
-                defaultValue: "Reset Failed",
-                comment: "Title shown when the reset operation fails"
-            ),
+            title: String(localized: "settings.reset.failure.title"),
             message: error.localizedDescription,
             preferredStyle: .alert
         )
         alert.addAction(
             UIAlertAction(
-                title: String(
-                    localized: "common.ok",
-                    defaultValue: "OK",
-                    comment: "Default acknowledgement button title"
-                ),
+                title: String(localized: "common.ok"),
                 style: .default
             )
         )
