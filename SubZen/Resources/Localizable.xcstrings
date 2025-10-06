@@ -1,214 +1,630 @@
 {
-  "sourceLanguage" : "en",
+  "sourceLanguage" : "en", 
   "strings" : {
     "%@ %@ %@" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "new", 
+            "value" : "%1$@ %2$@ %3$@"
+          }
+        }, 
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
             "value" : "%1$@ %2$@ %3$@"
           }
         }
       }
-    },
+    }, 
     "%@ %@ %@ per %@" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "new", 
             "value" : "%1$@ %2$@ %3$@ per %4$@"
+          }
+        }, 
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "%1$@ %2$@ %3$@ \u6bcf %4$@"
           }
         }
       }
-    },
+    }, 
     "%@ will renew in %lld days." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "new", 
             "value" : "%1$@ will renew in %2$lld days."
+          }
+        }, 
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "%1$@ \u5c06\u5728 %2$lld \u5929\u540e\u7eed\u8ba2\u3002"
           }
         }
       }
-    },
+    }, 
     "%@ will renew in 2 weeks." : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "%@ \u5c06\u5728 2 \u5468\u540e\u7eed\u8ba2\u3002"
+          }
+        }
+      }
+    }, 
     "%@ will renew in 3 days." : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "%@ \u5c06\u5728 3 \u5929\u540e\u7eed\u8ba2\u3002"
+          }
+        }
+      }
+    }, 
     "%@ will renew next week." : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "%@ \u5c06\u5728\u4e0b\u5468\u7eed\u8ba2\u3002"
+          }
+        }
+      }
+    }, 
     "%@ will renew tomorrow." : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "%@ \u5c06\u5728\u660e\u5929\u7eed\u8ba2\u3002"
+          }
+        }
+      }
+    }, 
     "%lld days before" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u63d0\u524d %1$lld \u5929"
+          }
+        }
+      }
+    }, 
     "%lld days left" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u5269\u4f59 %1$lld \u5929"
+          }
+        }
+      }
+    }, 
     "1 day before" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u63d0\u524d 1 \u5929"
+          }
+        }
+      }
+    }, 
     "3 days before" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u63d0\u524d 3 \u5929"
+          }
+        }
+      }
+    }, 
     "7 days before" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u63d0\u524d 7 \u5929"
+          }
+        }
+      }
+    }, 
     "Add your first subscription to get started" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u6dfb\u52a0\u7b2c\u4e00\u4e2a\u8ba2\u9605\u5373\u53ef\u5f00\u59cb"
+          }
+        }
+      }
+    }, 
     "Are you sure you want to delete %@?" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u786e\u5b9a\u8981\u5220\u9664 %@ \u5417\uff1f"
+          }
+        }
+      }
+    }, 
     "Cancel" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u53d6\u6d88"
+          }
+        }
+      }
+    }, 
     "Confirm Reset" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u786e\u8ba4\u91cd\u7f6e"
+          }
+        }
+      }
+    }, 
     "Cycle" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u5468\u671f"
+          }
+        }
+      }
+    }, 
     "Daily" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u6bcf\u65e5"
+          }
+        }
+      }
+    }, 
     "day" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u5929"
+          }
+        }
+      }
+    }, 
     "Delete" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u5220\u9664"
+          }
+        }
+      }
+    }, 
     "Delete Subscription" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u5220\u9664\u8ba2\u9605"
+          }
+        }
+      }
+    }, 
     "Enter price" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u8f93\u5165\u4ef7\u683c"
+          }
+        }
+      }
+    }, 
     "Enter subscription name" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u8f93\u5165\u8ba2\u9605\u540d\u79f0"
+          }
+        }
+      }
+    }, 
     "Error" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u9519\u8bef"
+          }
+        }
+      }
+    }, 
     "If you encounter any issues, try resetting the app. This removes all content and resets the entire database." : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u5982\u679c\u9047\u5230\u95ee\u9898\uff0c\u53ef\u5c1d\u8bd5\u91cd\u7f6e\u5e94\u7528\u3002\u8fd9\u5c06\u6e05\u9664\u6240\u6709\u5185\u5bb9\u5e76\u91cd\u5efa\u6574\u4e2a\u6570\u636e\u5e93\u3002"
+          }
+        }
+      }
+    }, 
     "Invalid currency code" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u65e0\u6548\u7684\u8d27\u5e01\u4ee3\u7801"
+          }
+        }
+      }
+    }, 
     "Last Billing Date" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u4e0a\u6b21\u8ba1\u8d39\u65e5\u671f"
+          }
+        }
+      }
+    }, 
     "Last billing date cannot be in the future" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u4e0a\u6b21\u8ba1\u8d39\u65e5\u671f\u4e0d\u80fd\u665a\u4e8e\u4eca\u5929"
+          }
+        }
+      }
+    }, 
     "month" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u6708"
+          }
+        }
+      }
+    }, 
     "Monthly" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u6bcf\u6708"
+          }
+        }
+      }
+    }, 
     "No Subscriptions" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u6682\u65e0\u8ba2\u9605"
+          }
+        }
+      }
+    }, 
     "OK" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u597d"
+          }
+        }
+      }
+    }, 
     "Please enter a valid name." : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u8bf7\u8f93\u5165\u6709\u6548\u540d\u79f0\u3002"
+          }
+        }
+      }
+    }, 
     "Please enter a valid price." : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u8bf7\u8f93\u5165\u6709\u6548\u4ef7\u683c\u3002"
+          }
+        }
+      }
+    }, 
     "Price" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u4ef7\u683c"
+          }
+        }
+      }
+    }, 
     "Remind Me" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u63d0\u9192\u6211"
+          }
+        }
+      }
+    }, 
     "Reset" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u91cd\u7f6e"
+          }
+        }
+      }
+    }, 
     "Reset Failed" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u91cd\u7f6e\u5931\u8d25"
+          }
+        }
+      }
+    }, 
     "Resets the application and clears all data." : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u91cd\u7f6e\u5e94\u7528\u5e76\u6e05\u9664\u6240\u6709\u6570\u636e\u3002"
+          }
+        }
+      }
+    }, 
     "Save" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u4fdd\u5b58"
+          }
+        }
+      }
+    }, 
     "Search code or name" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u641c\u7d22\u4ee3\u7801\u6216\u540d\u79f0"
+          }
+        }
+      }
+    }, 
     "Select" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u9009\u62e9"
+          }
+        }
+      }
+    }, 
     "Select Currency" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u9009\u62e9\u8d27\u5e01"
+          }
+        }
+      }
+    }, 
     "Selected currency: %@ %@" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "new", 
             "value" : "Selected currency: %1$@ %2$@"
+          }
+        }, 
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u5df2\u9009\u62e9\u8d27\u5e01\uff1a%1$@ %2$@"
           }
         }
       }
-    },
+    }, 
     "Send Debug Renewal Notifications" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u53d1\u9001\u8c03\u8bd5\u7eed\u8ba2\u901a\u77e5"
+          }
+        }
+      }
+    }, 
     "Subscription Name" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u8ba2\u9605\u540d\u79f0"
+          }
+        }
+      }
+    }, 
     "Subscription name cannot be empty" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u8ba2\u9605\u540d\u79f0\u4e0d\u80fd\u4e3a\u7a7a"
+          }
+        }
+      }
+    }, 
     "Subscription price must be greater than 0" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u8ba2\u9605\u4ef7\u683c\u5fc5\u987b\u5927\u4e8e 0"
+          }
+        }
+      }
+    }, 
     "Subscription Reminder" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u8ba2\u9605\u63d0\u9192"
+          }
+        }
+      }
+    }, 
     "Subscription Renews in 2 Weeks" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u8ba2\u9605\u5c06\u5728 2 \u5468\u540e\u7eed\u8ba2"
+          }
+        }
+      }
+    }, 
     "Subscription Renews in 3 Days" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u8ba2\u9605\u5c06\u5728 3 \u5929\u540e\u7eed\u8ba2"
+          }
+        }
+      }
+    }, 
     "Subscription Renews Next Week" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u8ba2\u9605\u5c06\u5728\u4e0b\u5468\u7eed\u8ba2"
+          }
+        }
+      }
+    }, 
     "Subscription Renews Tomorrow!" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u8ba2\u9605\u5c06\u5728\u660e\u5929\u7eed\u8ba2\uff01"
+          }
+        }
+      }
+    }, 
     "SubZen" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "SubZen"
+          }
+        }
+      }
+    }, 
     "Tap Reset to erase all data and restart the app." : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u70b9\u51fb\u201c\u91cd\u7f6e\u201d\u4ee5\u6e05\u9664\u6240\u6709\u6570\u636e\u5e76\u91cd\u65b0\u542f\u52a8\u5e94\u7528\u3002"
+          }
+        }
+      }
+    }, 
     "This action cannot be undone." : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u8be5\u64cd\u4f5c\u65e0\u6cd5\u64a4\u9500\u3002"
+          }
+        }
+      }
+    }, 
     "week" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u5468"
+          }
+        }
+      }
+    }, 
     "Weekly" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u6bcf\u5468"
+          }
+        }
+      }
+    }, 
     "year" : {
-
-    },
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u5e74"
+          }
+        }
+      }
+    }, 
     "Yearly" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated", 
+            "value" : "\u6bcf\u5e74"
+          }
+        }
+      }
     }
-  },
+  }, 
   "version" : "1.1"
 }
