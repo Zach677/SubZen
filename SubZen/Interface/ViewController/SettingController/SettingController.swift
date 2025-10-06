@@ -12,15 +12,29 @@ class SettingController: UIViewController {
     private var isResetInProgress = false
     private let notificationPermissonService: NotificationPermissionService
     private let subscriptionNotificationScheduler: SubscriptionNotificationScheduling
+    #if DEBUG
+        private let subscriptionProvider: () -> [Subscription]
 
-    init(
-        notificationPermissonService: NotificationPermissionService = .shared,
-        subscriptionNotificationScheduler: SubscriptionNotificationScheduling = SubscriptionNotificationService()
-    ) {
-        self.notificationPermissonService = notificationPermissonService
-        self.subscriptionNotificationScheduler = subscriptionNotificationScheduler
-        super.init(nibName: nil, bundle: nil)
-    }
+        init(
+            notificationPermissonService: NotificationPermissionService = .shared,
+            subscriptionNotificationScheduler: SubscriptionNotificationScheduling = SubscriptionNotificationService(),
+            subscriptionProvider: @escaping () -> [Subscription] = { SubscriptionManager.shared.getAllSubscriptions() }
+        ) {
+            self.notificationPermissonService = notificationPermissonService
+            self.subscriptionNotificationScheduler = subscriptionNotificationScheduler
+            self.subscriptionProvider = subscriptionProvider
+            super.init(nibName: nil, bundle: nil)
+        }
+    #else
+        init(
+            notificationPermissonService: NotificationPermissionService = .shared,
+            subscriptionNotificationScheduler: SubscriptionNotificationScheduling = SubscriptionNotificationService()
+        ) {
+            self.notificationPermissonService = notificationPermissonService
+            self.subscriptionNotificationScheduler = subscriptionNotificationScheduler
+            super.init(nibName: nil, bundle: nil)
+        }
+    #endif
 
     @available(*, unavailable)
     required init?(coder _: NSCoder) {
@@ -98,16 +112,34 @@ extension SettingController: SettingViewDelegate {
 
     #if DEBUG
         func settingViewDidTapDebugNotification(_: SettingView) {
-            Task { [notificationPermissonService, subscriptionNotificationScheduler] in
+            Task { [
+                notificationPermissonService,
+                subscriptionNotificationScheduler,
+                subscriptionProvider
+            ] in
                 if notificationPermissonService.shouldRequestPermission() {
                     await notificationPermissonService.requestNotificationPermission()
                 }
 
-                do {
-                    try await subscriptionNotificationScheduler.triggerDebugExprirationPreview()
-                    print("[DebugNotification] Expriration preview scheduled.")
-                } catch {
-                    print("[DebugNotification] Failed to schedule preview: \(error)")
+                let subscriptions = subscriptionProvider()
+
+                guard !subscriptions.isEmpty else {
+                    do {
+                        try await subscriptionNotificationScheduler.triggerDebugExpirationPreview()
+                        print("[DebugNotification] Sent fallback preview notification (no subscriptions).")
+                    } catch {
+                        print("[DebugNotification] Failed to schedule fallback preview: \(error)")
+                    }
+                    return
+                }
+
+                for subscription in subscriptions {
+                    do {
+                        try await subscriptionNotificationScheduler.triggerDebugExpirationPreview(for: subscription)
+                        print("[DebugNotification] Scheduled previews for '\(subscription.name)'.")
+                    } catch {
+                        print("[DebugNotification] Failed preview for '\(subscription.name)': \(error)")
+                    }
                 }
             }
         }

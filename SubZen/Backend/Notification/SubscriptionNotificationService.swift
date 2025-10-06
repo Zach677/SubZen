@@ -9,7 +9,10 @@ import Foundation
 import UserNotifications
 
 protocol SubscriptionNotificationScheduling {
-    func triggerDebugExprirationPreview() async throws
+    #if DEBUG
+        func triggerDebugExpirationPreview() async throws
+        func triggerDebugExpirationPreview(for subscription: Subscription) async throws
+    #endif
     func scheduleNotifications(for subscription: Subscription) async throws
     func cancelAllScheduledNotifications() async
     func cancelNotifications(for subscription: Subscription) async
@@ -22,31 +25,60 @@ class SubscriptionNotificationService: SubscriptionNotificationScheduling {
         self.notificationCenter = notificationCenter
     }
 
-    // MARK: - Debug Preview
+    #if DEBUG
 
-    func triggerDebugExprirationPreview() async throws {
-        let content = UNMutableNotificationContent()
-        content.title = "Subscription Expiring Soon!!"
-        content.body = "Debug Preview: a subscription is about to renew."
-        content.sound = .default
+        // MARK: - Debug Preview
 
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
-        let request = UNNotificationRequest(
-            identifier: "debug.subscription.expiry.preview",
-            content: content,
-            trigger: trigger
-        )
+        func triggerDebugExpirationPreview() async throws {
+            let content = UNMutableNotificationContent()
+            content.title = "Subscription Expiring Soon"
+            content.body = "A subscription is about to renew."
+            content.sound = .default
 
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            notificationCenter.add(request) { error in
-                if let error {
-                    continuation.resume(throwing: error)
-                } else {
-                    continuation.resume(returning: ())
-                }
+            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
+            let request = UNNotificationRequest(
+                identifier: "debug.subscription.expiry.preview",
+                content: content,
+                trigger: trigger
+            )
+
+            try await notificationCenter.add(request)
+        }
+
+        func triggerDebugExpirationPreview(for subscription: Subscription) async throws {
+            let intervals = subscription.reminderIntervals.sorted()
+
+            guard !intervals.isEmpty else {
+                print("[DebugNotification] Subscription '\(subscription.name)' has no reminder intervals; skipping preview.")
+                return
+            }
+
+            let debugIdentifierPrefix = "debug.subscription.preview.\(subscription.id.uuidString)."
+
+            let pendingRequests = await notificationCenter.pendingNotificationRequests()
+            let identifiersToRemove = pendingRequests
+                .filter { $0.identifier.hasPrefix(debugIdentifierPrefix) }
+                .map(\.identifier)
+
+            if !identifiersToRemove.isEmpty {
+                notificationCenter.removePendingNotificationRequests(withIdentifiers: identifiersToRemove)
+            }
+
+            var delay: TimeInterval = 1
+
+            for daysBefore in intervals {
+                let content = createNotificationContent(for: subscription, daysBefore: daysBefore)
+
+                let trigger = UNTimeIntervalNotificationTrigger(timeInterval: delay, repeats: false)
+                let identifier = "\(debugIdentifierPrefix)\(daysBefore)"
+                let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
+
+                try await notificationCenter.add(request)
+
+                delay += 3
             }
         }
-    }
+    #endif
 
     // MARK: - Custom Reminder Scheduling
 
@@ -107,19 +139,19 @@ class SubscriptionNotificationService: SubscriptionNotificationScheduling {
         switch daysBefore {
         case 1:
             content.title = "Subscription Renews Tomorrow!"
-            content.body = "\"\(subscription.name)\" (\(subscription.formattedPrice)) will renew tomorrow."
+            content.body = "\(subscription.name) will renew tomorrow."
         case 3:
             content.title = "Subscription Renews in 3 Days"
-            content.body = "\"\(subscription.name)\" (\(subscription.formattedPrice)) will renew in 3 days."
+            content.body = "\(subscription.name) will renew in 3 days."
         case 7:
             content.title = "Subscription Renews Next Week"
-            content.body = "\"\(subscription.name)\" (\(subscription.formattedPrice)) will renew next week."
+            content.body = "\(subscription.name) will renew next week."
         case 14:
             content.title = "Subscription Renews in 2 Weeks"
-            content.body = "\"\(subscription.name)\" (\(subscription.formattedPrice)) will renew in 2 weeks."
+            content.body = "\(subscription.name) will renew in 2 weeks."
         default:
             content.title = "Subscription Reminder"
-            content.body = "\"\(subscription.name)\" (\(subscription.formattedPrice)) will renew in \(daysBefore) days."
+            content.body = "\(subscription.name) will renew in \(daysBefore) days."
         }
 
         content.sound = .default

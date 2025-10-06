@@ -49,7 +49,7 @@ class SettingView: UIView {
 
     #if DEBUG
         private lazy var debugNotificationButton = UIButton(type: .system).with {
-            $0.setTitle("Send Test Expriation Notification", for: .normal)
+            $0.setTitle("Send Debug Renewal Notifications", for: .normal)
             $0.setTitleColor(.systemOrange, for: .normal)
             $0.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: .semibold)
             $0.contentHorizontalAlignment = .leading
