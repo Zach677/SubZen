@@ -37,15 +37,15 @@ xcodebuild -workspace SubZen.xcworkspace \
 echo "[*] registering SubZen.xcarchive in Xcode Organizer..."
 open "$PROJECT_ROOT/.build/SubZen.xcarchive" -g
 
-xcodebuild -workspace SubZen.xcworkspace \
-    -scheme SubZen-Catalyst \
-    -configuration Release \
-    -destination 'generic/platform=macOS' \
-    -archivePath "$PROJECT_ROOT/.build/SubZen-Catalyst.xcarchive" \
-    archive | xcbeautify
+# xcodebuild -workspace SubZen.xcworkspace \
+#     -scheme SubZen-Catalyst \
+#     -configuration Release \
+#     -destination 'generic/platform=macOS' \
+#     -archivePath "$PROJECT_ROOT/.build/SubZen-Catalyst.xcarchive" \
+#     archive | xcbeautify
 
-echo "[*] registering SubZen-Catalyst.xcarchive in Xcode Organizer..."
-open "$PROJECT_ROOT/.build/SubZen-Catalyst.xcarchive" -g
+# echo "[*] registering SubZen-Catalyst.xcarchive in Xcode Organizer..."
+# open "$PROJECT_ROOT/.build/SubZen-Catalyst.xcarchive" -g
 
 echo "[*] done"
 
