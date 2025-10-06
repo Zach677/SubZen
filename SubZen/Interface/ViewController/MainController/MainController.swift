@@ -198,7 +198,6 @@ class MainController: UIViewController {
             name: .settingsDidReset,
             object: nil
         )
-
     }
 
     override func viewDidLayoutSubviews() {
@@ -242,7 +241,6 @@ class MainController: UIViewController {
     @objc private func handleSettingsDidReset() {
         hideSettings(animated: false)
     }
-
 }
 
 extension MainController: SubscriptionControllerSettingsDelegate {
