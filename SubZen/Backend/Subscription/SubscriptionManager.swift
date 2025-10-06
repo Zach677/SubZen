@@ -49,17 +49,28 @@ class SubscriptionManager {
     func subscriptionEdit(identifier: UUID, _ block: @escaping (inout Subscription) -> Void) {
         guard let index = subscriptions.firstIndex(where: { $0.id == identifier }) else { return }
 
-        // Store old reminder intervals to check if they changed
-        let oldReminderIntervals = subscriptions[index].reminderIntervals
+        let subscription = subscriptions[index]
+        let previousReminderIntervals = subscription.reminderIntervals
+        let previousName = subscription.name
+        let previousPrice = subscription.price
+        let previousCycle = subscription.cycle
+        let previousBillingDate = subscription.lastBillingDate
+        let previousCurrencyCode = subscription.currencyCode
 
         block(&subscriptions[index])
         saveSubscriptions()
 
-        // Update notifications if reminder intervals changed
-        let newReminderIntervals = subscriptions[index].reminderIntervals
-        if oldReminderIntervals != newReminderIntervals {
+        let updatedSubscription = subscriptions[index]
+        let schedulingDataChanged = previousReminderIntervals != updatedSubscription.reminderIntervals ||
+            previousName != updatedSubscription.name ||
+            previousPrice != updatedSubscription.price ||
+            previousCycle != updatedSubscription.cycle ||
+            previousBillingDate != updatedSubscription.lastBillingDate ||
+            previousCurrencyCode != updatedSubscription.currencyCode
+
+        if schedulingDataChanged {
             Task {
-                await SubscriptionNotificationManager.shared.handleSubscriptionUpdated(subscriptions[index])
+                await SubscriptionNotificationManager.shared.handleSubscriptionUpdated(updatedSubscription)
             }
         }
 

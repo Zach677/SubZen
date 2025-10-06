@@ -52,23 +52,22 @@ class SubscriptionNotificationService: SubscriptionNotificationScheduling {
 
     /// Schedule notifications for a subscription based on its reminder intervals
     func scheduleNotifications(for subscription: Subscription) async throws {
-        // Get current notification settings to check if we have permission
         let settings = await notificationCenter.notificationSettings()
-        guard settings.authorizationStatus == .authorized else {
-            print("Notification permission not granted, skipping scheduling for '\(subscription.name)'")
+        let allowedStatuses: Set<UNAuthorizationStatus> = [.authorized, .provisional, .ephemeral]
+
+        guard allowedStatuses.contains(settings.authorizationStatus) else {
+            print("Notification permission not granted (status: \(settings.authorizationStatus)), skipping scheduling for '\(subscription.name)'")
             return
         }
 
         let remainingDays = subscription.remainingDays
         let nextBillingDate = subscription.getNextBillingDate()
 
-        // Only schedule notifications for subscriptions that will expire in the future
         guard remainingDays > 0 else {
             print("Subscription '\(subscription.name)' has already expired or expires today, skipping notification")
             return
         }
 
-        // Schedule notifications for each reminder interval
         for daysBefore in subscription.reminderIntervals {
             guard remainingDays >= daysBefore else {
                 print("Subscription '\(subscription.name)' expires in \(remainingDays) days, skipping \(daysBefore)-day reminder")
@@ -81,15 +80,18 @@ class SubscriptionNotificationService: SubscriptionNotificationScheduling {
                 to: nextBillingDate
             ) ?? nextBillingDate
 
-            // Only schedule if notification date is in the future
-            guard notificationDate > Date() else {
-                print("Notification date for \(daysBefore)-day reminder is in the past, skipping")
-                continue
-            }
-
             let identifier = "\(subscription.id.uuidString).expiry.\(daysBefore)days"
             let content = createNotificationContent(for: subscription, daysBefore: daysBefore)
-            let trigger = UNCalendarNotificationTrigger(dateMatching: Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: notificationDate), repeats: false)
+
+            let trigger: UNNotificationTrigger
+            if notificationDate <= Date() {
+                let fallbackInterval: TimeInterval = 5
+                trigger = UNTimeIntervalNotificationTrigger(timeInterval: fallbackInterval, repeats: false)
+                print("Notification date for \(daysBefore)-day reminder already passed, scheduling immediate fallback")
+            } else {
+                let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: notificationDate)
+                trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
+            }
 
             let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
 
