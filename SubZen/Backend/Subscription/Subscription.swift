@@ -31,10 +31,60 @@ enum BillingCycle: String, CaseIterable, Codable {
     /// Returns a short display name for UI labels
     var displayUnit: String {
         switch self {
-        case .daily: "day"
-        case .weekly: "week"
-        case .monthly: "month"
-        case .yearly: "year"
+        case .daily:
+            String(
+                localized: "billingCycle.unit.daily",
+                defaultValue: "day",
+                comment: "Singular unit displayed for a daily billing cycle"
+            )
+        case .weekly:
+            String(
+                localized: "billingCycle.unit.weekly",
+                defaultValue: "week",
+                comment: "Singular unit displayed for a weekly billing cycle"
+            )
+        case .monthly:
+            String(
+                localized: "billingCycle.unit.monthly",
+                defaultValue: "month",
+                comment: "Singular unit displayed for a monthly billing cycle"
+            )
+        case .yearly:
+            String(
+                localized: "billingCycle.unit.yearly",
+                defaultValue: "year",
+                comment: "Singular unit displayed for a yearly billing cycle"
+            )
+        }
+    }
+
+    /// Localized display name suitable for segmented controls or pickers
+    var localizedName: String {
+        switch self {
+        case .daily:
+            String(
+                localized: "billingCycle.name.daily",
+                defaultValue: "Daily",
+                comment: "Display name for a daily billing cycle"
+            )
+        case .weekly:
+            String(
+                localized: "billingCycle.name.weekly",
+                defaultValue: "Weekly",
+                comment: "Display name for a weekly billing cycle"
+            )
+        case .monthly:
+            String(
+                localized: "billingCycle.name.monthly",
+                defaultValue: "Monthly",
+                comment: "Display name for a monthly billing cycle"
+            )
+        case .yearly:
+            String(
+                localized: "billingCycle.name.yearly",
+                defaultValue: "Yearly",
+                comment: "Display name for a yearly billing cycle"
+            )
         }
     }
 }
@@ -49,10 +99,30 @@ enum SubscriptionValidationError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .emptyName: "Subscription name cannot be empty"
-        case .negativePriceQuestionablePrice: "Subscription price must be greater than 0"
-        case .invalidCurrency: "Invalid currency code"
-        case .futureBillingDate: "Last billing date cannot be in the future"
+        case .emptyName:
+            String(
+                localized: "subscription.validation.emptyName",
+                defaultValue: "Subscription name cannot be empty",
+                comment: "Validation error shown when the subscription name is empty"
+            )
+        case .negativePriceQuestionablePrice:
+            String(
+                localized: "subscription.validation.negativePrice",
+                defaultValue: "Subscription price must be greater than 0",
+                comment: "Validation error shown when the subscription price is invalid"
+            )
+        case .invalidCurrency:
+            String(
+                localized: "subscription.validation.invalidCurrency",
+                defaultValue: "Invalid currency code",
+                comment: "Validation error shown when the currency code is invalid"
+            )
+        case .futureBillingDate:
+            String(
+                localized: "subscription.validation.futureDate",
+                defaultValue: "Last billing date cannot be in the future",
+                comment: "Validation error shown when the billing date lies in the future"
+            )
         }
     }
 }

@@ -109,11 +109,15 @@ extension SubscriptionListView: TitleBarDelegate {
 }
 
 extension SubscriptionListView {
-    class TitleBar: UIView {
+    final class TitleBar: UIView {
         weak var delegate: TitleBarDelegate?
 
         private let titleLabel = UILabel().with {
-            $0.text = "SubZen"
+            $0.text = String(
+                localized: "subscriptions.titleBar.title",
+                defaultValue: "SubZen",
+                comment: "Title displayed at the top of the subscriptions list"
+            )
             $0.font = UIFont.systemFont(ofSize: 25, weight: .bold)
             $0.textColor = .label
         }

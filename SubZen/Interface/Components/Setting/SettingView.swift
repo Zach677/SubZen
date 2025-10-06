@@ -26,7 +26,11 @@ class SettingView: UIView {
     }
 
     private let titleLabel = UILabel().with {
-        $0.text = "Reset"
+        $0.text = String(
+            localized: "settings.reset.section.title",
+            defaultValue: "Reset",
+            comment: "Title for the settings section that contains the reset controls"
+        )
         $0.font = UIFont.systemFont(ofSize: 15, weight: .medium)
         $0.textColor = .label
         $0.numberOfLines = 0
@@ -41,7 +45,11 @@ class SettingView: UIView {
     }
 
     private let warningLabel = UILabel().with {
-        $0.text = "This action cannot be undone."
+        $0.text = String(
+            localized: "settings.reset.warning",
+            defaultValue: "This action cannot be undone.",
+            comment: "Warning message shown beneath the reset controls"
+        )
         $0.font = UIFont.systemFont(ofSize: 14, weight: .regular)
         $0.textColor = .tertiaryLabel
         $0.numberOfLines = 0
@@ -49,7 +57,14 @@ class SettingView: UIView {
 
     #if DEBUG
         private lazy var debugNotificationButton = UIButton(type: .system).with {
-            $0.setTitle("Send Debug Renewal Notifications", for: .normal)
+            $0.setTitle(
+                String(
+                    localized: "settings.debugNotifications",
+                    defaultValue: "Send Debug Renewal Notifications",
+                    comment: "Button that triggers debug renewal notification previews"
+                ),
+                for: .normal
+            )
             $0.setTitleColor(.systemOrange, for: .normal)
             $0.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: .semibold)
             $0.contentHorizontalAlignment = .leading
@@ -174,8 +189,16 @@ private final class ResetActionControl: UIControl {
     private func setup() {
         isAccessibilityElement = true
         accessibilityTraits.insert(.button)
-        accessibilityLabel = "Reset"
-        accessibilityHint = "Resets the application and clears all data."
+        accessibilityLabel = String(
+            localized: "settings.reset.accessibility.label",
+            defaultValue: "Reset",
+            comment: "Accessibility label for the reset action control"
+        )
+        accessibilityHint = String(
+            localized: "settings.reset.accessibility.hint",
+            defaultValue: "Resets the application and clears all data.",
+            comment: "Accessibility hint describing the reset control action"
+        )
 
         layoutMargins = UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
 
@@ -209,7 +232,11 @@ private final class ResetActionControl: UIControl {
 
         titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
         titleLabel.textColor = .systemBlue
-        titleLabel.text = "Reset"
+        titleLabel.text = String(
+            localized: "settings.reset.action.title",
+            defaultValue: "Reset",
+            comment: "Title shown inside the reset action control"
+        )
 
         spacer.setContentHuggingPriority(.defaultLow, for: .horizontal)
         spacer.setContentCompressionResistancePriority(.fittingSizeLevel, for: .horizontal)
@@ -221,7 +248,11 @@ private final class ResetActionControl: UIControl {
         descriptionLabel.font = UIFont.systemFont(ofSize: 14, weight: .regular)
         descriptionLabel.textColor = .secondaryLabel
         descriptionLabel.numberOfLines = 0
-        descriptionLabel.text = "If you encounter any issues, try resetting the app. This removes all content and resets the entire database."
+        descriptionLabel.text = String(
+            localized: "settings.reset.action.description",
+            defaultValue: "If you encounter any issues, try resetting the app. This removes all content and resets the entire database.",
+            comment: "Description shown beneath the reset action title"
+        )
 
         let textStack = UIStackView(arrangedSubviews: [titleLabel, descriptionLabel])
         textStack.axis = .vertical

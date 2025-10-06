@@ -35,12 +35,20 @@ final class EditSubscriptionView: UIView {
     let nameLabel = UILabel().with {
         $0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         $0.textColor = .label
-        $0.text = "Subscription Name"
+        $0.text = String(
+            localized: "editSubscription.name.label",
+            defaultValue: "Subscription Name",
+            comment: "Label describing the subscription name text field"
+        )
     }
 
     let nameTextField = UITextField().with {
         $0.borderStyle = .none
-        $0.placeholder = "Enter subscription name"
+        $0.placeholder = String(
+            localized: "editSubscription.name.placeholder",
+            defaultValue: "Enter subscription name",
+            comment: "Placeholder shown in the subscription name text field"
+        )
         $0.clearButtonMode = .whileEditing
         $0.autocapitalizationType = .none
         $0.autocorrectionType = .no
@@ -49,12 +57,20 @@ final class EditSubscriptionView: UIView {
     let priceLabel = UILabel().with {
         $0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         $0.textColor = .label
-        $0.text = "Price"
+        $0.text = String(
+            localized: "editSubscription.price.label",
+            defaultValue: "Price",
+            comment: "Label describing the subscription price text field"
+        )
     }
 
     let priceTextField = UITextField().with {
         $0.borderStyle = .none
-        $0.placeholder = "Enter price"
+        $0.placeholder = String(
+            localized: "editSubscription.price.placeholder",
+            defaultValue: "Enter price",
+            comment: "Placeholder shown in the subscription price text field"
+        )
         $0.keyboardType = .decimalPad
         $0.clearButtonMode = .whileEditing
         $0.autocapitalizationType = .none
@@ -62,9 +78,15 @@ final class EditSubscriptionView: UIView {
     }
 
     let currencyButton = UIButton(type: .system).with {
-        $0.configuration = EditSubscriptionButtonStyler.makeCurrencyButtonBaseConfiguration(
+        var configuration = EditSubscriptionButtonStyler.makeCurrencyButtonBaseConfiguration(
             contentInsets: Layout.currencyButtonContentInsets
         )
+        configuration.title = String(
+            localized: "editSubscription.currencyButton.title",
+            defaultValue: "Select",
+            comment: "Title shown on the currency selection button before a currency is chosen"
+        )
+        $0.configuration = configuration
         $0.tintColor = .secondaryLabel
         $0.layer.cornerRadius = Layout.currencyButtonCornerRadius
         $0.layer.cornerCurve = .continuous
@@ -78,21 +100,33 @@ final class EditSubscriptionView: UIView {
     let cycleLabel = UILabel().with {
         $0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         $0.textColor = .label
-        $0.text = "Cycle"
+        $0.text = String(
+            localized: "editSubscription.cycle.label",
+            defaultValue: "Cycle",
+            comment: "Label describing the billing cycle segmented control"
+        )
     }
 
-    let cycleSegmentedControl = UISegmentedControl(items: BillingCycle.allCases.map(\.rawValue))
+    let cycleSegmentedControl = UISegmentedControl(items: BillingCycle.allCases.map(\.localizedName))
 
     let dateLabel = UILabel().with {
         $0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         $0.textColor = .label
-        $0.text = "Last Billing Date"
+        $0.text = String(
+            localized: "editSubscription.date.label",
+            defaultValue: "Last Billing Date",
+            comment: "Label describing the last billing date picker"
+        )
     }
 
     let reminderLabel = UILabel().with {
         $0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         $0.textColor = .label
-        $0.text = "Remind Me"
+        $0.text = String(
+            localized: "editSubscription.reminder.label",
+            defaultValue: "Remind Me",
+            comment: "Label describing the reminder selection control"
+        )
     }
 
     let datePicker = UIDatePicker().with {
@@ -211,8 +245,16 @@ final class EditSubscriptionView: UIView {
     }
 
     private func setupInteractions() {
-        floatingSaveBar.saveButton.addTarget(self, action: #selector(saveTapped), for: .touchUpInside)
-        currencyButton.addTarget(self, action: #selector(currencyTapped), for: .touchUpInside)
+        floatingSaveBar.saveButton.addTarget(
+            self,
+            action: #selector(saveTapped),
+            for: UIControl.Event.touchUpInside
+        )
+        currencyButton.addTarget(
+            self,
+            action: #selector(currencyTapped),
+            for: UIControl.Event.touchUpInside
+        )
 
         if #available(iOS 26.0, *) {
             let interaction = UIScrollEdgeElementContainerInteraction()
@@ -273,12 +315,38 @@ final class EditSubscriptionView: UIView {
 
     private func updateMaterialAppearance() {
         let reduceTransparency = UIAccessibility.isReduceTransparencyEnabled
-        floatingSaveBar.updateAppearance(reduceTransparencyActive: reduceTransparency)
+        let saveTitle = String(
+            localized: "editSubscription.saveButton.title",
+            defaultValue: "Save",
+            comment: "Title used for the save button"
+        )
+        floatingSaveBar.updateAppearance(
+            reduceTransparencyActive: reduceTransparency,
+            title: saveTitle
+        )
+
+        let fallbackCurrencyTitle = String(
+            localized: "editSubscription.currencyButton.title",
+            defaultValue: "Select",
+            comment: "Title shown on the currency selection button before a currency is chosen"
+        )
+        if currencyButton.configuration == nil {
+            var configuration = EditSubscriptionButtonStyler.makeCurrencyButtonBaseConfiguration(
+                contentInsets: Layout.currencyButtonContentInsets
+            )
+            configuration.title = fallbackCurrencyTitle
+            currencyButton.configuration = configuration
+        }
+
         EditSubscriptionButtonStyler.applyCurrencyButtonStyle(
             to: currencyButton,
             reduceTransparencyActive: reduceTransparency,
             contentInsets: Layout.currencyButtonContentInsets
         )
+
+        if currencyButton.currentTitle?.isEmpty != false {
+            currencyButton.setTitle(fallbackCurrencyTitle, for: UIControl.State.normal)
+        }
         EditSubscriptionSelectionStyler.applySegmentedStyle(
             to: cycleSegmentedControl,
             reduceTransparencyActive: reduceTransparency
@@ -322,9 +390,21 @@ final class EditSubscriptionView: UIView {
     func updateSelectedCurrencyDisplay(with currency: Currency) {
         let code = currency.code
         let symbol = CurrencyList.displaySymbol(for: code)
-        let title = "\(currency.name) \(symbol) \(code)"
-        currencyButton.setTitle(title, for: .normal)
-        currencyButton.accessibilityLabel = "Selected currency: \(currency.name) \(code)"
+        let title = String(
+            localized: "editSubscription.currencyButton.selectedTitle",
+            defaultValue: "\(currency.name) \(symbol) \(currency.code)",
+            comment: "Title shown on the currency button once a currency is selected"
+        )
+        currencyButton.setTitle(title, for: UIControl.State.normal)
+        if var configuration = currencyButton.configuration {
+            configuration.title = title
+            currencyButton.configuration = configuration
+        }
+        currencyButton.accessibilityLabel = String(
+            localized: "editSubscription.currencyButton.accessibility",
+            defaultValue: "Selected currency: \(currency.name) \(currency.code)",
+            comment: "Accessibility label announced after selecting a currency"
+        )
     }
 
     deinit {

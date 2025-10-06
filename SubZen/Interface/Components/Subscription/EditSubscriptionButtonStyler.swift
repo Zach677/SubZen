@@ -52,7 +52,6 @@ enum EditSubscriptionButtonStyler {
         contentInsets: NSDirectionalEdgeInsets
     ) -> UIButton.Configuration {
         var configuration = UIButton.Configuration.tinted()
-        configuration.title = "Select"
         configuration.cornerStyle = .large
         configuration.contentInsets = contentInsets
         configuration.titleAlignment = .leading

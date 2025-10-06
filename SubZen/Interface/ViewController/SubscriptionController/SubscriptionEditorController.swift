@@ -21,8 +21,6 @@ class SubscriptionEditorController: UIViewController {
            let currency = CurrencyList.getCurrency(byCode: subscription.currencyCode)
         {
             selectedCurrency = currency
-        } else if let baseCurrency = CurrencyList.getCurrency(byCode: CurrencyTotalService.shared.baseCurrency) {
-            selectedCurrency = baseCurrency
         } else if let fallback = CurrencyList.allCurrencies.first {
             selectedCurrency = fallback
         } else {
@@ -74,11 +72,23 @@ class SubscriptionEditorController: UIViewController {
         let date = editSubscriptionView.datePicker.date
 
         guard !name.isEmpty else {
-            showAlert("Please enter a valid name.")
+            showAlert(
+                String(
+                    localized: "editSubscription.error.emptyName",
+                    defaultValue: "Please enter a valid name.",
+                    comment: "Error message shown when the user leaves the name empty"
+                )
+            )
             return
         }
         guard let price = parsePrice(editSubscriptionView.priceTextField.text) else {
-            showAlert("Please enter a valid price.")
+            showAlert(
+                String(
+                    localized: "editSubscription.error.invalidPrice",
+                    defaultValue: "Please enter a valid price.",
+                    comment: "Error message shown when the entered price cannot be parsed"
+                )
+            )
             return
         }
 
@@ -140,8 +150,25 @@ class SubscriptionEditorController: UIViewController {
     }
 
     private func showAlert(_ message: String) {
-        let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        let alert = UIAlertController(
+            title: String(
+                localized: "common.error.title",
+                defaultValue: "Error",
+                comment: "Generic error alert title"
+            ),
+            message: message,
+            preferredStyle: .alert
+        )
+        alert.addAction(
+            UIAlertAction(
+                title: String(
+                    localized: "common.ok",
+                    defaultValue: "OK",
+                    comment: "Default acknowledgement button title"
+                ),
+                style: .default
+            )
+        )
         present(alert, animated: true)
     }
 }

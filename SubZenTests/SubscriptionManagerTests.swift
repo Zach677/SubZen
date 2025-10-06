@@ -10,12 +10,12 @@ final class SubscriptionManagerTests: XCTestCase {
         defaultsGuard = UserDefaultsGuard(key: key)
         defaultsGuard.clear()
         // Ensure manager starts clean
-        SubscriptionManager.shared.subscriptions.removeAll()
+        SubscriptionManager.shared.eraseAll()
     }
 
     override func tearDown() {
         // Clear and restore defaults via guard deinit
-        SubscriptionManager.shared.subscriptions.removeAll()
+        SubscriptionManager.shared.eraseAll()
         defaultsGuard = nil
         super.tearDown()
     }
@@ -62,8 +62,7 @@ final class SubscriptionManagerTests: XCTestCase {
         XCTAssertEqual(updated?.name, "Spotify Premium")
 
         // Ensure persisted to UserDefaults: wipe memory then rescan
-        m.subscriptions.removeAll()
-        m.scanAll()
+        m.reloadFromPersistentStore()
         XCTAssertEqual(m.subscription(identifier: sub.id)?.name, "Spotify Premium")
     }
 

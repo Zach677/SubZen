@@ -4,26 +4,21 @@ import XCTest
 final class SettingsResetServiceTests: XCTestCase {
     private var defaultsGuards: [UserDefaultsGuard] = []
 
-    private let exchangeRateKey = "ExchangeRateCache"
-    private let baseCurrencyKey = "BaseCurrency"
     private let notificationKey = "HasRequestedNotificationPermission"
     private let subscriptionsKey = "subscriptions"
 
     override func setUp() {
         super.setUp()
         defaultsGuards = [
-            UserDefaultsGuard(key: exchangeRateKey),
-            UserDefaultsGuard(key: baseCurrencyKey),
             UserDefaultsGuard(key: notificationKey),
             UserDefaultsGuard(key: subscriptionsKey),
         ]
-        SubscriptionManager.shared.subscriptions.removeAll()
+        SubscriptionManager.shared.eraseAll()
         NotificationPermissionService.shared.hasRequestedPermission = false
     }
 
     override func tearDown() {
-        SubscriptionManager.shared.subscriptions.removeAll()
-        CurrencyTotalService.shared.setBaseCurrency(ExchangeRateConfig.defaultBaseCurrency)
+        SubscriptionManager.shared.eraseAll()
         NotificationPermissionService.shared.hasRequestedPermission = false
         defaultsGuards.removeAll()
         super.tearDown()
@@ -33,8 +28,6 @@ final class SettingsResetServiceTests: XCTestCase {
         let defaults = UserDefaults.standard
 
         // Seed persistent state
-        defaults.set(Data([0x01]), forKey: exchangeRateKey)
-        CurrencyTotalService.shared.setBaseCurrency("JPY")
         defaults.set(true, forKey: notificationKey)
         NotificationPermissionService.shared.hasRequestedPermission = true
 
@@ -62,10 +55,7 @@ final class SettingsResetServiceTests: XCTestCase {
 
         wait(for: [exp, completionExpectation], timeout: 2.0)
 
-        XCTAssertNil(defaults.data(forKey: exchangeRateKey))
-        XCTAssertNil(defaults.string(forKey: baseCurrencyKey))
         XCTAssertNil(defaults.data(forKey: subscriptionsKey))
-        XCTAssertEqual(CurrencyTotalService.shared.baseCurrency, ExchangeRateConfig.defaultBaseCurrency)
         XCTAssertFalse(NotificationPermissionService.shared.hasRequestedPermission)
         XCTAssertTrue(manager.getAllSubscriptions().isEmpty)
     }
@@ -73,13 +63,11 @@ final class SettingsResetServiceTests: XCTestCase {
     func testSettingsOnlyScopePreservesSubscriptions() throws {
         let defaults = UserDefaults.standard
 
-        defaults.set(Data([0x02]), forKey: exchangeRateKey)
-        CurrencyTotalService.shared.setBaseCurrency("EUR")
         defaults.set(true, forKey: notificationKey)
         NotificationPermissionService.shared.hasRequestedPermission = true
 
         let manager = SubscriptionManager.shared
-        manager.subscriptions.removeAll()
+        manager.eraseAll()
         let subscription = try manager.createSubscription(
             name: "Spotify",
             price: 9.99,
@@ -95,8 +83,6 @@ final class SettingsResetServiceTests: XCTestCase {
 
         wait(for: [exp], timeout: 1.0)
 
-        XCTAssertNil(defaults.data(forKey: exchangeRateKey))
-        XCTAssertNil(defaults.string(forKey: baseCurrencyKey))
         XCTAssertFalse(NotificationPermissionService.shared.hasRequestedPermission)
         XCTAssertEqual(manager.getAllSubscriptions().count, 1)
         XCTAssertEqual(manager.subscription(identifier: subscription.id)?.name, "Spotify")

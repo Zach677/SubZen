@@ -76,7 +76,10 @@ final class FloatingSaveBarView: UIView {
         }
     }
 
-    func updateAppearance(reduceTransparencyActive newValue: Bool) {
+    func updateAppearance(
+        reduceTransparencyActive newValue: Bool,
+        title: String
+    ) {
         reduceTransparencyActive = newValue
 
         if reduceTransparencyActive {
@@ -96,7 +99,7 @@ final class FloatingSaveBarView: UIView {
 
         EditSubscriptionButtonStyler.applySaveButtonStyle(
             to: saveButton,
-            title: "Save",
+            title: title,
             reduceTransparencyActive: reduceTransparencyActive,
             contentInsets: buttonContentInsets
         )

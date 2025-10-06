@@ -52,13 +52,35 @@ class SettingController: UIViewController {
 
     private func presentFinalResetPrompt() {
         let alert = UIAlertController(
-            title: "Confirm Reset",
-            message: "Tap Reset to erase all data and restart the app.",
+            title: String(
+                localized: "settings.reset.prompt.title",
+                defaultValue: "Confirm Reset",
+                comment: "Title for the alert that confirms a full application reset"
+            ),
+            message: String(
+                localized: "settings.reset.prompt.message",
+                defaultValue: "Tap Reset to erase all data and restart the app.",
+                comment: "Message explaining the consequences of performing a full reset"
+            ),
             preferredStyle: .alert
         )
 
-        let cancel = UIAlertAction(title: "Cancel", style: .cancel)
-        let reset = UIAlertAction(title: "Reset", style: .destructive) { [weak self] _ in
+        let cancel = UIAlertAction(
+            title: String(
+                localized: "common.cancel",
+                defaultValue: "Cancel",
+                comment: "Title for the cancel button"
+            ),
+            style: .cancel
+        )
+        let reset = UIAlertAction(
+            title: String(
+                localized: "settings.reset.confirm",
+                defaultValue: "Reset",
+                comment: "Title for the destructive reset confirmation button"
+            ),
+            style: .destructive
+        ) { [weak self] _ in
             self?.performFactoryReset()
         }
 
@@ -89,11 +111,24 @@ class SettingController: UIViewController {
 
     private func presentResetFailureAlert(error: Error) {
         let alert = UIAlertController(
-            title: "Reset Failed",
+            title: String(
+                localized: "settings.reset.failure.title",
+                defaultValue: "Reset Failed",
+                comment: "Title shown when the reset operation fails"
+            ),
             message: error.localizedDescription,
             preferredStyle: .alert
         )
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        alert.addAction(
+            UIAlertAction(
+                title: String(
+                    localized: "common.ok",
+                    defaultValue: "OK",
+                    comment: "Default acknowledgement button title"
+                ),
+                style: .default
+            )
+        )
         present(alert, animated: true)
     }
 

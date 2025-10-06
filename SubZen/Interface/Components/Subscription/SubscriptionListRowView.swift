@@ -52,8 +52,19 @@ class SubscriptionListRowView: UIView {
         )
 
         priceLabel.attributedText = attributed
-        priceLabel.accessibilityLabel = "\(code) \(symbol) \(amount) per \(cycleDisplayUnit)"
-        daysLabel.text = "\(subscription.remainingDays) days left"
+        let accessibilityAmountDescription = String(
+            localized: "subscriptions.row.price.accessibility",
+            defaultValue: "\(code) \(symbol) \(amount) per \(cycleDisplayUnit)",
+            comment: "Accessibility label describing the subscription price and billing cycle"
+        )
+        priceLabel.accessibilityLabel = accessibilityAmountDescription
+
+        let remainingDays = subscription.remainingDays
+        daysLabel.text = String(
+            localized: "subscriptions.row.daysLeft",
+            defaultValue: "\(remainingDays) days left",
+            comment: "Text describing how many days remain until the subscription renews"
+        )
     }
 
     private static var formatterCache: [Int: NumberFormatter] = [:]

@@ -25,7 +25,6 @@ SubZen is a privacy-first subscription manager for iOS and macOS Catalyst built 
 - **SubscriptionController** – Coordinates subscription CRUD, table presentation, and detail editing.
 - **SettingController** – Manages settings UI and integrates reset + notification preferences.
 - **SubscriptionManager** – Singleton persistence layer that stores subscription data in `UserDefaults` and emits notifications (`.newSubCreated`, `.subscriptionUpdated`).
-- **CurrencyTotalService** + **ExchangeRateService** – Calculate monthly/yearly totals and convert currencies via cached network requests.
 - **NotificationPermissionService** + **SubscriptionNotificationService/Manager** – Request permissions, schedule reminders, and manage lifecycle.
 - **SettingsResetService** – Clears local state and posts `.settingsDidReset`.
 

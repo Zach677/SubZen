@@ -121,20 +121,60 @@ class SubscriptionNotificationService: SubscriptionNotificationScheduling {
 
         switch daysBefore {
         case 1:
-            content.title = "Subscription Renews Tomorrow!"
-            content.body = "\(subscription.name) will renew tomorrow."
+            content.title = String(
+                localized: "notification.subscription.tomorrow.title",
+                defaultValue: "Subscription Renews Tomorrow!",
+                comment: "Title for a subscription renewal notification scheduled one day before the billing date"
+            )
+            content.body = String(
+                localized: "notification.subscription.tomorrow.body",
+                defaultValue: "\(subscription.name) will renew tomorrow.",
+                comment: "Body for a subscription renewal notification scheduled one day before the billing date"
+            )
         case 3:
-            content.title = "Subscription Renews in 3 Days"
-            content.body = "\(subscription.name) will renew in 3 days."
+            content.title = String(
+                localized: "notification.subscription.threeDays.title",
+                defaultValue: "Subscription Renews in 3 Days",
+                comment: "Title for a subscription renewal notification scheduled three days before the billing date"
+            )
+            content.body = String(
+                localized: "notification.subscription.threeDays.body",
+                defaultValue: "\(subscription.name) will renew in 3 days.",
+                comment: "Body for a subscription renewal notification scheduled three days before the billing date"
+            )
         case 7:
-            content.title = "Subscription Renews Next Week"
-            content.body = "\(subscription.name) will renew next week."
+            content.title = String(
+                localized: "notification.subscription.sevenDays.title",
+                defaultValue: "Subscription Renews Next Week",
+                comment: "Title for a subscription renewal notification scheduled seven days before the billing date"
+            )
+            content.body = String(
+                localized: "notification.subscription.sevenDays.body",
+                defaultValue: "\(subscription.name) will renew next week.",
+                comment: "Body for a subscription renewal notification scheduled seven days before the billing date"
+            )
         case 14:
-            content.title = "Subscription Renews in 2 Weeks"
-            content.body = "\(subscription.name) will renew in 2 weeks."
+            content.title = String(
+                localized: "notification.subscription.twoWeeks.title",
+                defaultValue: "Subscription Renews in 2 Weeks",
+                comment: "Title for a subscription renewal notification scheduled fourteen days before the billing date"
+            )
+            content.body = String(
+                localized: "notification.subscription.twoWeeks.body",
+                defaultValue: "\(subscription.name) will renew in 2 weeks.",
+                comment: "Body for a subscription renewal notification scheduled fourteen days before the billing date"
+            )
         default:
-            content.title = "Subscription Reminder"
-            content.body = "\(subscription.name) will renew in \(daysBefore) days."
+            content.title = String(
+                localized: "notification.subscription.generic.title",
+                defaultValue: "Subscription Reminder",
+                comment: "Generic title for a subscription renewal notification"
+            )
+            content.body = String(
+                localized: "notification.subscription.generic.body",
+                defaultValue: "\(subscription.name) will renew in \(daysBefore) days.",
+                comment: "Generic body for a subscription renewal notification"
+            )
         }
 
         content.sound = .default
