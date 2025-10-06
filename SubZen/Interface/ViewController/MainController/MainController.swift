@@ -199,7 +199,6 @@ class MainController: UIViewController {
             object: nil
         )
 
-        setupNotificationPermission()
     }
 
     override func viewDidLayoutSubviews() {
@@ -244,18 +243,6 @@ class MainController: UIViewController {
         hideSettings(animated: false)
     }
 
-    private func setupNotificationPermission() {
-        let notificationService = NotificationPermissionService.shared
-
-        if notificationService.shouldRequestPermission() {
-            Task {
-                await notificationService.requestNotificationPermission()
-                print("Notification permission requested")
-            }
-        } else {
-            print("Notification permission already requested or not needed")
-        }
-    }
 }
 
 extension MainController: SubscriptionControllerSettingsDelegate {

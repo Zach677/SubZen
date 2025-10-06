@@ -11,15 +11,28 @@ class SubscriptionNotificationManager {
     static let shared = SubscriptionNotificationManager()
 
     private let notificationService: SubscriptionNotificationScheduling
+    private let permissionService: NotificationPermissionService
 
-    init(notificationService: SubscriptionNotificationScheduling = SubscriptionNotificationService()) {
+    init(
+        notificationService: SubscriptionNotificationScheduling = SubscriptionNotificationService(),
+        permissionService: NotificationPermissionService = .shared
+    ) {
         self.notificationService = notificationService
+        self.permissionService = permissionService
     }
 
     // MARK: - Public Methods
 
     /// Schedule notifications for a subscription based on its reminder intervals
     func scheduleNotifications(for subscription: Subscription) async {
+        guard !subscription.reminderIntervals.isEmpty else { return }
+
+        let needsPrompt = await MainActor.run { permissionService.shouldRequestPermission() }
+
+        if needsPrompt {
+            await permissionService.requestNotificationPermission()
+        }
+
         do {
             try await notificationService.scheduleNotifications(for: subscription)
             print("Successfully scheduled notifications for subscription: \(subscription.name)")

@@ -7,15 +7,21 @@
 
 import SnapKit
 import UIKit
+import UserNotifications
 
 class SubscriptionEditorController: UIViewController {
     private let cycles = BillingCycle.allCases
     private let editSubscriptionView = EditSubscriptionView()
     private let subscriptionManager = SubscriptionManager.shared
     private let editSubscription: Subscription?
+    private let notificationPermissionService: NotificationPermissionService
     private var selectedCurrency: Currency
 
-    init(subscription: Subscription? = nil) {
+    init(
+        subscription: Subscription? = nil,
+        notificationPermissionService: NotificationPermissionService = .shared
+    ) {
+        self.notificationPermissionService = notificationPermissionService
         editSubscription = subscription
         if let subscription,
            let currency = CurrencyList.getCurrency(byCode: subscription.currencyCode)
@@ -57,6 +63,26 @@ class SubscriptionEditorController: UIViewController {
         editSubscriptionView.onCurrencyTapped = { [weak self] in
             self?.presentCurrencyPicker()
         }
+        editSubscriptionView.onReminderSelectionChanged = { [weak self] interval in
+            self?.handleReminderSelectionChanged(interval)
+        }
+        editSubscriptionView.onReminderWarningTapped = { [weak self] in
+            self?.handleReminderWarningTapped()
+        }
+
+        updateReminderPermissionWarning()
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        notificationPermissionService.checkCurrentPermissionStatus()
+
+        Task { [weak self] in
+            await Task.yield()
+            await MainActor.run {
+                self?.updateReminderPermissionWarning()
+            }
+        }
     }
 
     private func selectedCycle() -> BillingCycle {
@@ -65,6 +91,13 @@ class SubscriptionEditorController: UIViewController {
     }
 
     private func handleSave() {
+        Task { [weak self] in
+            await self?.performSave()
+        }
+    }
+
+    @MainActor
+    private func performSave() async {
         let cycle = selectedCycle()
         view.endEditing(true)
 
@@ -84,9 +117,14 @@ class SubscriptionEditorController: UIViewController {
             return
         }
 
-        do {
-            let reminderIntervals = editSubscriptionView.getReminderIntervals()
+        let reminderIntervals = editSubscriptionView.getReminderIntervals()
 
+        if !reminderIntervals.isEmpty, notificationPermissionService.shouldRequestPermission() {
+            await notificationPermissionService.requestNotificationPermission()
+            updateReminderPermissionWarning()
+        }
+
+        do {
             if let editing = editSubscription {
                 subscriptionManager.subscriptionEdit(identifier: editing.id) { [weak self] usedSubscription in
                     guard let self else { return }
@@ -111,6 +149,92 @@ class SubscriptionEditorController: UIViewController {
         } catch {
             showAlert(error.localizedDescription)
         }
+
+        updateReminderPermissionWarning()
+    }
+
+    @MainActor
+    private func handleReminderSelectionChanged(_ interval: Int?) {
+        updateReminderPermissionWarning()
+
+        guard interval != nil else { return }
+        guard notificationPermissionService.shouldRequestPermission() else { return }
+
+        Task { [notificationPermissionService, weak self] in
+            await notificationPermissionService.requestNotificationPermission()
+            await MainActor.run {
+                self?.updateReminderPermissionWarning()
+            }
+        }
+    }
+
+    @MainActor
+    private func updateReminderPermissionWarning() {
+        let allowedStatuses: Set<UNAuthorizationStatus> = [.authorized, .provisional, .ephemeral]
+        let hasReminderSelection = !editSubscriptionView.getReminderIntervals().isEmpty
+        let isAuthorized = allowedStatuses.contains(notificationPermissionService.permissionStatus)
+        let shouldShowWarning = hasReminderSelection && notificationPermissionService.hasRequestedPermission && !isAuthorized
+
+        if shouldShowWarning {
+            let message: String
+            switch notificationPermissionService.permissionStatus {
+            case .denied:
+                message = String(localized: "Notifications are turned off. Tap to open notification settings.")
+            case .notDetermined:
+                message = String(localized: "Enable notifications to receive reminders. Tap to open notification settings.")
+            default:
+                message = String(localized: "Enable notifications to receive reminders. Tap to open notification settings.")
+            }
+            editSubscriptionView.setReminderPermissionWarningMessage(message)
+        }
+
+        editSubscriptionView.setReminderPermissionWarningVisible(shouldShowWarning)
+    }
+
+    @MainActor
+    private func handleReminderWarningTapped() {
+        let application = UIApplication.shared
+
+        if let notificationURL = URL(string: UIApplication.openNotificationSettingsURLString),
+           application.canOpenURL(notificationURL)
+        {
+            application.open(notificationURL, options: [:]) { [weak self] success in
+                guard !success else { return }
+                self?.openAppSettingsFallback(using: application)
+            }
+            return
+        }
+
+        openAppSettingsFallback(using: application)
+    }
+
+    @MainActor
+    private func openAppSettingsFallback(using application: UIApplication) {
+        guard let settingsURL = URL(string: UIApplication.openSettingsURLString), application.canOpenURL(settingsURL) else {
+            presentSettingsUnavailableAlert()
+            return
+        }
+
+        application.open(settingsURL, options: [:]) { [weak self] success in
+            guard !success else { return }
+            self?.presentSettingsUnavailableAlert()
+        }
+    }
+
+    @MainActor
+    private func presentSettingsUnavailableAlert() {
+        let alert = UIAlertController(
+            title: String(localized: "Settings Unavailable"),
+            message: String(localized: "Open Settings manually to enable notifications for SubZen."),
+            preferredStyle: .alert
+        )
+        alert.addAction(
+            UIAlertAction(
+                title: String(localized: "OK"),
+                style: .default
+            )
+        )
+        present(alert, animated: true)
     }
 
     private func presentCurrencyPicker() {

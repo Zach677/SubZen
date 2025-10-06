@@ -229,6 +229,16 @@
         }
       }
     },
+    "Enable notifications to receive reminders. Tap to open notification settings." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " 启通知权限才能收到提醒。轻点即可前往通知设置。"
+          }
+        }
+      }
+    },
     "Enter price" : {
       "localizations" : {
         "zh-Hans" : {
@@ -329,12 +339,42 @@
         }
       }
     },
+    "Notifications are turned off. Tap to open notification settings." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通知权限已关闭。轻点即可前往通知设置。"
+          }
+        }
+      }
+    },
     "OK" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "好"
+          }
+        }
+      }
+    },
+    "Open Settings manually to enable notifications for SubZen." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请手动前往“设置”开启 SubZen 的通知权限。"
+          }
+        }
+      }
+    },
+    "Opens notification settings." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开通知设置。"
           }
         }
       }
@@ -471,6 +511,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "发送调试续订通知"
+          }
+        }
+      }
+    },
+    "Settings Unavailable" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设置不可用"
           }
         }
       }

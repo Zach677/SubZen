@@ -6,8 +6,25 @@
     {
       "layers" : [
         {
-          "blend-mode" : "normal",
-          "fill" : "automatic",
+          "blend-mode-specializations" : [
+            {
+              "value" : "normal"
+            },
+            {
+              "appearance" : "dark",
+              "value" : "normal"
+            }
+          ],
+          "fill-specializations" : [
+            {
+              "value" : "automatic"
+            },
+            {
+              "appearance" : "dark",
+              "value" : "automatic"
+            }
+          ],
+          "hidden" : false,
           "image-name" : "subzen 2.png",
           "name" : "subzen"
         }

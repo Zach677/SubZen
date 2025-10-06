@@ -13,6 +13,8 @@ final class ReminderChipPickerView: UIView {
         didSet { updateSelection() }
     }
 
+    var onSelectionChanged: ((Int?) -> Void)?
+
     init(cornerRadius: CGFloat) {
         self.cornerRadius = cornerRadius
         super.init(frame: .zero)
@@ -91,6 +93,8 @@ final class ReminderChipPickerView: UIView {
         } else {
             selectedInterval = value
         }
+
+        onSelectionChanged?(selectedInterval)
     }
 
     private static func title(for days: Int) -> String {

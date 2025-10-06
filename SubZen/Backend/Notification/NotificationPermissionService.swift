@@ -13,6 +13,7 @@ class NotificationPermissionService: ObservableObject {
 
     @Published var permissionStatus: UNAuthorizationStatus = .notDetermined
     @Published var hasRequestedPermission = false
+    @Published private(set) var isRequestingPermission = false
 
     private let userDefaults = UserDefaults.standard
     private let hasRequestedPermissionKey = "HasRequestedNotificationPermission"
@@ -31,7 +32,19 @@ class NotificationPermissionService: ObservableObject {
 
     /// 请求通知权限
     func requestNotificationPermission() async {
-        guard !hasRequestedPermission else { return }
+        let shouldRequest = await MainActor.run { () -> Bool in
+            guard !self.hasRequestedPermission, !self.isRequestingPermission else { return false }
+            self.isRequestingPermission = true
+            return true
+        }
+
+        guard shouldRequest else { return }
+
+        defer {
+            Task { @MainActor in
+                self.isRequestingPermission = false
+            }
+        }
 
         do {
             let granted = try await UNUserNotificationCenter.current().requestAuthorization(
