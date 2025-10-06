@@ -10,7 +10,6 @@ import UserNotifications
 
 protocol SubscriptionNotificationScheduling {
     #if DEBUG
-        func triggerDebugExpirationPreview() async throws
         func triggerDebugExpirationPreview(for subscription: Subscription) async throws
     #endif
     func scheduleNotifications(for subscription: Subscription) async throws
@@ -28,22 +27,6 @@ class SubscriptionNotificationService: SubscriptionNotificationScheduling {
     #if DEBUG
 
         // MARK: - Debug Preview
-
-        func triggerDebugExpirationPreview() async throws {
-            let content = UNMutableNotificationContent()
-            content.title = "Subscription Expiring Soon"
-            content.body = "A subscription is about to renew."
-            content.sound = .default
-
-            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
-            let request = UNNotificationRequest(
-                identifier: "debug.subscription.expiry.preview",
-                content: content,
-                trigger: trigger
-            )
-
-            try await notificationCenter.add(request)
-        }
 
         func triggerDebugExpirationPreview(for subscription: Subscription) async throws {
             let intervals = subscription.reminderIntervals.sorted()

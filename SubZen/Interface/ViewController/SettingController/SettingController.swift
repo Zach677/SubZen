@@ -123,16 +123,6 @@ extension SettingController: SettingViewDelegate {
 
                 let subscriptions = subscriptionProvider()
 
-                guard !subscriptions.isEmpty else {
-                    do {
-                        try await subscriptionNotificationScheduler.triggerDebugExpirationPreview()
-                        print("[DebugNotification] Sent fallback preview notification (no subscriptions).")
-                    } catch {
-                        print("[DebugNotification] Failed to schedule fallback preview: \(error)")
-                    }
-                    return
-                }
-
                 for subscription in subscriptions {
                     do {
                         try await subscriptionNotificationScheduler.triggerDebugExpirationPreview(for: subscription)
