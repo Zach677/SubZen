@@ -96,13 +96,13 @@ final class ReminderChipPickerView: UIView {
     private static func title(for days: Int) -> String {
         switch days {
         case 1:
-            return String(localized: "1 day before")
+            String(localized: "1 day before")
         case 3:
-            return String(localized: "3 days before")
+            String(localized: "3 days before")
         case 7:
-            return String(localized: "7 days before")
+            String(localized: "7 days before")
         default:
-            return String(localized: "\(days) days before")
+            String(localized: "\(days) days before")
         }
     }
 
