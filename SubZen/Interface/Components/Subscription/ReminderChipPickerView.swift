@@ -96,14 +96,13 @@ final class ReminderChipPickerView: UIView {
     private static func title(for days: Int) -> String {
         switch days {
         case 1:
-            return String(localized: "editSubscription.reminder.option.one")
+            return String(localized: "1 day before")
         case 3:
-            return String(localized: "editSubscription.reminder.option.three")
+            return String(localized: "3 days before")
         case 7:
-            return String(localized: "editSubscription.reminder.option.seven")
+            return String(localized: "7 days before")
         default:
-            let format = String(localized: "editSubscription.reminder.option.generic")
-            return String.localizedStringWithFormat(format, days)
+            return String(localized: "\(days) days before")
         }
     }
 

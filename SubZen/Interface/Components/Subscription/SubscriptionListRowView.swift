@@ -52,11 +52,11 @@ class SubscriptionListRowView: UIView {
         )
 
         priceLabel.attributedText = attributed
-        let accessibilityAmountDescription = String(localized: "subscriptions.row.price.accessibility")
+        let accessibilityAmountDescription = String(localized: "\(code) \(symbol) \(amount) per \(cycleDisplayUnit)")
         priceLabel.accessibilityLabel = accessibilityAmountDescription
 
         let remainingDays = subscription.remainingDays
-        daysLabel.text = String(localized: "subscriptions.row.daysLeft")
+        daysLabel.text = String(localized: "\(remainingDays) days left")
     }
 
     private static var formatterCache: [Int: NumberFormatter] = [:]

@@ -16,14 +16,14 @@ class EmptyStateView: UIView {
     }
 
     let titleLabel = UILabel().with {
-        $0.text = String(localized: "subscriptions.emptyState.title")
+        $0.text = String(localized: "No Subscriptions")
         $0.font = .systemFont(ofSize: 22, weight: .medium)
         $0.textColor = .label
         $0.textAlignment = .center
     }
 
     let subtitleLabel = UILabel().with {
-        $0.text = String(localized: "subscriptions.emptyState.subtitle")
+        $0.text = String(localized: "Add your first subscription to get started")
         $0.font = .systemFont(ofSize: 16)
         $0.textColor = .secondaryLabel
         $0.textAlignment = .center

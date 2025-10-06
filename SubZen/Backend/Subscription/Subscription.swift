@@ -32,13 +32,13 @@ enum BillingCycle: String, CaseIterable, Codable {
     var displayUnit: String {
         switch self {
         case .daily:
-            String(localized: "billingCycle.unit.daily")
+            String(localized: "day")
         case .weekly:
-            String(localized: "billingCycle.unit.weekly")
+            String(localized: "week")
         case .monthly:
-            String(localized: "billingCycle.unit.monthly")
+            String(localized: "month")
         case .yearly:
-            String(localized: "billingCycle.unit.yearly")
+            String(localized: "year")
         }
     }
 
@@ -46,13 +46,13 @@ enum BillingCycle: String, CaseIterable, Codable {
     var localizedName: String {
         switch self {
         case .daily:
-            String(localized: "billingCycle.name.daily")
+            String(localized: "Daily")
         case .weekly:
-            String(localized: "billingCycle.name.weekly")
+            String(localized: "Weekly")
         case .monthly:
-            String(localized: "billingCycle.name.monthly")
+            String(localized: "Monthly")
         case .yearly:
-            String(localized: "billingCycle.name.yearly")
+            String(localized: "Yearly")
         }
     }
 }
@@ -68,13 +68,13 @@ enum SubscriptionValidationError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .emptyName:
-            String(localized: "subscription.validation.emptyName")
+            String(localized: "Subscription name cannot be empty")
         case .negativePriceQuestionablePrice:
-            String(localized: "subscription.validation.negativePrice")
+            String(localized: "Subscription price must be greater than 0")
         case .invalidCurrency:
-            String(localized: "subscription.validation.invalidCurrency")
+            String(localized: "Invalid currency code")
         case .futureBillingDate:
-            String(localized: "subscription.validation.futureDate")
+            String(localized: "Last billing date cannot be in the future")
         }
     }
 }

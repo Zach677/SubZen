@@ -113,7 +113,7 @@ extension SubscriptionListView {
         weak var delegate: TitleBarDelegate?
 
         private let titleLabel = UILabel().with {
-            $0.text = String(localized: "subscriptions.titleBar.title")
+            $0.text = String(localized: "SubZen")
             $0.font = UIFont.systemFont(ofSize: 25, weight: .bold)
             $0.textColor = .label
         }

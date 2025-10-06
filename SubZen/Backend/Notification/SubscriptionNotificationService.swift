@@ -121,20 +121,20 @@ class SubscriptionNotificationService: SubscriptionNotificationScheduling {
 
         switch daysBefore {
         case 1:
-            content.title = String(localized: "notification.subscription.tomorrow.title")
-            content.body = String(localized: "notification.subscription.tomorrow.body")
+            content.title = String(localized: "Subscription Renews Tomorrow!")
+            content.body = String(localized: "\(subscription.name) will renew tomorrow.")
         case 3:
-            content.title = String(localized: "notification.subscription.threeDays.title")
-            content.body = String(localized: "notification.subscription.threeDays.body")
+            content.title = String(localized: "Subscription Renews in 3 Days")
+            content.body = String(localized: "\(subscription.name) will renew in 3 days.")
         case 7:
-            content.title = String(localized: "notification.subscription.sevenDays.title")
-            content.body = String(localized: "notification.subscription.sevenDays.body")
+            content.title = String(localized: "Subscription Renews Next Week")
+            content.body = String(localized: "\(subscription.name) will renew next week.")
         case 14:
-            content.title = String(localized: "notification.subscription.twoWeeks.title")
-            content.body = String(localized: "notification.subscription.twoWeeks.body")
+            content.title = String(localized: "Subscription Renews in 2 Weeks")
+            content.body = String(localized: "\(subscription.name) will renew in 2 weeks.")
         default:
-            content.title = String(localized: "notification.subscription.generic.title")
-            content.body = String(localized: "notification.subscription.generic.body")
+            content.title = String(localized: "Subscription Reminder")
+            content.body = String(localized: "\(subscription.name) will renew in \(daysBefore) days.")
         }
 
         content.sound = .default

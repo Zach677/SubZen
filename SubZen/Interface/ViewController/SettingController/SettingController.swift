@@ -52,17 +52,17 @@ class SettingController: UIViewController {
 
     private func presentFinalResetPrompt() {
         let alert = UIAlertController(
-            title: String(localized: "settings.reset.prompt.title"),
-            message: String(localized: "settings.reset.prompt.message"),
+            title: String(localized: "Confirm Reset"),
+            message: String(localized: "Tap Reset to erase all data and restart the app."),
             preferredStyle: .alert
         )
 
         let cancel = UIAlertAction(
-            title: String(localized: "common.cancel"),
+            title: String(localized: "Cancel"),
             style: .cancel
         )
         let reset = UIAlertAction(
-            title: String(localized: "settings.reset.confirm"),
+            title: String(localized: "Reset"),
             style: .destructive
         ) { [weak self] _ in
             self?.performFactoryReset()
@@ -95,13 +95,13 @@ class SettingController: UIViewController {
 
     private func presentResetFailureAlert(error: Error) {
         let alert = UIAlertController(
-            title: String(localized: "settings.reset.failure.title"),
+            title: String(localized: "Reset Failed"),
             message: error.localizedDescription,
             preferredStyle: .alert
         )
         alert.addAction(
             UIAlertAction(
-                title: String(localized: "common.ok"),
+                title: String(localized: "OK"),
                 style: .default
             )
         )
