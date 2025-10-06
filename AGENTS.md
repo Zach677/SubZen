@@ -51,19 +51,58 @@ SubZen is a privacy-first subscription management app for iOS/macOS built with S
 
 ## Coding Standards
 
-### Swift Style Guidelines
-- Follow Swift API Design Guidelines
-- 4-space indentation, braces on same line
-- `PascalCase` for types, `camelCase` for members
-- Use `// MARK:` dividers for code organization
-- Extract helpers when files exceed ~150 lines
-- Route async work through service types
+### Swift Code Style Guidelines
 
-### File Organization
-- Name test files `<Feature>NameTests.swift`
-- Mirror production namespaces in test structure
-- Reuse fixtures from `SubZenTests/Support/`
-- Group related functionality in extensions
+#### Core Style
+- Indent with 4 spaces; keep opening braces on the same line as declarations
+- Insert single spaces around operators and commas for readability
+- Use PascalCase for types and camelCase for properties, methods, and variables
+- Follow Swift API Design Guidelines for naming clarity
+
+#### File Organization
+- Keep files grouped logically within the existing directory structure
+- Name files in PascalCase for types; append `+Feature` when adding extensions
+- Introduce modular extensions rather than growing monolithic types
+- Name test files as `<Feature>NameTests.swift` and mirror production namespaces
+- Reuse fixtures from `SubZenTests/Support/` to avoid duplication
+
+#### Modern Swift Features
+- Prefer the `@Observable` macro over `ObservableObject`/`@Published`
+- Embrace Swift concurrency (`async/await`, `Task`, `actor`, `@MainActor`) where appropriate
+- Use result builders to express declarative APIs when they improve clarity
+- Break long property wrapper declarations across multiple lines for readability
+- Return `some Protocol` for opaque types when exposing constrained abstractions
+- Route async work through service types to keep view models thin
+
+#### Code Structure
+- Favor early returns and `guard` statements to minimize nesting
+- Keep each type or extension focused on a single responsibility
+- Prefer value types; use `final` classes when references are required
+- Organize larger files with `// MARK:` dividers and extract helpers once files exceed ~150 lines
+
+#### Error Handling
+- Model recoverable failures with typed `Result` values
+- Propagate errors with `throws`/`try` and unwrap optionals with `guard let`/`if let`
+- Define explicit error types for each domain and document invariants with comments when non-obvious
+
+#### Architecture
+- Avoid protocol-oriented patterns unless the additional abstraction delivers value
+- Inject dependencies instead of introducing new singletons
+- Prefer composition over inheritance; use factory or repository patterns for construction and persistence concerns
+
+#### Third-Party Libraries
+- Use SnapKit for Auto Layout constraints instead of bare `NSLayoutConstraint`
+- Chain view configuration with `then` to improve readability in setup blocks
+- Localize all user-facing strings with `String(localized:)`
+- Run `make` at the project root to verify builds before sharing changes
+
+#### Debug Assertions
+- Guard developer-only invariants with `assert()` and mark unreachable paths with `assertionFailure()`
+- Use `precondition()` when violating conditions should abort execution even in release builds
+
+#### Memory Management
+- Capture references as `weak` to break cycles; upgrade to `unowned` only when lifetime is guaranteed
+- Provide explicit capture lists in closures and release resources in `deinit`
 
 ## Testing & Quality Assurance
 
