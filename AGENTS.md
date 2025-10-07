@@ -132,6 +132,7 @@ SubZen is a privacy-first subscription manager for iOS and macOS Catalyst built 
 - Maintain license compliance via the DevKit scripts.
 
 ## Platform Considerations
+- Minimum deployment target: iOS 17.0+ across all new code paths (match Catalyst baselines accordingly).
 - Support both iOS and macOS Catalyst from the same UIKit codebase.
 - Keep components platform-neutral; isolate Catalyst-specific deltas in extensions.
 - Test critical flows on both platforms before release.

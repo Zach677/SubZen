@@ -60,23 +60,23 @@ final class CurrencyPickerController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: Constants.reuseIdentifier, for: indexPath)
         let currency = filteredCurrencies[indexPath.row]
-
         var content = UIListContentConfiguration.subtitleCell()
         content.text = currency.name
         let displaySymbol = CurrencyList.displaySymbol(for: currency.code)
         let symbolPart = displaySymbol.caseInsensitiveCompare(currency.code) == .orderedSame
             ? currency.code
             : "\(displaySymbol) \(currency.code)"
-        content.secondaryText = symbolPart
         content.textProperties.font = .systemFont(ofSize: 17, weight: .semibold)
+        content.secondaryText = symbolPart
+        content.secondaryTextProperties.font = .systemFont(ofSize: 15, weight: .regular)
         content.secondaryTextProperties.color = .secondaryLabel
         cell.contentConfiguration = content
 
-        if currency.code == selectedCode {
-            cell.accessoryType = .checkmark
-        } else {
-            cell.accessoryType = .none
-        }
+        var background = UIBackgroundConfiguration.listGroupedCell()
+        background = background.updated(for: cell.configurationState)
+        cell.backgroundConfiguration = background
+
+        cell.accessoryType = currency.code == selectedCode ? .checkmark : .none
 
         return cell
     }
