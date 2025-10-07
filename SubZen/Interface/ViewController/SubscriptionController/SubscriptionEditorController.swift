@@ -26,15 +26,10 @@ class SubscriptionEditorController: UIViewController {
         self.notificationPermissionService = notificationPermissionService
         self.reminderPermissionPresenter = reminderPermissionPresenter ?? ReminderPermissionPresenter(notificationPermissionService: notificationPermissionService)
         editSubscription = subscription
-        if let subscription,
-           let currency = CurrencyList.getCurrency(byCode: subscription.currencyCode)
-        {
-            selectedCurrency = currency
-        } else if let fallback = CurrencyList.allCurrencies.first {
-            selectedCurrency = fallback
-        } else {
-            selectedCurrency = Currency(code: "USD", numeric: "840", name: "US Dollar", symbol: "$", decimalDigits: 2)
-        }
+        selectedCurrency = subscription
+            .flatMap { CurrencyList.getCurrency(byCode: $0.currencyCode) }
+            ?? CurrencyList.allCurrencies.first
+            ?? Currency(code: "USD", numeric: "840", name: "US Dollar", symbol: "$", decimalDigits: 2)
         super.init(nibName: nil, bundle: nil)
     }
 

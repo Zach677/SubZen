@@ -51,12 +51,7 @@ final class ReminderChipPickerView: UIView {
             segmentedControl.insertSegment(withTitle: Self.title(for: option), at: index, animated: false)
         }
 
-        if let selected = selectedInterval, !options.contains(selected) {
-            selectedInterval = nil
-        } else {
-            updateSelection()
-        }
-
+        selectedInterval = selectedInterval.flatMap { options.contains($0) ? $0 : nil }
         updateAppearance(reduceTransparencyActive: reduceTransparencyActive)
     }
 
@@ -88,12 +83,7 @@ final class ReminderChipPickerView: UIView {
         }
 
         let value = options[selectedIndex]
-        if selectedInterval == value {
-            selectedInterval = nil
-        } else {
-            selectedInterval = value
-        }
-
+        selectedInterval = selectedInterval == value ? nil : value
         onSelectionChanged?(selectedInterval)
     }
 

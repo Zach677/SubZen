@@ -52,17 +52,13 @@ class SubscriptionNotificationManager {
         // Cancel existing notifications
         await cancelNotifications(for: subscription)
 
-        // Schedule new notifications if there are reminder intervals
-        if !subscription.reminderIntervals.isEmpty {
-            await scheduleNotifications(for: subscription)
-        }
+        // Schedule new notifications; implementation skips empty intervals
+        await scheduleNotifications(for: subscription)
     }
 
     /// Handle subscription creation - schedule notifications if reminder intervals are set
     func handleSubscriptionCreated(_ subscription: Subscription) async {
-        if !subscription.reminderIntervals.isEmpty {
-            await scheduleNotifications(for: subscription)
-        }
+        await scheduleNotifications(for: subscription)
     }
 
     /// Handle subscription update - update notifications

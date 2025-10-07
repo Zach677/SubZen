@@ -43,9 +43,7 @@ class SubscriptionNotificationService: SubscriptionNotificationScheduling {
                 .filter { $0.identifier.hasPrefix(debugIdentifierPrefix) }
                 .map(\.identifier)
 
-            if !identifiersToRemove.isEmpty {
-                notificationCenter.removePendingNotificationRequests(withIdentifiers: identifiersToRemove)
-            }
+            notificationCenter.removePendingNotificationRequests(withIdentifiers: identifiersToRemove)
 
             var delay: TimeInterval = 1
 
@@ -150,10 +148,9 @@ class SubscriptionNotificationService: SubscriptionNotificationScheduling {
         let pendingRequests = await notificationCenter.pendingNotificationRequests()
         let subscriptionIdentifiers = pendingRequests.filter { $0.identifier.contains(".expiry.") }.map(\.identifier)
 
-        if !subscriptionIdentifiers.isEmpty {
-            notificationCenter.removePendingNotificationRequests(withIdentifiers: subscriptionIdentifiers)
-            print("Cancelled \(subscriptionIdentifiers.count) scheduled subscription notifications")
-        }
+        notificationCenter.removePendingNotificationRequests(withIdentifiers: subscriptionIdentifiers)
+        guard !subscriptionIdentifiers.isEmpty else { return }
+        print("Cancelled \(subscriptionIdentifiers.count) scheduled subscription notifications")
     }
 
     /// Cancel notifications for a specific subscription
@@ -161,9 +158,8 @@ class SubscriptionNotificationService: SubscriptionNotificationScheduling {
         let pendingRequests = await notificationCenter.pendingNotificationRequests()
         let subscriptionIdentifiers = pendingRequests.filter { $0.identifier.hasPrefix("\(subscription.id.uuidString).expiry.") }.map(\.identifier)
 
-        if !subscriptionIdentifiers.isEmpty {
-            notificationCenter.removePendingNotificationRequests(withIdentifiers: subscriptionIdentifiers)
-            print("Cancelled \(subscriptionIdentifiers.count) notifications for '\(subscription.name)'")
-        }
+        notificationCenter.removePendingNotificationRequests(withIdentifiers: subscriptionIdentifiers)
+        guard !subscriptionIdentifiers.isEmpty else { return }
+        print("Cancelled \(subscriptionIdentifiers.count) notifications for '\(subscription.name)'")
     }
 }
