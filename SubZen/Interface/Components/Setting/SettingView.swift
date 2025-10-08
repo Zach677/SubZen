@@ -26,8 +26,8 @@ class SettingView: UIView {
     }
 
     private let titleLabel = UILabel().with {
-        $0.text = String(localized: "Reset")
-        $0.font = UIFont.systemFont(ofSize: 15, weight: .medium)
+        $0.text = String(localized: "Setting")
+        $0.font = UIFont.systemFont(ofSize: 24, weight: .bold)
         $0.textColor = .label
         $0.numberOfLines = 0
     }
@@ -76,9 +76,10 @@ class SettingView: UIView {
 
         contentStack.addArrangedSubview(titleLabel)
 
+				contentStack.addArrangedSubview(resetlabel)
         resetActionView.addTarget(self, action: #selector(handleResetTapped), for: .touchUpInside)
         contentStack.addArrangedSubview(resetActionView)
-        contentStack.setCustomSpacing(18, after: resetActionView)
+        contentStack.setCustomSpacing(12, after: resetActionView)
 
         let infoStack = UIStackView(arrangedSubviews: [separatorView, warningLabel]).with {
             $0.axis = .vertical

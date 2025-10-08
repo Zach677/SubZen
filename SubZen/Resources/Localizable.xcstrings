@@ -515,6 +515,16 @@
         }
       }
     },
+    "Setting" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设置"
+          }
+        }
+      }
+    },
     "Settings Unavailable" : {
       "localizations" : {
         "zh-Hans" : {
