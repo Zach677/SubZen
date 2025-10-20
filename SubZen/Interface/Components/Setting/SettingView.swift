@@ -75,8 +75,6 @@ class SettingView: UIView {
         }
 
         contentStack.addArrangedSubview(titleLabel)
-
-				contentStack.addArrangedSubview(resetlabel)
         resetActionView.addTarget(self, action: #selector(handleResetTapped), for: .touchUpInside)
         contentStack.addArrangedSubview(resetActionView)
         contentStack.setCustomSpacing(12, after: resetActionView)
