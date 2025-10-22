@@ -57,6 +57,9 @@ class SubscriptionListRowView: UIView {
 
         let remainingDays = subscription.remainingDays
         daysLabel.text = String(localized: "\(remainingDays) days left")
+				if (remainingDays == 0) {
+						daysLabel.text = String(localized: "Today!")
+				}
     }
 
     private static var formatterCache: [Int: NumberFormatter] = [:]

@@ -645,6 +645,16 @@
         }
       }
     },
+    "Today!" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今天！"
+          }
+        }
+      }
+    },
     "week" : {
       "localizations" : {
         "zh-Hans" : {

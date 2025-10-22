@@ -212,16 +212,32 @@ final class Subscription: Codable, Identifiable, Equatable {
 
     /// Calculate remaining days until next billing date
     var remainingDays: Int {
-        let nextBillingDate = calculateNextBillingDate()
         let currentDate = Date()
-
-        // Use startOfDay to avoid truncating partial days when calculating the gap.
         let calendar = Calendar.current
+
+        var probe = lastBillingDate
+        while true {
+            guard let next = calendar.date(
+                byAdding: cycle.calendarComponent,
+                value: cycle.calendarValue,
+                to: probe
+            ) else { break }
+
+            if calendar.isDate(next, inSameDayAs: currentDate) {
+                return 0
+            }
+
+            // If the next boundary is in the future (and not today), stop probing.
+            if next > currentDate { break }
+
+            // Advance probe and continue.
+            probe = next
+        }
+
+        let nextBillingDate = calculateNextBillingDate()
         let startOfCurrentDay = calendar.startOfDay(for: currentDate)
         let startOfNextBillingDay = calendar.startOfDay(for: nextBillingDate)
         let components = calendar.dateComponents([.day], from: startOfCurrentDay, to: startOfNextBillingDay)
-
-        // Return 0 if past billing date (needs immediate renewal)
         return max(0, components.day ?? 0)
     }
 
