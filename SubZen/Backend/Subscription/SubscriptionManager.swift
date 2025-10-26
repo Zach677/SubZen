@@ -42,7 +42,7 @@ class SubscriptionManager {
         }
     }
 
-    func getAllSubscriptions() -> [Subscription] {
+    func allSubscriptions() -> [Subscription] {
         subscriptions
     }
 

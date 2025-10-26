@@ -180,7 +180,14 @@
       }
     },
     "Currency" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "货币"
+          }
+        }
+      }
     },
     "Cycle" : {
       "localizations" : {

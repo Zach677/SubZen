@@ -30,7 +30,7 @@ class SubscriptionEditorController: UIViewController {
         editSubscription = subscription
         self.defaultCurrencyProvider = defaultCurrencyProvider
         selectedCurrency = subscription
-            .flatMap { CurrencyList.getCurrency(byCode: $0.currencyCode) }
+            .flatMap { CurrencyList.currency(for: $0.currencyCode) }
             ?? defaultCurrencyProvider.loadDefaultCurrency()
         super.init(nibName: nil, bundle: nil)
     }
@@ -49,12 +49,12 @@ class SubscriptionEditorController: UIViewController {
             make.edges.equalTo(view.safeAreaLayoutGuide)
         }
 
-        if let usedSubscription = editSubscription {
-            editSubscriptionView.nameTextField.text = usedSubscription.name
-            editSubscriptionView.priceTextField.text = NSDecimalNumber(decimal: usedSubscription.price).stringValue
-            editSubscriptionView.datePicker.date = usedSubscription.lastBillingDate
-            editSubscriptionView.cycleSegmentedControl.selectedSegmentIndex = cycles.firstIndex(of: usedSubscription.cycle) ?? 2
-            editSubscriptionView.setReminderIntervals(usedSubscription.reminderIntervals)
+        if let existingSubscription = editSubscription {
+            editSubscriptionView.nameTextField.text = existingSubscription.name
+            editSubscriptionView.priceTextField.text = NSDecimalNumber(decimal: existingSubscription.price).stringValue
+            editSubscriptionView.datePicker.date = existingSubscription.lastBillingDate
+            editSubscriptionView.cycleSegmentedControl.selectedSegmentIndex = cycles.firstIndex(of: existingSubscription.cycle) ?? 2
+            editSubscriptionView.setReminderIntervals(existingSubscription.reminderIntervals)
         }
         editSubscriptionView.updateSelectedCurrencyDisplay(with: selectedCurrency)
         editSubscriptionView.onSaveTapped = { [weak self] in
@@ -86,8 +86,8 @@ class SubscriptionEditorController: UIViewController {
     }
 
     private func selectedCycle() -> BillingCycle {
-        let ix = editSubscriptionView.cycleSegmentedControl.selectedSegmentIndex
-        return (0 ..< cycles.count).contains(ix) ? cycles[ix] : .monthly
+        let selectedIndex = editSubscriptionView.cycleSegmentedControl.selectedSegmentIndex
+        return (0 ..< cycles.count).contains(selectedIndex) ? cycles[selectedIndex] : .monthly
     }
 
     private func handleSave() {
@@ -117,7 +117,7 @@ class SubscriptionEditorController: UIViewController {
             return
         }
 
-        let reminderIntervals = editSubscriptionView.getReminderIntervals()
+        let reminderIntervals = editSubscriptionView.selectedReminderIntervals()
 
         if reminderPermissionPresenter.shouldRequestPermissionOnSelectionChange(hasReminderSelection: !reminderIntervals.isEmpty) {
             await notificationPermissionService.requestNotificationPermission()
@@ -125,14 +125,14 @@ class SubscriptionEditorController: UIViewController {
 
         do {
             if let editing = editSubscription {
-                subscriptionManager.subscriptionEdit(identifier: editing.id) { [weak self] usedSubscription in
+                subscriptionManager.subscriptionEdit(identifier: editing.id) { [weak self] editingSubscription in
                     guard let self else { return }
-                    usedSubscription.name = name
-                    usedSubscription.price = price
-                    usedSubscription.lastBillingDate = date
-                    usedSubscription.cycle = cycle
-                    usedSubscription.currencyCode = selectedCurrency.code
-                    usedSubscription.reminderIntervals = reminderIntervals
+                    editingSubscription.name = name
+                    editingSubscription.price = price
+                    editingSubscription.lastBillingDate = date
+                    editingSubscription.cycle = cycle
+                    editingSubscription.currencyCode = selectedCurrency.code
+                    editingSubscription.reminderIntervals = reminderIntervals
                 }
             } else {
                 _ = try subscriptionManager.createSubscription(
@@ -169,7 +169,7 @@ class SubscriptionEditorController: UIViewController {
 
     @MainActor
     private func updateReminderPermissionBanner() {
-        let hasReminderSelection = !editSubscriptionView.getReminderIntervals().isEmpty
+        let hasReminderSelection = !editSubscriptionView.selectedReminderIntervals().isEmpty
         let viewState = reminderPermissionPresenter.makeViewState(hasReminderSelection: hasReminderSelection)
         editSubscriptionView.updateReminderPermissionBanner(
             isVisible: viewState.isBannerVisible,

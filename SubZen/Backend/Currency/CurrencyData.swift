@@ -52,12 +52,12 @@ enum CurrencyList {
     static let allCurrencies: [Currency] = loadCurrencies()
     static let supportedCurrencyCodes: Set<String> = Set(allCurrencies.map(\.code))
 
-    static func getCurrency(byCode code: String) -> Currency? {
+    static func currency(for code: String) -> Currency? {
         let uppercasedCode = code.uppercased()
         return allCurrencies.first { $0.code == uppercasedCode }
     }
 
-    static func getSymbol(for code: String) -> String {
+    static func symbol(for code: String) -> String {
         displaySymbol(for: code)
     }
 
@@ -72,7 +72,7 @@ enum CurrencyList {
             return cached
         }
 
-        if let currency = getCurrency(byCode: normalized),
+        if let currency = currency(for: normalized),
            currency.symbol.caseInsensitiveCompare(normalized) != .orderedSame
         {
             displaySymbolCache[normalized] = currency.symbol

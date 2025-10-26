@@ -74,7 +74,7 @@ class SubscriptionNotificationService: SubscriptionNotificationScheduling {
         }
 
         let remainingDays = subscription.remainingDays
-        let nextBillingDate = subscription.getNextBillingDate()
+        let nextBillingDate = subscription.nextBillingDate()
 
         guard remainingDays > 0 else {
             print("Subscription '\(subscription.name)' has already expired or expires today, skipping notification")

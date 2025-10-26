@@ -23,15 +23,15 @@ struct DefaultCurrencyProvider: DefaultCurrencyProviding {
 
     func loadDefaultCurrency() -> Currency {
         if let code = userDefaults.string(forKey: key),
-           let c = CurrencyList.getCurrency(byCode: code)
+           let currency = CurrencyList.currency(for: code)
         {
-            return c
+            return currency
         }
 
         if let localeCode = Locale.current.currency?.identifier,
-           let c = CurrencyList.getCurrency(byCode: localeCode)
+           let currency = CurrencyList.currency(for: localeCode)
         {
-            return c
+            return currency
         }
 
         return Currency(code: "USD", numeric: "840", name: "US Dollar", symbol: "$", decimalDigits: 2)
@@ -41,4 +41,3 @@ struct DefaultCurrencyProvider: DefaultCurrencyProviding {
         userDefaults.set(currency.code, forKey: key)
     }
 }
-

@@ -10,19 +10,19 @@ import UIKit
 class SettingController: UIViewController {
     private var settingView: SettingView { view as! SettingView }
     private var isResetInProgress = false
-    private let notificationPermissonService: NotificationPermissionService
+    private let notificationPermissionService: NotificationPermissionService
     private let subscriptionNotificationScheduler: SubscriptionNotificationScheduling
     private let defaultCurrencyProvider: DefaultCurrencyProviding
     #if DEBUG
         private let subscriptionProvider: () -> [Subscription]
 
         init(
-            notificationPermissonService: NotificationPermissionService = .shared,
+            notificationPermissionService: NotificationPermissionService = .shared,
             subscriptionNotificationScheduler: SubscriptionNotificationScheduling = SubscriptionNotificationService(),
-            subscriptionProvider: @escaping () -> [Subscription] = { SubscriptionManager.shared.getAllSubscriptions() },
+            subscriptionProvider: @escaping () -> [Subscription] = { SubscriptionManager.shared.allSubscriptions() },
             defaultCurrencyProvider: DefaultCurrencyProviding = DefaultCurrencyProvider()
         ) {
-            self.notificationPermissonService = notificationPermissonService
+            self.notificationPermissionService = notificationPermissionService
             self.subscriptionNotificationScheduler = subscriptionNotificationScheduler
             self.subscriptionProvider = subscriptionProvider
             self.defaultCurrencyProvider = defaultCurrencyProvider
@@ -30,11 +30,11 @@ class SettingController: UIViewController {
         }
     #else
         init(
-            notificationPermissonService: NotificationPermissionService = .shared,
+            notificationPermissionService: NotificationPermissionService = .shared,
             subscriptionNotificationScheduler: SubscriptionNotificationScheduling = SubscriptionNotificationService(),
             defaultCurrencyProvider: DefaultCurrencyProviding = DefaultCurrencyProvider()
         ) {
-            self.notificationPermissonService = notificationPermissonService
+            self.notificationPermissionService = notificationPermissionService
             self.subscriptionNotificationScheduler = subscriptionNotificationScheduler
             self.defaultCurrencyProvider = defaultCurrencyProvider
             super.init(nibName: nil, bundle: nil)
@@ -130,10 +130,10 @@ class SettingController: UIViewController {
 						self.settingView.setDefaultCurrency(currency)
 						self.defaultCurrencyProvider.saveDefaultCurrency(currency)
 				}
-				let nav = UINavigationController(rootViewController: picker)
-				nav.modalPresentationStyle = .pageSheet
-				if let sheet = nav.sheetPresentationController { sheet.detents = [.medium(), .large()] }
-				present(nav, animated: true)
+        let navigationController = UINavigationController(rootViewController: picker)
+        navigationController.modalPresentationStyle = .pageSheet
+        if let sheet = navigationController.sheetPresentationController { sheet.detents = [.medium(), .large()] }
+        present(navigationController, animated: true)
 		}
 }
 
@@ -148,12 +148,12 @@ extension SettingController: SettingViewDelegate {
     #if DEBUG
         func settingViewDidTapDebugNotification(_: SettingView) {
             Task { [
-                notificationPermissonService,
+                notificationPermissionService,
                 subscriptionNotificationScheduler,
                 subscriptionProvider
             ] in
-                if notificationPermissonService.shouldRequestPermission() {
-                    await notificationPermissonService.requestNotificationPermission()
+                if notificationPermissionService.shouldRequestPermission() {
+                    await notificationPermissionService.requestNotificationPermission()
                 }
 
                 let subscriptions = subscriptionProvider()

@@ -260,8 +260,8 @@ final class Subscription: Codable, Identifiable, Equatable {
         return nextBillingDate
     }
 
-    /// Get next billing date (public accessor)
-    func getNextBillingDate() -> Date {
+    /// Next billing date (public accessor)
+    func nextBillingDate() -> Date {
         calculateNextBillingDate()
     }
 }

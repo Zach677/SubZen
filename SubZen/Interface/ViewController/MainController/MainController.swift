@@ -14,10 +14,10 @@ class MainController: UIViewController {
     }
 
     private let subscriptionController = SubscriptionController()
-    private let notificationPermissonService = NotificationPermissionService.shared
+    private let notificationPermissionService = NotificationPermissionService.shared
     private lazy var subscriptionNotificationService = SubscriptionNotificationService()
     private lazy var settingsController = SettingController(
-        notificationPermissonService: notificationPermissonService,
+        notificationPermissionService: notificationPermissionService,
         subscriptionNotificationScheduler: subscriptionNotificationService
     )
     private let settingsContainer = UIView().with {
@@ -44,7 +44,7 @@ class MainController: UIViewController {
     }
 
     @objc private func handlePanGesture(_ gesture: UIPanGestureRecognizer) {
-        let tx = gesture.translation(in: view).x
+        let translationX = gesture.translation(in: view).x
 
         switch gesture.state {
         case .began:
@@ -69,7 +69,7 @@ class MainController: UIViewController {
         case .changed:
             guard isHandlingPan else { return }
 
-            var visibleX = panStartX + tx
+            var visibleX = panStartX + translationX
             visibleX = min(max(0, visibleX), settingsWidth)
 
             settingsLeadingConstraint?.update(offset: visibleX - settingsWidth)
@@ -90,13 +90,13 @@ class MainController: UIViewController {
 
             isHandlingPan = false
 
-            let vx = gesture.velocity(in: view).x
+            let velocityX = gesture.velocity(in: view).x
             let speedThreshold: CGFloat = 300
             let positionThreshold = settingsWidth * 0.25
 
-            let shouldShow: Bool = if vx > speedThreshold {
+            let shouldShow: Bool = if velocityX > speedThreshold {
                 true
-            } else if vx < -speedThreshold {
+            } else if velocityX < -speedThreshold {
                 false
             } else {
                 panVisibleX > positionThreshold

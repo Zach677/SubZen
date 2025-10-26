@@ -12,7 +12,7 @@ class SubscriptionListRowView: UIView {
     func configure(with subscription: Subscription) {
         titleLabel.text = subscription.name
         let code = subscription.currencyCode.uppercased()
-        let currency = CurrencyList.getCurrency(byCode: code)
+        let currency = CurrencyList.currency(for: code)
         let decimals = currency?.decimalDigits ?? 2
         let symbol = CurrencyList.displaySymbol(for: code)
         let cycleDisplayUnit = subscription.cycle.displayUnit

@@ -55,7 +55,7 @@ class SubscriptionController: UIViewController {
     }
 
     func loadSubscriptions() {
-        let subscriptions = subscriptionManager.getAllSubscriptions()
+        let subscriptions = subscriptionManager.allSubscriptions()
         subscriptionListView.updateSubscriptions(subscriptions)
     }
 

@@ -361,7 +361,7 @@ final class EditSubscriptionView: UIView {
         reminderPickerView.selectedInterval = intervals.first
     }
 
-    func getReminderIntervals() -> [Int] {
+    func selectedReminderIntervals() -> [Int] {
         guard let interval = reminderPickerView.selectedInterval else { return [] }
         return [interval]
     }
