@@ -496,6 +496,7 @@
       }
     },
     "Send Debug Renewal Notifications" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
