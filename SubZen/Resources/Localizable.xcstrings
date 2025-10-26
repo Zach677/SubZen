@@ -269,16 +269,6 @@
         }
       }
     },
-    "If you encounter any issues, try resetting the app. This removes all content and resets the entire database." : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "如果遇到问题，可尝试重置应用。这将清除所有内容并重建整个数据库。"
-          }
-        }
-      }
-    },
     "Invalid currency code" : {
       "localizations" : {
         "zh-Hans" : {
@@ -429,22 +419,22 @@
         }
       }
     },
+    "Reset All Data" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "清除所有数据"
+          }
+        }
+      }
+    },
     "Reset Failed" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "重置失败"
-          }
-        }
-      }
-    },
-    "Resets the application and clears all data." : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "重置应用并清除所有数据。"
           }
         }
       }

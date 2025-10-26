@@ -1,6 +1,7 @@
 # Copy from https://github.com/Lakr233/FlowDown/blob/bc9ba079f9474f315b985255a4e9ed67b72e9fd0/Resources/DevKit/scripts/archive.all.sh, which is licensed under the MIT license.
 #!/bin/zsh
 
+set -euo pipefail
 cd "$(dirname "$0")"
 
 while [[ ! -d .git ]] && [[ "$(pwd)" != "/" ]]; do
@@ -38,14 +39,14 @@ echo "[*] registering SubZen.xcarchive in Xcode Organizer..."
 open "$PROJECT_ROOT/.build/SubZen.xcarchive" -g
 
 # xcodebuild -workspace SubZen.xcworkspace \
-#     -scheme SubZen-Catalyst \
+#     -scheme SubZen \
 #     -configuration Release \
 #     -destination 'generic/platform=macOS' \
-#     -archivePath "$PROJECT_ROOT/.build/SubZen-Catalyst.xcarchive" \
+#     -archivePath "$PROJECT_ROOT/.build/SubZen-macOS.xcarchive" \
 #     archive | xcbeautify
 
-# echo "[*] registering SubZen-Catalyst.xcarchive in Xcode Organizer..."
-# open "$PROJECT_ROOT/.build/SubZen-Catalyst.xcarchive" -g
+# echo "[*] registering SubZen-macOS.xcarchive in Xcode Organizer..."
+# open "$PROJECT_ROOT/.build/SubZen-macOS.xcarchive" -g
 
 echo "[*] done"
 

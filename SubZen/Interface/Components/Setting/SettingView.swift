@@ -31,14 +31,34 @@ class SettingView: UIView {
         $0.textColor = .label
         $0.numberOfLines = 0
     }
-
-    private let resetActionView = ResetActionControl()
-
-    private let separatorView = UIView().with {
-        $0.backgroundColor = .separator
-        $0.layer.cornerRadius = 0.5
-        $0.clipsToBounds = true
-    }
+		
+		private lazy var resetButton = UIButton().with { button in
+				let title = String(localized: "Reset All Data")
+				let insets = NSDirectionalEdgeInsets(top: 14, leading: 16, bottom: 14, trailing: 16)
+				
+				if #available(iOS 26.0, *), !UIAccessibility.isReduceMotionEnabled {
+						var config = UIButton.Configuration.prominentGlass()
+						config.title = title
+						config.contentInsets = insets
+						config.cornerStyle = .large
+						config.buttonSize = .large
+						config.baseForegroundColor = .white
+						config.background.backgroundColor = UIColor.systemRed.withAlphaComponent(0.9)
+						button.configuration = config
+				} else {
+						var config = UIButton.Configuration.borderedProminent()
+						config.title = title
+						config.cornerStyle = .large
+						config.baseBackgroundColor = .white
+						config.buttonSize = .large
+						config.contentInsets = insets
+						config.baseBackgroundColor = .systemRed
+						button.configuration = config
+				}
+				
+				button.addTarget(self, action: #selector(handleResetTapped), for: .touchUpInside)
+				button.accessibilityIdentifier = "reset_all_data_button"
+		}
 
     private let warningLabel = UILabel().with {
         $0.text = String(localized: "This action cannot be undone.")
@@ -62,48 +82,39 @@ class SettingView: UIView {
     init() {
         super.init(frame: .zero)
         backgroundColor = .background
-        setupLayout()
+				addSubview(contentStack)
+				contentStack.snp.makeConstraints { make in
+						make.top.equalTo(safeAreaLayoutGuide.snp.top).offset(32)
+						make.leading.equalToSuperview().offset(24)
+						make.trailing.equalToSuperview().offset(-24)
+						make.bottom.lessThanOrEqualTo(safeAreaLayoutGuide.snp.bottom).offset(-32)
+				}
+				
+				let resetSection = UIStackView(arrangedSubviews: [resetButton, warningLabel]).with {
+						$0.axis = .vertical
+						$0.spacing = 8
+						$0.alignment = .fill
+				}
+
+				contentStack.addArrangedSubview(titleLabel)
+				contentStack.addArrangedSubview(resetSection)
+				
+				resetButton.snp.makeConstraints { make in
+						make.height.equalTo(52)
+				}
+
+				#if DEBUG
+						debugNotificationButton.addTarget(self, action: #selector(handleDebugNotificationTapped), for: .touchUpInside)
+						contentStack.addArrangedSubview(debugNotificationButton)
+				#endif
     }
-
-    private func setupLayout() {
-        addSubview(contentStack)
-        contentStack.snp.makeConstraints { make in
-            make.top.equalTo(safeAreaLayoutGuide.snp.top).offset(32)
-            make.leading.equalToSuperview().offset(24)
-            make.trailing.equalToSuperview().offset(-24)
-            make.bottom.lessThanOrEqualTo(safeAreaLayoutGuide.snp.bottom).offset(-32)
-        }
-
-        contentStack.addArrangedSubview(titleLabel)
-        resetActionView.addTarget(self, action: #selector(handleResetTapped), for: .touchUpInside)
-        contentStack.addArrangedSubview(resetActionView)
-        contentStack.setCustomSpacing(12, after: resetActionView)
-
-        let infoStack = UIStackView(arrangedSubviews: [separatorView, warningLabel]).with {
-            $0.axis = .vertical
-            $0.spacing = 12
-            $0.alignment = .fill
-        }
-
-        #if DEBUG
-            contentStack.setCustomSpacing(32, after: infoStack)
-
-            debugNotificationButton.addTarget(self, action: #selector(handleDebugNotificationTapped), for: .touchUpInside)
-            contentStack.addArrangedSubview(debugNotificationButton)
-        #endif
-
-        separatorView.snp.makeConstraints { make in
-            make.height.equalTo(1)
-        }
-
-        contentStack.addArrangedSubview(infoStack)
-
-        resetActionView.updateEnabledState(true, animated: false)
-    }
-
-    func setResetEnabled(_ enabled: Bool) {
-        resetActionView.updateEnabledState(enabled, animated: true)
-    }
+		
+		func setResetEnabled(_ enabled: Bool) {
+				resetButton.isEnabled = enabled
+				UIView.animate(withDuration: 0.2) {
+						self.resetButton.alpha = enabled ? 1.0 : 0.6
+				}
+		}
 
     @objc private func handleResetTapped() {
         delegate?.settingViewDidTapReset(self)
@@ -118,141 +129,5 @@ class SettingView: UIView {
     @available(*, unavailable)
     required init?(coder _: NSCoder) {
         fatalError()
-    }
-}
-
-private final class ResetActionControl: UIControl {
-    private let highlightView = UIView()
-    private let contentStack = UIStackView()
-    private let iconView = UIImageView()
-    private let titleLabel = UILabel()
-    private let descriptionLabel = UILabel()
-    private let activityIndicator = UIActivityIndicatorView(style: .medium)
-    private let spacer = UIView()
-
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        setup()
-    }
-
-    @available(*, unavailable)
-    required init?(coder _: NSCoder) {
-        fatalError()
-    }
-
-    override var isHighlighted: Bool {
-        didSet { updateHighlight(animated: true) }
-    }
-
-    func updateEnabledState(_ enabled: Bool, animated: Bool = true) {
-        isEnabled = enabled
-        let tintColor = enabled ? UIColor.systemBlue : UIColor.systemGray2
-        iconView.tintColor = tintColor
-        titleLabel.textColor = tintColor
-        descriptionLabel.textColor = enabled ? .secondaryLabel : .tertiaryLabel
-
-        if enabled {
-            activityIndicator.stopAnimating()
-        } else {
-            activityIndicator.startAnimating()
-        }
-        activityIndicator.isHidden = enabled
-
-        let apply = {
-            self.alpha = enabled ? 1.0 : 0.6
-        }
-
-        if animated {
-            UIView.animate(withDuration: 0.2, animations: apply)
-        } else {
-            apply()
-        }
-
-        if !enabled {
-            updateHighlight(animated: false)
-        }
-    }
-
-    private func setup() {
-        isAccessibilityElement = true
-        accessibilityTraits.insert(.button)
-        accessibilityLabel = String(localized: "Reset")
-        accessibilityHint = String(localized: "Resets the application and clears all data.")
-
-        layoutMargins = UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
-
-        highlightView.backgroundColor = UIColor.secondarySystemFill
-        highlightView.layer.cornerRadius = 14
-        highlightView.layer.cornerCurve = .continuous
-        highlightView.alpha = 0
-        highlightView.isUserInteractionEnabled = false
-        addSubview(highlightView)
-        highlightView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-
-        contentStack.axis = .vertical
-        contentStack.spacing = 0
-        contentStack.alignment = .fill
-        contentStack.isUserInteractionEnabled = false
-        addSubview(contentStack)
-        contentStack.snp.makeConstraints { make in
-            make.top.equalTo(layoutMarginsGuide.snp.top)
-            make.leading.equalTo(layoutMarginsGuide.snp.leading)
-            make.trailing.equalTo(layoutMarginsGuide.snp.trailing)
-            make.bottom.equalTo(layoutMarginsGuide.snp.bottom)
-        }
-
-        let symbolConfig = UIImage.SymbolConfiguration(pointSize: 16, weight: .semibold)
-        iconView.image = UIImage(systemName: "arrow.counterclockwise", withConfiguration: symbolConfig)
-        iconView.tintColor = .systemBlue
-        iconView.setContentHuggingPriority(.required, for: .horizontal)
-        iconView.setContentCompressionResistancePriority(.required, for: .horizontal)
-
-        titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
-        titleLabel.textColor = .systemBlue
-        titleLabel.text = String(localized: "Reset")
-
-        spacer.setContentHuggingPriority(.defaultLow, for: .horizontal)
-        spacer.setContentCompressionResistancePriority(.fittingSizeLevel, for: .horizontal)
-
-        activityIndicator.hidesWhenStopped = true
-        activityIndicator.color = .systemBlue
-        activityIndicator.isHidden = true
-
-        descriptionLabel.font = UIFont.systemFont(ofSize: 14, weight: .regular)
-        descriptionLabel.textColor = .secondaryLabel
-        descriptionLabel.numberOfLines = 0
-        descriptionLabel.text = String(localized: "If you encounter any issues, try resetting the app. This removes all content and resets the entire database.")
-
-        let textStack = UIStackView(arrangedSubviews: [titleLabel, descriptionLabel])
-        textStack.axis = .vertical
-        textStack.spacing = 4
-        textStack.alignment = .leading
-
-        activityIndicator.setContentHuggingPriority(.required, for: .horizontal)
-        activityIndicator.setContentCompressionResistancePriority(.required, for: .horizontal)
-
-        let mainStack = UIStackView(arrangedSubviews: [iconView, textStack, spacer, activityIndicator])
-        mainStack.axis = .horizontal
-        mainStack.spacing = 12
-        mainStack.alignment = .top
-
-        contentStack.addArrangedSubview(mainStack)
-
-        updateHighlight(animated: false)
-    }
-
-    private func updateHighlight(animated: Bool) {
-        let active = isHighlighted && isEnabled
-        let changes = {
-            self.highlightView.alpha = active ? 1.0 : 0.0
-        }
-
-        if animated {
-            UIView.animate(withDuration: 0.15, delay: 0, options: [.curveEaseInOut], animations: changes)
-        } else {
-            changes()
-        }
     }
 }

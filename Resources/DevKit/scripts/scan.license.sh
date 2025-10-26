@@ -36,10 +36,12 @@ if [[ -n $(git status --porcelain) ]]; then
 fi
 
 echo "[*] cleaning framework dir..."
-pushd Frameworks >/dev/null
-# spm may have duplicated LICENSE file inside their own .build directory
-git clean -fdx -f
-popd >/dev/null
+if [[ -d Frameworks ]]; then
+    pushd Frameworks >/dev/null
+    # spm may have duplicated LICENSE file inside their own .build directory
+    git clean -fdx -f
+    popd >/dev/null
+fi
 
 echo "[*] resolving packages..."
 
@@ -57,16 +59,59 @@ SCANNER_DIR=(
     "$PACKAGE_CLONE_ROOT/checkouts"
 )
 
+# Build package name mapping from Package.resolved
+declare -A PACKAGE_NAME_MAP
+PACKAGE_RESOLVED="${PROJECT_ROOT}/SubZen.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+
+# Manual corrections for packages where GitHub URL is lowercase but actual name has different casing
+declare -A MANUAL_CORRECTIONS=()
+
+if [[ -f "$PACKAGE_RESOLVED" ]]; then
+    echo "[*] reading package names from Package.resolved..."
+    # Extract identity (lowercase) and location (with correct case) pairs
+    while IFS= read -r line; do
+        if [[ $line =~ \"identity\"[[:space:]]*:[[:space:]]*\"([^\"]+)\" ]]; then
+            identity="${match[1]}"
+            # Check manual corrections first
+            if [[ -n "${MANUAL_CORRECTIONS[$identity]}" ]]; then
+                PACKAGE_NAME_MAP[$identity]="${MANUAL_CORRECTIONS[$identity]}"
+            else
+                # Read next few lines to find location
+                read -r location_line
+                if [[ $location_line =~ \"location\"[[:space:]]*:[[:space:]]*\"[^/]+/([^/\"]+)\" ]]; then
+                    repo_name="${match[1]}"
+                    # Remove .git suffix if present
+                    repo_name="${repo_name%.git}"
+                    PACKAGE_NAME_MAP[$identity]="$repo_name"
+                fi
+            fi
+        fi
+    done < <(grep -A 1 '"identity"' "$PACKAGE_RESOLVED")
+fi
+
+function get_correct_package_name {
+    local dir_name=$1
+    local lowercase_name=$(echo "$dir_name" | tr '[:upper:]' '[:lower:]')
+
+    # Try to find in the map
+    if [[ -n "${PACKAGE_NAME_MAP[$lowercase_name]}" ]]; then
+        echo "${PACKAGE_NAME_MAP[$lowercase_name]}"
+    else
+        # Fallback to original name
+        echo "$dir_name"
+    fi
+}
+
 SCANNED_LICENSE_CONTENT="# Open Source License\n\n"
 
 for dir in "${SCANNER_DIR[@]}"; do
     if [[ -d "$dir" ]]; then
         for file in $(find "$dir" -name "LICENSE*" -type f); do
-            PACKAGE_NAME=$(basename $(dirname $file))
+            PACKAGE_NAME=$(get_correct_package_name $(basename $(dirname $file)))
             SCANNED_LICENSE_CONTENT="${SCANNED_LICENSE_CONTENT}\n\n## ${PACKAGE_NAME}\n\n$(cat $file)"
         done
         for file in $(find "$dir" -name "COPYING*" -type f); do
-            PACKAGE_NAME=$(basename $(dirname $file))
+            PACKAGE_NAME=$(get_correct_package_name $(basename $(dirname $file)))
 
             # special handling for zstd license, it was dual licensed with BSD and GPL
             # https://github.com/facebook/zstd/issues/3717
