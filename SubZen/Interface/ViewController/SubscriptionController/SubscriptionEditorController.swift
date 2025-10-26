@@ -16,20 +16,22 @@ class SubscriptionEditorController: UIViewController {
     private let editSubscription: Subscription?
     private let notificationPermissionService: NotificationPermissionService
     private let reminderPermissionPresenter: ReminderPermissionPresenter
+    private let defaultCurrencyProvider: DefaultCurrencyProviding
     private var selectedCurrency: Currency
 
     init(
         subscription: Subscription? = nil,
         notificationPermissionService: NotificationPermissionService = .shared,
-        reminderPermissionPresenter: ReminderPermissionPresenter? = nil
+        reminderPermissionPresenter: ReminderPermissionPresenter? = nil,
+        defaultCurrencyProvider: DefaultCurrencyProviding = DefaultCurrencyProvider()
     ) {
         self.notificationPermissionService = notificationPermissionService
         self.reminderPermissionPresenter = reminderPermissionPresenter ?? ReminderPermissionPresenter(notificationPermissionService: notificationPermissionService)
         editSubscription = subscription
+        self.defaultCurrencyProvider = defaultCurrencyProvider
         selectedCurrency = subscription
             .flatMap { CurrencyList.getCurrency(byCode: $0.currencyCode) }
-            ?? CurrencyList.allCurrencies.first
-            ?? Currency(code: "USD", numeric: "840", name: "US Dollar", symbol: "$", decimalDigits: 2)
+            ?? defaultCurrencyProvider.loadDefaultCurrency()
         super.init(nibName: nil, bundle: nil)
     }
 

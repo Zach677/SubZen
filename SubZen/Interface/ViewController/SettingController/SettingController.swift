@@ -12,26 +12,31 @@ class SettingController: UIViewController {
     private var isResetInProgress = false
     private let notificationPermissonService: NotificationPermissionService
     private let subscriptionNotificationScheduler: SubscriptionNotificationScheduling
+    private let defaultCurrencyProvider: DefaultCurrencyProviding
     #if DEBUG
         private let subscriptionProvider: () -> [Subscription]
 
         init(
             notificationPermissonService: NotificationPermissionService = .shared,
             subscriptionNotificationScheduler: SubscriptionNotificationScheduling = SubscriptionNotificationService(),
-            subscriptionProvider: @escaping () -> [Subscription] = { SubscriptionManager.shared.getAllSubscriptions() }
+            subscriptionProvider: @escaping () -> [Subscription] = { SubscriptionManager.shared.getAllSubscriptions() },
+            defaultCurrencyProvider: DefaultCurrencyProviding = DefaultCurrencyProvider()
         ) {
             self.notificationPermissonService = notificationPermissonService
             self.subscriptionNotificationScheduler = subscriptionNotificationScheduler
             self.subscriptionProvider = subscriptionProvider
+            self.defaultCurrencyProvider = defaultCurrencyProvider
             super.init(nibName: nil, bundle: nil)
         }
     #else
         init(
             notificationPermissonService: NotificationPermissionService = .shared,
-            subscriptionNotificationScheduler: SubscriptionNotificationScheduling = SubscriptionNotificationService()
+            subscriptionNotificationScheduler: SubscriptionNotificationScheduling = SubscriptionNotificationService(),
+            defaultCurrencyProvider: DefaultCurrencyProviding = DefaultCurrencyProvider()
         ) {
             self.notificationPermissonService = notificationPermissonService
             self.subscriptionNotificationScheduler = subscriptionNotificationScheduler
+            self.defaultCurrencyProvider = defaultCurrencyProvider
             super.init(nibName: nil, bundle: nil)
         }
     #endif
@@ -48,7 +53,7 @@ class SettingController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         settingView.delegate = self
-				let current = loadDefaultCurrency()
+				let current = defaultCurrencyProvider.loadDefaultCurrency()
 				settingView.setDefaultCurrency(current)
     }
 
@@ -117,27 +122,13 @@ class SettingController: UIViewController {
         }
     }
 		
-		private let defaultCurrencyKey = "settings.defaultCurrencyCode"
-
-		private func loadDefaultCurrency() -> Currency {
-				if let code = UserDefaults.standard.string(forKey: defaultCurrencyKey),
-					 let c = CurrencyList.getCurrency(byCode: code) { return c }
-				if let localeCode = Locale.current.currency?.identifier,
-					 let c = CurrencyList.getCurrency(byCode: localeCode) { return c }
-				return Currency(code: "USD", numeric: "840", name: "US Dollar", symbol: "$", decimalDigits: 2)
-		}
-
-		private func saveDefaultCurrency(_ currency: Currency) {
-				UserDefaults.standard.set(currency.code, forKey: defaultCurrencyKey)
-		}
-
 		private func presentCurrencyPicker() {
-				let current = loadDefaultCurrency()
+				let current = defaultCurrencyProvider.loadDefaultCurrency()
 				let picker = CurrencyPickerController(currencies: CurrencyList.allCurrencies, selectedCode: current.code)
 				picker.onSelectCurrency = { [weak self] currency in
 						guard let self else { return }
 						self.settingView.setDefaultCurrency(currency)
-						self.saveDefaultCurrency(currency)
+						self.defaultCurrencyProvider.saveDefaultCurrency(currency)
 				}
 				let nav = UINavigationController(rootViewController: picker)
 				nav.modalPresentationStyle = .pageSheet
