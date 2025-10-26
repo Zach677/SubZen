@@ -48,6 +48,8 @@ class SettingController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         settingView.delegate = self
+				let current = loadDefaultCurrency()
+				settingView.setDefaultCurrency(current)
     }
 
     private func presentFinalResetPrompt() {
@@ -114,12 +116,43 @@ class SettingController: UIViewController {
             exit(0)
         }
     }
+		
+		private let defaultCurrencyKey = "settings.defaultCurrencyCode"
+
+		private func loadDefaultCurrency() -> Currency {
+				if let code = UserDefaults.standard.string(forKey: defaultCurrencyKey),
+					 let c = CurrencyList.getCurrency(byCode: code) { return c }
+				if let localeCode = Locale.current.currency?.identifier,
+					 let c = CurrencyList.getCurrency(byCode: localeCode) { return c }
+				return Currency(code: "USD", numeric: "840", name: "US Dollar", symbol: "$", decimalDigits: 2)
+		}
+
+		private func saveDefaultCurrency(_ currency: Currency) {
+				UserDefaults.standard.set(currency.code, forKey: defaultCurrencyKey)
+		}
+
+		private func presentCurrencyPicker() {
+				let current = loadDefaultCurrency()
+				let picker = CurrencyPickerController(currencies: CurrencyList.allCurrencies, selectedCode: current.code)
+				picker.onSelectCurrency = { [weak self] currency in
+						guard let self else { return }
+						self.settingView.setDefaultCurrency(currency)
+						self.saveDefaultCurrency(currency)
+				}
+				let nav = UINavigationController(rootViewController: picker)
+				nav.modalPresentationStyle = .pageSheet
+				if let sheet = nav.sheetPresentationController { sheet.detents = [.medium(), .large()] }
+				present(nav, animated: true)
+		}
 }
 
 extension SettingController: SettingViewDelegate {
     func settingViewDidTapReset(_: SettingView) {
         presentFinalResetPrompt()
     }
+		func settingViewDidTapDefaultCurrency(_ view: SettingView) {
+				presentCurrencyPicker()
+		}
 
     #if DEBUG
         func settingViewDidTapDebugNotification(_: SettingView) {

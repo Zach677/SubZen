@@ -10,6 +10,7 @@ import UIKit
 
 protocol SettingViewDelegate: AnyObject {
     func settingViewDidTapReset(_ view: SettingView)
+		func settingViewDidTapDefaultCurrency(_ view: SettingView)
 
     #if DEBUG
         func settingViewDidTapDebugNotification(_ view: SettingView)
@@ -31,6 +32,26 @@ class SettingView: UIView {
         $0.textColor = .label
         $0.numberOfLines = 0
     }
+		
+		private let currencyRow = UIControl()
+		private let currencyIconView = UIImageView(image: UIImage(systemName: "dollarsign.arrow.circlepath")).with {
+				$0.tintColor = .secondaryLabel
+				$0.contentMode = .scaleAspectFit
+				$0.setContentHuggingPriority(.required, for: .horizontal)
+				$0.setContentCompressionResistancePriority(.required, for: .horizontal)
+		}
+		private let currencyTitleLabel = UILabel().with {
+				$0.text = String(localized: "Currency") + " : "
+				$0.font = .systemFont(ofSize: 16, weight: .medium)
+				$0.textColor = .secondaryLabel
+		}
+		private let currencyNameLabel = UILabel().with {
+				$0.font = .systemFont(ofSize: 16, weight: .semibold)
+				$0.textColor = .label
+				$0.textAlignment = .right
+				$0.setContentHuggingPriority(.required, for: .horizontal)
+				$0.setContentCompressionResistancePriority(.required, for: .horizontal)
+		}
 		
 		private lazy var resetButton = UIButton().with { button in
 				let title = String(localized: "Reset All Data")
@@ -95,9 +116,32 @@ class SettingView: UIView {
 						$0.spacing = 8
 						$0.alignment = .fill
 				}
+				
+				let currencyStack = UIStackView(arrangedSubviews: [currencyIconView, currencyTitleLabel, UIView(), currencyNameLabel]).with {
+						$0.axis = .horizontal
+						$0.alignment = .center
+						$0.spacing = 12
+						$0.isLayoutMarginsRelativeArrangement = true
+						$0.layoutMargins = .init(top: 12, left: 16, bottom: 12, right: 16)
+				}
+				currencyStack.isUserInteractionEnabled = false
+				currencyRow.layer.cornerRadius = 12
+				currencyRow.layer.cornerCurve = .continuous
+				currencyRow.backgroundColor = UIColor.accent.withAlphaComponent(0.4)
+				
+				currencyRow.addSubview(currencyStack)
+				currencyStack.snp.makeConstraints { make in
+						make.edges.equalToSuperview()
+				}
 
 				contentStack.addArrangedSubview(titleLabel)
+				contentStack.addArrangedSubview(currencyRow)
 				contentStack.addArrangedSubview(resetSection)
+				
+				currencyRow.addTarget(self, action: #selector(handleCurrencyTapped), for: .touchUpInside)
+				currencyRow.snp.makeConstraints { make in
+						make.height.greaterThanOrEqualTo(44)
+				}
 				
 				resetButton.snp.makeConstraints { make in
 						make.height.equalTo(52)
@@ -114,6 +158,14 @@ class SettingView: UIView {
 				UIView.animate(withDuration: 0.2) {
 						self.resetButton.alpha = enabled ? 1.0 : 0.6
 				}
+		}
+		
+		func setDefaultCurrency(_ currency: Currency) {
+				currencyNameLabel.text = currency.name
+		}
+		
+		@objc private func handleCurrencyTapped() {
+				delegate?.settingViewDidTapDefaultCurrency(self)
 		}
 
     @objc private func handleResetTapped() {

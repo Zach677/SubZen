@@ -179,6 +179,9 @@
         }
       }
     },
+    "Currency" : {
+
+    },
     "Cycle" : {
       "localizations" : {
         "zh-Hans" : {
@@ -496,7 +499,6 @@
       }
     },
     "Send Debug Renewal Notifications" : {
-      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
