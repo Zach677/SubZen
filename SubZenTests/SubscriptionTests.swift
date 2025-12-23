@@ -66,7 +66,7 @@ final class SubscriptionTests: XCTestCase {
         let lastMonth = Calendar.current.date(byAdding: .month, value: -1, to: Date())!
         let s = try Subscription(name: "Pro", price: 5, cycle: .monthly, lastBillingDate: lastMonth, currencyCode: "USD")
 
-        let next = s.getNextBillingDate()
+        let next = s.nextBillingDate()
         XCTAssertTrue(next > Date())
         XCTAssertTrue(next > s.lastBillingDate)
     }

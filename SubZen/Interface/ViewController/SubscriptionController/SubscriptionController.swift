@@ -15,10 +15,15 @@ protocol SubscriptionControllerSettingsDelegate: AnyObject {
 class SubscriptionController: UIViewController {
     private let subscriptionListView = SubscriptionListView()
     let subscriptionManager = SubscriptionManager.shared
+    private let currencyRateService = CurrencyRateService()
+    private let defaultCurrencyProvider = DefaultCurrencyProvider()
+    private let spendingCalculator = SubscriptionSpendingCalculator()
+    private var summaryTask: Task<Void, Never>?
     weak var settingsDelegate: SubscriptionControllerSettingsDelegate?
 
     deinit {
         NotificationCenter.default.removeObserver(self)
+        summaryTask?.cancel()
     }
 
     override func viewDidLoad() {
@@ -46,6 +51,12 @@ class SubscriptionController: UIViewController {
             name: .subscriptionUpdated,
             object: nil
         )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleDefaultCurrencyChanged),
+            name: .defaultCurrencyDidChange,
+            object: nil
+        )
         loadSubscriptions()
     }
 
@@ -57,10 +68,95 @@ class SubscriptionController: UIViewController {
     func loadSubscriptions() {
         let subscriptions = subscriptionManager.allSubscriptions()
         subscriptionListView.updateSubscriptions(subscriptions)
+        refreshSummary(with: subscriptions)
     }
 
     @objc private func handleSubscriptionsChanged() {
         loadSubscriptions()
+    }
+
+    @objc private func handleDefaultCurrencyChanged() {
+        loadSubscriptions()
+    }
+
+    private func refreshSummary(with subscriptions: [Subscription]) {
+        summaryTask?.cancel()
+
+        guard !subscriptions.isEmpty else {
+            subscriptionListView.updateSummary(nil)
+            return
+        }
+
+        let baseCurrency = defaultCurrencyProvider.loadDefaultCurrency()
+
+        // Check if currency conversion is needed
+        switch spendingCalculator.evaluateConversionNeed(for: subscriptions, baseCurrencyCode: baseCurrency.code) {
+        case let .noCurrencyConversion(total):
+            // All subscriptions use the base currency; skip network request
+            let model = SubscriptionSummaryViewModel(
+                currency: baseCurrency,
+                total: total
+            )
+            subscriptionListView.updateSummary(model)
+            return
+
+        case .requiresConversion:
+            break
+        }
+
+        summaryTask = Task { [weak self] in
+            guard let self else { return }
+            do {
+                let snapshot = try await currencyRateService.latestSnapshot(for: baseCurrency.code)
+                let result = spendingCalculator.monthlyTotal(
+                    for: subscriptions,
+                    baseCurrencyCode: baseCurrency.code,
+                    ratesSnapshot: snapshot
+                )
+
+                guard !Task.isCancelled else { return }
+
+                await MainActor.run { [weak self] in
+                    guard let self else { return }
+                    let model = SubscriptionSummaryViewModel(
+                        currency: baseCurrency,
+                        total: result.total
+                    )
+                    self.subscriptionListView.updateSummary(model)
+                }
+            } catch {
+                // Show fallback: calculate base currency subscriptions only
+                await MainActor.run { [weak self] in
+                    guard let self else { return }
+                    let fallbackTotal = self.calculateFallbackTotal(
+                        subscriptions: subscriptions,
+                        baseCurrencyCode: baseCurrency.code
+                    )
+                    let model = SubscriptionSummaryViewModel(
+                        currency: baseCurrency,
+                        total: fallbackTotal
+                    )
+                    self.subscriptionListView.updateSummary(model)
+                }
+            }
+        }
+    }
+
+    private func calculateFallbackTotal(
+        subscriptions: [Subscription],
+        baseCurrencyCode: String
+    ) -> Decimal {
+        let base = baseCurrencyCode.uppercased()
+        var total: Decimal = 0
+
+        for subscription in subscriptions {
+            let code = subscription.currencyCode.uppercased()
+            if code == base {
+                total += spendingCalculator.monthlyAmount(for: subscription)
+            }
+        }
+
+        return total
     }
 }
 

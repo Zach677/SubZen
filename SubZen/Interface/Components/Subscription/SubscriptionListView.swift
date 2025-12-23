@@ -23,6 +23,13 @@ class SubscriptionListView: UIView {
     weak var delegate: SubscriptionListViewDelegate?
 
     private let titleBar = TitleBar()
+    private let summaryView = SubscriptionSummaryView()
+    private let headerStack = UIStackView().with {
+        $0.axis = .vertical
+        $0.spacing = 10
+        $0.alignment = .fill
+        $0.distribution = .fill
+    }
     private let tableView = UITableView(frame: .zero, style: .insetGrouped).with {
         $0.separatorStyle = .none
         $0.showsVerticalScrollIndicator = false
@@ -44,16 +51,24 @@ class SubscriptionListView: UIView {
         tableView.delegate = self
         tableView.register(SubscriptionListView.SubscriptionTableViewCell.self, forCellReuseIdentifier: SubscriptionListView.SubscriptionTableViewCell.reuseIdentifier)
 
-        addSubview(titleBar)
+        addSubview(headerStack)
         addSubview(tableView)
 
+        headerStack.addArrangedSubview(titleBar)
+        headerStack.addArrangedSubview(summaryView)
+
         titleBar.snp.makeConstraints { make in
-            make.top.leading.trailing.equalTo(safeAreaLayoutGuide)
             make.height.equalTo(60)
         }
 
+        summaryView.isHidden = true
+
+        headerStack.snp.makeConstraints { make in
+            make.top.leading.trailing.equalTo(safeAreaLayoutGuide)
+        }
+
         tableView.snp.makeConstraints { make in
-            make.top.equalTo(titleBar.snp.bottom)
+            make.top.equalTo(headerStack.snp.bottom)
             make.leading.trailing.bottom.equalToSuperview()
         }
     }
@@ -75,6 +90,10 @@ class SubscriptionListView: UIView {
         } else {
             tableView.backgroundView = nil
         }
+    }
+
+    func updateSummary(_ model: SubscriptionSummaryViewModel?) {
+        summaryView.configure(with: model)
     }
 }
 

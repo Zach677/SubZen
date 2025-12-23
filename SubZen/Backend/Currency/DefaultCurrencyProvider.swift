@@ -39,5 +39,11 @@ struct DefaultCurrencyProvider: DefaultCurrencyProviding {
 
     func saveDefaultCurrency(_ currency: Currency) {
         userDefaults.set(currency.code, forKey: key)
+        NotificationCenter.default.post(name: .defaultCurrencyDidChange, object: currency.code)
     }
+}
+
+extension Notification.Name {
+    /// Posted when the user updates the default currency in settings.
+    static let defaultCurrencyDidChange = Notification.Name("defaultCurrencyDidChange")
 }

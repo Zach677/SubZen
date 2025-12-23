@@ -30,7 +30,7 @@ final class SubscriptionManagerTests: XCTestCase {
             currencyCode: "USD"
         )
 
-        let all = m.getAllSubscriptions()
+        let all = m.allSubscriptions()
         XCTAssertEqual(all.count, 1)
         XCTAssertEqual(all.first?.id, sub.id)
 
@@ -62,7 +62,7 @@ final class SubscriptionManagerTests: XCTestCase {
         XCTAssertEqual(updated?.name, "Spotify Premium")
 
         // Ensure persisted to UserDefaults: wipe memory then rescan
-        m.reloadFromPersistentStore()
+        m.scanAll()
         XCTAssertEqual(m.subscription(identifier: sub.id)?.name, "Spotify Premium")
     }
 
@@ -73,9 +73,9 @@ final class SubscriptionManagerTests: XCTestCase {
 
         m.deleteSubscription(identifier: a.id)
         XCTAssertNil(m.subscription(identifier: a.id))
-        XCTAssertEqual(m.getAllSubscriptions().count, 1)
+        XCTAssertEqual(m.allSubscriptions().count, 1)
 
         m.eraseAll()
-        XCTAssertEqual(m.getAllSubscriptions().count, 0)
+        XCTAssertEqual(m.allSubscriptions().count, 0)
     }
 }
