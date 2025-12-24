@@ -521,15 +521,6 @@
       }
     },
     "Send Debug Renewal Notifications" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "发送调试续订通知"
-          }
-        }
-      },
       "shouldTranslate" : false
     },
     "Setting" : {

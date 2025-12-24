@@ -12,6 +12,7 @@ protocol SubscriptionListViewDelegate: AnyObject {
     func subscriptionListViewDidSelectSubscription(_ subscription: Subscription)
     func subscriptionListViewDidTapAddButton()
     func subscriptionListViewDidRequestSettings(_ listview: SubscriptionListView)
+    func subscriptionListViewDidRequestDelete(_ subscription: Subscription)
 }
 
 protocol TitleBarDelegate: AnyObject {
@@ -114,6 +115,21 @@ extension SubscriptionListView: UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
         let subscription = subscriptions[indexPath.row]
         delegate?.subscriptionListViewDidSelectSubscription(subscription)
+    }
+
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let subscription = subscriptions[indexPath.row]
+
+        let deleteAction = UIContextualAction(style: .destructive, title: String(localized: "Delete")) { [weak self] _, _, completionHandler in
+            self?.delegate?.subscriptionListViewDidRequestDelete(subscription)
+            completionHandler(true)
+        }
+
+        deleteAction.backgroundColor = .systemRed
+
+        let configuration = UISwipeActionsConfiguration(actions: [deleteAction])
+        configuration.performsFirstActionWithFullSwipe = true
+        return configuration
     }
 }
 

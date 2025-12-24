@@ -172,4 +172,8 @@ extension SubscriptionController: SubscriptionListViewDelegate {
     func subscriptionListViewDidSelectSubscription(_ subscription: Subscription) {
         presentSubscriptionEditor(for: subscription)
     }
+
+    func subscriptionListViewDidRequestDelete(_ subscription: Subscription) {
+        deleteSubscription(subscription)
+    }
 }
