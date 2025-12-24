@@ -369,7 +369,19 @@ final class EditSubscriptionView: UIView {
     func updateSelectedCurrencyDisplay(with currency: Currency) {
         let code = currency.code
         let symbol = CurrencyList.displaySymbol(for: code)
-        let title = String(localized: "\(currency.name) \(symbol) \(code)")
+
+        // Avoid redundant display when symbol already contains the currency code prefix
+        // e.g., for CNY with symbol "CN¥", display "Yuan Renminbi ¥ CNY" instead of "Yuan Renminbi CN¥ CNY"
+        let displaySymbol: String
+        if symbol.hasPrefix(code) || symbol.hasPrefix(String(code.prefix(2))) {
+            // Symbol contains code prefix (e.g., "CN¥"), clean it to just the symbol part
+            displaySymbol = symbol.trimmingCharacters(in: CharacterSet.letters)
+        } else {
+            // Normal case: code and symbol are distinct
+            displaySymbol = symbol
+        }
+
+        let title = String(localized: "\(currency.name) \(displaySymbol) \(code)")
         currencyButton.setTitle(title, for: UIControl.State.normal)
         if var configuration = currencyButton.configuration {
             configuration.title = title

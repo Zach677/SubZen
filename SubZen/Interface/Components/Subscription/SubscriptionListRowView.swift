@@ -28,8 +28,20 @@ class SubscriptionListRowView: UIView {
             .foregroundColor: color.withAlphaComponent(0.7),
         ]
 
+        // Avoid redundant display when symbol already contains the currency code prefix
+        // e.g., for CNY with symbol "CN¥", display "CNY ¥" instead of "CNY CN¥"
+        let displayText: String
+        if symbol.hasPrefix(code) || symbol.hasPrefix(code.prefix(2)) {
+            // Symbol contains code prefix (e.g., "CN¥"), show code + cleaned symbol
+            let cleanedSymbol = symbol.trimmingCharacters(in: CharacterSet.letters)
+            displayText = "\(code) \(cleanedSymbol) "
+        } else {
+            // Normal case: code and symbol are distinct
+            displayText = "\(code) \(symbol) "
+        }
+
         let attributed = NSMutableAttributedString(
-            string: "\(code) \(symbol) ",
+            string: displayText,
             attributes: prefixAttributes
         )
         attributed.append(
