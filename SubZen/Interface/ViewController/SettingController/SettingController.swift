@@ -135,6 +135,14 @@ class SettingController: UIViewController {
         if let sheet = navigationController.sheetPresentationController { sheet.detents = [.medium(), .large()] }
         present(navigationController, animated: true)
 		}
+
+		private func presentPrivacyPolicy() {
+				let privacyController = PrivacyPolicyController()
+				let navigationController = UINavigationController(rootViewController: privacyController)
+				navigationController.modalPresentationStyle = .pageSheet
+				if let sheet = navigationController.sheetPresentationController { sheet.detents = [.large()] }
+				present(navigationController, animated: true)
+		}
 }
 
 extension SettingController: SettingViewDelegate {
@@ -143,6 +151,9 @@ extension SettingController: SettingViewDelegate {
     }
 		func settingViewDidTapDefaultCurrency(_ view: SettingView) {
 				presentCurrencyPicker()
+		}
+		func settingViewDidTapPrivacyPolicy(_ view: SettingView) {
+				presentPrivacyPolicy()
 		}
 
     #if DEBUG

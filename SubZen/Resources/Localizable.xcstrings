@@ -418,6 +418,12 @@
         }
       }
     },
+    "Privacy Policy" : {
+
+    },
+    "Privacy policy not found. Please check your installation." : {
+
+    },
     "Remind Me" : {
       "localizations" : {
         "zh-Hans" : {

@@ -1,0 +1,50 @@
+# Privacy Policy
+
+## Overview
+
+SubZen is a privacy-first subscription manager that keeps all your data on your device. This policy explains our approach to your privacy and data.
+
+## SubZen Team Privacy Policy
+
+- **No Data Collection**: We do not collect, store, or transmit any personal information or usage data.
+- **All Data Stays Local**: Your subscription data remains entirely on your device, stored in iOS sandboxed storage (UserDefaults).
+- **No Telemetry**: We do not track usage, behavior patterns, or analytics.
+- **No Crash Reports**: We do not collect crash reports or diagnostic data.
+- **No Account Required**: SubZen works completely offline. No sign-up, no servers, no cloud.
+
+## Network Usage
+
+SubZen makes network requests only for:
+- **Currency Exchange Rates**: We fetch real-time exchange rates from [Frankfurter API](https://frankfurter.app) (European Central Bank data) to convert subscription costs across currencies. These requests do not include any personal information.
+- **Offline Fallback**: If you're offline, cached rates (up to 24 hours old) are used automatically.
+
+You can use SubZen entirely offline if all your subscriptions use the same currency.
+
+## Third-Party Services
+
+SubZen does not integrate any third-party analytics, advertising, or tracking services.
+
+## Data Security
+
+- Your data is protected by iOS sandboxing and device encryption (when you enable passcode/Face ID).
+- We do not transmit subscription details to any servers.
+- Currency API requests only send currency codes (e.g., "USD", "CNY"), not your subscription data.
+
+## Your Rights
+
+Since all data is stored locally on your device:
+- **Export**: Use iOS Backup to preserve your data when switching devices.
+- **Deletion**: Delete the app to remove all stored data permanently.
+- **Reset**: Use "Reset All Data" in Settings to clear subscriptions without uninstalling.
+
+## Policy Updates
+
+We may update this policy as new features are added. Updates will be posted in the app and on our GitHub repository.
+
+## Contact Us
+
+For questions or feedback about privacy:
+- GitHub Issues: [SubZen Repository](https://github.com/Zach677/SubZen)
+- Email: contact@subzen.app
+
+_Last updated: December 24, 2024_
