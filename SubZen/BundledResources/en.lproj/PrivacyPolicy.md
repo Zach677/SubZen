@@ -45,6 +45,6 @@ We may update this policy as new features are added. Updates will be posted in t
 
 For questions or feedback about privacy:
 - GitHub Issues: [SubZen Repository](https://github.com/Zach677/SubZen)
-- Email: contact@subzen.app
+- Email: i@zaxh.org
 
-_Last updated: December 24, 2024_
+_Last updated: December 24, 2025_

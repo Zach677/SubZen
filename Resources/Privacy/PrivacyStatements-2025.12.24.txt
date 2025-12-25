@@ -3,7 +3,7 @@
 This file archives the privacy policy as submitted to the App Store.
 
 **Version**: 1.0
-**Date**: December 24, 2024
+**Date**: December 24, 2025
 **Submitted for**: SubZen v1.0 (Build 1)
 
 ---
@@ -54,16 +54,16 @@ We may update this policy as new features are added. Updates will be posted in t
 ## Contact Us
 
 For questions or feedback about privacy:
-- GitHub Issues: https://github.com/Lakr233/SubZen
-- Email: contact@subzen.app
+- GitHub Issues: https://github.com/Zach677/SubZen
+- Email: i@zaxh.org
 
-_Last updated: December 24, 2024_
+_Last updated: December 24, 2025_
 
 ---
 
 # Change Log
 
-## 2024-12-24 - Initial Version
+## 2025-12-24 - Initial Version
 - Established privacy-first policy
 - Declared local-only data storage
 - Documented currency exchange rate API usage

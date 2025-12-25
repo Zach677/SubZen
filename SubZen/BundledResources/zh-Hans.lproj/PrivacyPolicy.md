@@ -45,6 +45,6 @@ SubZen 不集成任何第三方分析、广告或追踪服务。
 
 关于隐私的问题或反馈:
 - GitHub Issues: [SubZen 仓库](https://github.com/Zach677/SubZen)
-- 邮箱: contact@subzen.app
+- 邮箱: i@zaxh.org
 
-_最后更新: 2024年12月24日_
+_最后更新: 2025年12月24日_
