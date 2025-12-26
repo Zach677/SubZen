@@ -372,13 +372,12 @@ final class EditSubscriptionView: UIView {
 
         // Avoid redundant display when symbol already contains the currency code prefix
         // e.g., for CNY with symbol "CN¥", display "Yuan Renminbi ¥ CNY" instead of "Yuan Renminbi CN¥ CNY"
-        let displaySymbol: String
-        if symbol.hasPrefix(code) || symbol.hasPrefix(String(code.prefix(2))) {
+        let displaySymbol: String = if symbol.hasPrefix(code) || symbol.hasPrefix(String(code.prefix(2))) {
             // Symbol contains code prefix (e.g., "CN¥"), clean it to just the symbol part
-            displaySymbol = symbol.trimmingCharacters(in: CharacterSet.letters)
+            symbol.trimmingCharacters(in: CharacterSet.letters)
         } else {
             // Normal case: code and symbol are distinct
-            displaySymbol = symbol
+            symbol
         }
 
         let title = String(localized: "\(currency.name) \(displaySymbol) \(code)")

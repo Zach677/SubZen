@@ -122,13 +122,13 @@ class SubscriptionController: UIViewController {
                         currency: baseCurrency,
                         total: result.total
                     )
-                    self.subscriptionListView.updateSummary(model)
+                    subscriptionListView.updateSummary(model)
                 }
             } catch {
                 // Show fallback: calculate base currency subscriptions only
                 await MainActor.run { [weak self] in
                     guard let self else { return }
-                    let fallbackTotal = self.calculateFallbackTotal(
+                    let fallbackTotal = calculateFallbackTotal(
                         subscriptions: subscriptions,
                         baseCurrencyCode: baseCurrency.code
                     )
@@ -136,7 +136,7 @@ class SubscriptionController: UIViewController {
                         currency: baseCurrency,
                         total: fallbackTotal
                     )
-                    self.subscriptionListView.updateSummary(model)
+                    subscriptionListView.updateSummary(model)
                 }
             }
         }

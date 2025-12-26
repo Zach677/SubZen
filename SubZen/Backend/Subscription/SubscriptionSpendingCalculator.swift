@@ -82,13 +82,13 @@ struct SubscriptionSpendingCalculator {
     func monthlyAmount(for subscription: Subscription) -> Decimal {
         switch subscription.cycle {
         case .monthly:
-            return subscription.price
+            subscription.price
         case .yearly:
-            return subscription.price / Decimal(12)
+            subscription.price / Decimal(12)
         case .weekly:
-            return subscription.price * weeksPerYear / Decimal(12)
+            subscription.price * weeksPerYear / Decimal(12)
         case .daily:
-            return subscription.price * averageDaysInMonth
+            subscription.price * averageDaysInMonth
         }
     }
 }

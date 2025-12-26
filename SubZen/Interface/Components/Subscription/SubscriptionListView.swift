@@ -31,6 +31,7 @@ class SubscriptionListView: UIView {
         $0.alignment = .fill
         $0.distribution = .fill
     }
+
     private let tableView = UITableView(frame: .zero, style: .insetGrouped).with {
         $0.separatorStyle = .none
         $0.showsVerticalScrollIndicator = false
@@ -117,7 +118,7 @@ extension SubscriptionListView: UITableViewDelegate {
         delegate?.subscriptionListViewDidSelectSubscription(subscription)
     }
 
-    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+    func tableView(_: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let subscription = subscriptions[indexPath.row]
 
         let deleteAction = UIContextualAction(style: .destructive, title: String(localized: "Delete")) { [weak self] _, _, completionHandler in

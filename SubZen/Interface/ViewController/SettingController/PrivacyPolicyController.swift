@@ -5,8 +5,8 @@
 //  Created by Star on 2024/12/24.
 //
 
-import UIKit
 import SnapKit
+import UIKit
 
 class PrivacyPolicyController: UIViewController {
     private let textView = UITextView().with {

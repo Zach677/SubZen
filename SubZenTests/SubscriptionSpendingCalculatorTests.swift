@@ -27,11 +27,11 @@ final class SubscriptionSpendingCalculatorTests: XCTestCase {
             fetchedAt: Date()
         )
 
-        let subscriptions: [Subscription] = [
-            try Subscription(name: "US Monthly", price: 10, cycle: .monthly, lastBillingDate: .now, currencyCode: "USD"),
-            try Subscription(name: "US Yearly", price: 120, cycle: .yearly, lastBillingDate: .now, currencyCode: "USD"),
-            try Subscription(name: "EU Monthly", price: 10, cycle: .monthly, lastBillingDate: .now, currencyCode: "EUR"),
-            try Subscription(name: "JP Weekly", price: 1000, cycle: .weekly, lastBillingDate: .now, currencyCode: "JPY"),
+        let subscriptions: [Subscription] = try [
+            Subscription(name: "US Monthly", price: 10, cycle: .monthly, lastBillingDate: .now, currencyCode: "USD"),
+            Subscription(name: "US Yearly", price: 120, cycle: .yearly, lastBillingDate: .now, currencyCode: "USD"),
+            Subscription(name: "EU Monthly", price: 10, cycle: .monthly, lastBillingDate: .now, currencyCode: "EUR"),
+            Subscription(name: "JP Weekly", price: 1000, cycle: .weekly, lastBillingDate: .now, currencyCode: "JPY"),
         ]
 
         let result = calculator.monthlyTotal(for: subscriptions, baseCurrencyCode: "USD", ratesSnapshot: snapshot)
@@ -57,8 +57,8 @@ final class SubscriptionSpendingCalculatorTests: XCTestCase {
             fetchedAt: Date()
         )
 
-        let subscriptions: [Subscription] = [
-            try Subscription(name: "Unsupported", price: 5, cycle: .monthly, lastBillingDate: .now, currencyCode: "CHF"),
+        let subscriptions: [Subscription] = try [
+            Subscription(name: "Unsupported", price: 5, cycle: .monthly, lastBillingDate: .now, currencyCode: "CHF"),
         ]
 
         let result = calculator.monthlyTotal(for: subscriptions, baseCurrencyCode: "USD", ratesSnapshot: snapshot)
@@ -74,8 +74,8 @@ final class SubscriptionSpendingCalculatorTests: XCTestCase {
             fetchedAt: Date()
         )
 
-        let subscriptions: [Subscription] = [
-            try Subscription(name: "Daily Sub", price: 1, cycle: .daily, lastBillingDate: .now, currencyCode: "USD"),
+        let subscriptions: [Subscription] = try [
+            Subscription(name: "Daily Sub", price: 1, cycle: .daily, lastBillingDate: .now, currencyCode: "USD"),
         ]
 
         let result = calculator.monthlyTotal(for: subscriptions, baseCurrencyCode: "USD", ratesSnapshot: snapshot)
@@ -94,9 +94,9 @@ final class SubscriptionSpendingCalculatorTests: XCTestCase {
             fetchedAt: Date()
         )
 
-        let subscriptions: [Subscription] = [
-            try Subscription(name: "Euro Sub 1", price: 10, cycle: .monthly, lastBillingDate: .now, currencyCode: "EUR"),
-            try Subscription(name: "Euro Sub 2", price: 20, cycle: .monthly, lastBillingDate: .now, currencyCode: "EUR"),
+        let subscriptions: [Subscription] = try [
+            Subscription(name: "Euro Sub 1", price: 10, cycle: .monthly, lastBillingDate: .now, currencyCode: "EUR"),
+            Subscription(name: "Euro Sub 2", price: 20, cycle: .monthly, lastBillingDate: .now, currencyCode: "EUR"),
         ]
 
         let result = calculator.monthlyTotal(for: subscriptions, baseCurrencyCode: "EUR", ratesSnapshot: snapshot)
@@ -132,9 +132,9 @@ final class SubscriptionSpendingCalculatorTests: XCTestCase {
     }
 
     func testEvaluateConversionNeedAllSameCurrency() throws {
-        let subscriptions: [Subscription] = [
-            try Subscription(name: "Sub 1", price: 10, cycle: .monthly, lastBillingDate: .now, currencyCode: "USD"),
-            try Subscription(name: "Sub 2", price: 20, cycle: .monthly, lastBillingDate: .now, currencyCode: "USD"),
+        let subscriptions: [Subscription] = try [
+            Subscription(name: "Sub 1", price: 10, cycle: .monthly, lastBillingDate: .now, currencyCode: "USD"),
+            Subscription(name: "Sub 2", price: 20, cycle: .monthly, lastBillingDate: .now, currencyCode: "USD"),
         ]
 
         let mode = calculator.evaluateConversionNeed(for: subscriptions, baseCurrencyCode: "USD")
@@ -147,9 +147,9 @@ final class SubscriptionSpendingCalculatorTests: XCTestCase {
     }
 
     func testEvaluateConversionNeedMixedCurrencies() throws {
-        let subscriptions: [Subscription] = [
-            try Subscription(name: "USD Sub", price: 10, cycle: .monthly, lastBillingDate: .now, currencyCode: "USD"),
-            try Subscription(name: "EUR Sub", price: 20, cycle: .monthly, lastBillingDate: .now, currencyCode: "EUR"),
+        let subscriptions: [Subscription] = try [
+            Subscription(name: "USD Sub", price: 10, cycle: .monthly, lastBillingDate: .now, currencyCode: "USD"),
+            Subscription(name: "EUR Sub", price: 20, cycle: .monthly, lastBillingDate: .now, currencyCode: "EUR"),
         ]
 
         let mode = calculator.evaluateConversionNeed(for: subscriptions, baseCurrencyCode: "USD")
@@ -162,8 +162,8 @@ final class SubscriptionSpendingCalculatorTests: XCTestCase {
     }
 
     func testEvaluateConversionNeedCaseInsensitive() throws {
-        let subscriptions: [Subscription] = [
-            try Subscription(name: "Sub", price: 10, cycle: .monthly, lastBillingDate: .now, currencyCode: "usd"),
+        let subscriptions: [Subscription] = try [
+            Subscription(name: "Sub", price: 10, cycle: .monthly, lastBillingDate: .now, currencyCode: "usd"),
         ]
 
         let mode = calculator.evaluateConversionNeed(for: subscriptions, baseCurrencyCode: "USD")
@@ -189,8 +189,8 @@ final class SubscriptionSpendingCalculatorTests: XCTestCase {
             fetchedAt: Date()
         )
 
-        let subscriptions: [Subscription] = [
-            try Subscription(name: "EU Sub", price: 100, cycle: .monthly, lastBillingDate: .now, currencyCode: "EUR"),
+        let subscriptions: [Subscription] = try [
+            Subscription(name: "EU Sub", price: 100, cycle: .monthly, lastBillingDate: .now, currencyCode: "EUR"),
         ]
 
         let result = calculator.monthlyTotal(for: subscriptions, baseCurrencyCode: "JPY", ratesSnapshot: snapshot)

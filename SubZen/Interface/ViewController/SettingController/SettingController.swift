@@ -53,8 +53,8 @@ class SettingController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         settingView.delegate = self
-				let current = defaultCurrencyProvider.loadDefaultCurrency()
-				settingView.setDefaultCurrency(current)
+        let current = defaultCurrencyProvider.loadDefaultCurrency()
+        settingView.setDefaultCurrency(current)
     }
 
     private func presentFinalResetPrompt() {
@@ -121,40 +121,42 @@ class SettingController: UIViewController {
             exit(0)
         }
     }
-		
-		private func presentCurrencyPicker() {
-				let current = defaultCurrencyProvider.loadDefaultCurrency()
-				let picker = CurrencyPickerController(currencies: CurrencyList.allCurrencies, selectedCode: current.code)
-				picker.onSelectCurrency = { [weak self] currency in
-						guard let self else { return }
-						self.settingView.setDefaultCurrency(currency)
-						self.defaultCurrencyProvider.saveDefaultCurrency(currency)
-				}
+
+    private func presentCurrencyPicker() {
+        let current = defaultCurrencyProvider.loadDefaultCurrency()
+        let picker = CurrencyPickerController(currencies: CurrencyList.allCurrencies, selectedCode: current.code)
+        picker.onSelectCurrency = { [weak self] currency in
+            guard let self else { return }
+            settingView.setDefaultCurrency(currency)
+            defaultCurrencyProvider.saveDefaultCurrency(currency)
+        }
         let navigationController = UINavigationController(rootViewController: picker)
         navigationController.modalPresentationStyle = .pageSheet
         if let sheet = navigationController.sheetPresentationController { sheet.detents = [.medium(), .large()] }
         present(navigationController, animated: true)
-		}
+    }
 
-		private func presentPrivacyPolicy() {
-				let privacyController = PrivacyPolicyController()
-				let navigationController = UINavigationController(rootViewController: privacyController)
-				navigationController.modalPresentationStyle = .pageSheet
-				if let sheet = navigationController.sheetPresentationController { sheet.detents = [.large()] }
-				present(navigationController, animated: true)
-		}
+    private func presentPrivacyPolicy() {
+        let privacyController = PrivacyPolicyController()
+        let navigationController = UINavigationController(rootViewController: privacyController)
+        navigationController.modalPresentationStyle = .pageSheet
+        if let sheet = navigationController.sheetPresentationController { sheet.detents = [.large()] }
+        present(navigationController, animated: true)
+    }
 }
 
 extension SettingController: SettingViewDelegate {
     func settingViewDidTapReset(_: SettingView) {
         presentFinalResetPrompt()
     }
-		func settingViewDidTapDefaultCurrency(_ view: SettingView) {
-				presentCurrencyPicker()
-		}
-		func settingViewDidTapPrivacyPolicy(_ view: SettingView) {
-				presentPrivacyPolicy()
-		}
+
+    func settingViewDidTapDefaultCurrency(_: SettingView) {
+        presentCurrencyPicker()
+    }
+
+    func settingViewDidTapPrivacyPolicy(_: SettingView) {
+        presentPrivacyPolicy()
+    }
 
     #if DEBUG
         func settingViewDidTapDebugNotification(_: SettingView) {
