@@ -67,6 +67,7 @@ class SubscriptionController: UIViewController {
 
     func loadSubscriptions() {
         let subscriptions = subscriptionManager.allSubscriptions()
+            .sorted { $0.remainingDays < $1.remainingDays }
         subscriptionListView.updateSubscriptions(subscriptions)
         refreshSummary(with: subscriptions)
     }
