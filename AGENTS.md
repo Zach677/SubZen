@@ -46,6 +46,10 @@ SubZen is a privacy-first subscription manager for iOS and macOS Catalyst built 
 - `make all` – Archive pipeline (requires a clean git tree).
 - `make clean` – Remove generated artifacts.
 
+### Code Formatting
+- `swiftformat . --swiftversion 6.0 --indent 4` – Format all Swift files with consistent style.
+- **IMPORTANT**: Run this command after completing any code changes to maintain consistent code style across the codebase.
+
 ### Development Scripts
 - `Resources/DevKit/scripts/scan.license.sh` – Refresh license compliance report.
 - `Resources/DevKit/scripts/bump.version.sh` – Version management.
@@ -143,6 +147,7 @@ SubZen is a privacy-first subscription manager for iOS and macOS Catalyst built 
 - Preserve privacy-first design by keeping all data local and avoiding network calls outside existing services.
 - Coordinate with the `Withable` helpers and SnapKit patterns when generating new components.
 - Prefer incremental refactors with test coverage instead of sweeping rewrites.
+- **CRITICAL**: After completing any code changes, ALWAYS run `swiftformat . --swiftversion 6.0 --indent 4` to format the code before finishing the task.
 
 ## MCP
 Always fetch context via Context7 when you need code generation, setup instructions, or framework documentation.
