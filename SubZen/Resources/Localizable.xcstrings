@@ -521,7 +521,7 @@
       }
     },
     "Send Debug Renewal Notifications" : {
-      "shouldTranslate" : false
+
     },
     "Setting" : {
       "localizations" : {
@@ -668,6 +668,16 @@
     },
     "Unsupported base currency" : {
 
+    },
+    "Version %@ (%d)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Version %1$@ (%2$d)"
+          }
+        }
+      }
     },
     "week" : {
       "localizations" : {

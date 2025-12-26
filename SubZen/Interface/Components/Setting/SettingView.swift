@@ -112,6 +112,41 @@ class SettingView: UIView {
         $0.numberOfLines = 0
     }
 
+    private let versionLabel = UILabel().with {
+        $0.text = AppVersion.displayString
+        $0.font = .preferredFont(forTextStyle: .caption2)
+        $0.textColor = .tertiaryLabel
+        $0.textAlignment = .center
+        $0.numberOfLines = 1
+    }
+
+    private let buildTimeLabel = UILabel().with {
+        $0.text = BuildInfo.buildTime
+        $0.font = .preferredFont(forTextStyle: .caption2).monospaced
+        $0.textColor = .tertiaryLabel
+        $0.textAlignment = .center
+        $0.numberOfLines = 1
+    }
+
+    private let commitLabel = UILabel().with {
+        let commitID = BuildInfo.commitID
+        $0.text = commitID.isEmpty ? "N/A" : commitID
+        $0.font = .preferredFont(forTextStyle: .caption2).monospaced
+        $0.textColor = .tertiaryLabel
+        $0.textAlignment = .center
+        $0.numberOfLines = 1
+    }
+
+    private lazy var versionFooterStack = UIStackView(arrangedSubviews: [
+        versionLabel,
+        buildTimeLabel,
+        commitLabel,
+    ]).with {
+        $0.axis = .vertical
+        $0.alignment = .center
+        $0.spacing = 4
+    }
+
     #if DEBUG
         private lazy var debugNotificationButton = UIButton(type: .system).with {
             $0.setTitle(
@@ -198,6 +233,9 @@ class SettingView: UIView {
             debugNotificationButton.addTarget(self, action: #selector(handleDebugNotificationTapped), for: .touchUpInside)
             contentStack.addArrangedSubview(debugNotificationButton)
         #endif
+
+        contentStack.addArrangedSubview(UIView()) // Spacer
+        contentStack.addArrangedSubview(versionFooterStack)
     }
 
     func setResetEnabled(_ enabled: Bool) {
