@@ -9,6 +9,10 @@ import SnapKit
 import UIKit
 
 class SubscriptionListRowView: UIView {
+    // MARK: - Expiration Progress Gradient
+
+    private let progressGradientLayer = CAGradientLayer()
+    private var currentProgress: Double = 0
     func configure(with subscription: Subscription) {
         titleLabel.text = subscription.name
         let code = subscription.currencyCode.uppercased()
@@ -69,9 +73,13 @@ class SubscriptionListRowView: UIView {
 
         let remainingDays = subscription.remainingDays
         daysLabel.text = String(localized: "\(remainingDays) days left")
-				if (remainingDays == 0) {
-						daysLabel.text = String(localized: "Today!")
-				}
+        if remainingDays == 0 {
+            daysLabel.text = String(localized: "Today!")
+        }
+
+        // Update expiration progress gradient with animation
+        let targetProgress = subscription.expirationProgress
+        animateProgress(to: targetProgress)
     }
 
     private static var formatterCache: [Int: NumberFormatter] = [:]
@@ -122,6 +130,17 @@ class SubscriptionListRowView: UIView {
         layer.cornerRadius = 12
         layer.masksToBounds = true
 
+        // Setup progress gradient layer (left to right fill)
+        progressGradientLayer.colors = [
+            UIColor.accent.withAlphaComponent(0.35).cgColor,
+            UIColor.accent.withAlphaComponent(0.15).cgColor,
+        ]
+        progressGradientLayer.startPoint = CGPoint(x: 0, y: 0.5)
+        progressGradientLayer.endPoint = CGPoint(x: 1, y: 0.5)
+        progressGradientLayer.cornerRadius = 12
+        layer.insertSublayer(progressGradientLayer, at: 0)
+        updateGradientLocations(progress: 0)
+
         addSubview(titleLabel)
         addSubview(rightStackView)
 
@@ -137,6 +156,56 @@ class SubscriptionListRowView: UIView {
             make.centerY.equalToSuperview()
             make.trailing.equalToSuperview().offset(-16)
             make.leading.greaterThanOrEqualTo(titleLabel.snp.trailing).offset(8)
+        }
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        progressGradientLayer.frame = bounds
+        CATransaction.commit()
+    }
+
+    // MARK: - Progress Gradient Helpers
+
+    private func updateGradientLocations(progress: Double) {
+        // Gradient fills from left (0) to progress point, then fades to transparent
+        let fillEnd = max(0.001, min(0.999, progress))
+        progressGradientLayer.locations = [0, NSNumber(value: fillEnd)]
+
+        // Adjust opacity: more progress = more visible gradient
+        let baseAlpha = 0.15 + (progress * 0.25)
+        progressGradientLayer.colors = [
+            UIColor.accent.withAlphaComponent(baseAlpha + 0.15).cgColor,
+            UIColor.accent.withAlphaComponent(baseAlpha * 0.3).cgColor,
+        ]
+    }
+
+    private func animateProgress(to targetProgress: Double) {
+        guard abs(targetProgress - currentProgress) > 0.01 else {
+            updateGradientLocations(progress: targetProgress)
+            currentProgress = targetProgress
+            return
+        }
+
+        currentProgress = targetProgress
+
+        // Animate the gradient fill
+        let animation = CABasicAnimation(keyPath: "locations")
+        animation.fromValue = [0, NSNumber(value: 0.001)]
+        animation.toValue = [0, NSNumber(value: max(0.001, targetProgress))]
+        animation.duration = 0.6
+        animation.timingFunction = CAMediaTimingFunction(name: .easeOut)
+        animation.fillMode = .forwards
+        animation.isRemovedOnCompletion = false
+
+        progressGradientLayer.add(animation, forKey: "progressAnimation")
+
+        // Update to final state after animation
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [weak self] in
+            self?.progressGradientLayer.removeAnimation(forKey: "progressAnimation")
+            self?.updateGradientLocations(progress: targetProgress)
         }
     }
 
