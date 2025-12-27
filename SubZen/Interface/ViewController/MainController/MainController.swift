@@ -246,12 +246,22 @@ class MainController: UIViewController, UIGestureRecognizerDelegate {
     // MARK: - UIGestureRecognizerDelegate
 
     func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        guard gestureRecognizer is UIPanGestureRecognizer else { return true }
+        guard let panGesture = gestureRecognizer as? UIPanGestureRecognizer else { return true }
 
         // Disable settings panel gesture when table cells are showing swipe actions
         if subscriptionController.isShowingSwipeActions {
             return false
         }
+
+        // Only allow settings gesture for rightward swipes (to open settings)
+        // or leftward swipes when settings is already showing (to close settings)
+        // This lets tableView handle leftward swipes for delete actions
+        let velocity = panGesture.velocity(in: view)
+        if !isShowingSettings, velocity.x < 0 {
+            // Swiping left while settings is closed - let tableView handle it for swipe actions
+            return false
+        }
+
         return true
     }
 }
