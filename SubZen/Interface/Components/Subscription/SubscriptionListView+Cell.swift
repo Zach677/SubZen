@@ -32,14 +32,5 @@ extension SubscriptionListView {
         func configure(with subscription: Subscription) {
             cardView.configure(with: subscription)
         }
-
-        override func setHighlighted(_ highlighted: Bool, animated: Bool) {
-            super.setHighlighted(highlighted, animated: animated)
-
-            UIView.animate(withDuration: 0.1) {
-                self.cardView.transform = highlighted ? CGAffineTransform(scaleX: 0.98, y: 0.98) : .identity
-                self.cardView.alpha = highlighted ? 0.8 : 1.0
-            }
-        }
     }
 }

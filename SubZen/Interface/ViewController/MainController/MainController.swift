@@ -8,7 +8,7 @@
 import SnapKit
 import UIKit
 
-class MainController: UIViewController {
+class MainController: UIViewController, UIGestureRecognizerDelegate {
     private let contentView = UIView().with {
         $0.backgroundColor = .background
     }
@@ -177,6 +177,7 @@ class MainController: UIViewController {
         }
 
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
+        panGesture.delegate = self
         view.addGestureRecognizer(panGesture)
 
         setupSettingsStack()
@@ -240,6 +241,35 @@ class MainController: UIViewController {
 
     @objc private func handleSettingsDidReset() {
         hideSettings(animated: false)
+    }
+
+    // MARK: - UIGestureRecognizerDelegate
+
+    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        guard gestureRecognizer is UIPanGestureRecognizer else { return true }
+
+        // Disable settings panel gesture when table cells are showing swipe actions
+        if let tableView = findTableView(in: subscriptionController.view) {
+            for cell in tableView.visibleCells {
+                // Cell contentView is offset when swipe actions are visible
+                if cell.contentView.frame.origin.x != 0 {
+                    return false
+                }
+            }
+        }
+        return true
+    }
+
+    private func findTableView(in view: UIView) -> UITableView? {
+        if let tableView = view as? UITableView {
+            return tableView
+        }
+        for subview in view.subviews {
+            if let found = findTableView(in: subview) {
+                return found
+            }
+        }
+        return nil
     }
 }
 

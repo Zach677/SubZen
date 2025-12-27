@@ -1,3 +1,7 @@
+---
+trigger: always_on
+---
+
 # SubZen Repository Guidelines
 
 ## Project Overview
