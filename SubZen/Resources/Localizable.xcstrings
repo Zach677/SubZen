@@ -169,6 +169,9 @@
         }
       }
     },
+    "Cannot access the selected file" : {
+
+    },
     "Confirm Reset" : {
       "localizations" : {
         "zh-Hans" : {
@@ -299,6 +302,15 @@
         }
       }
     },
+    "Failed to build rates URL" : {
+
+    },
+    "Failed to encode subscriptions: %@" : {
+
+    },
+    "Failed to load rates (HTTP %lld)" : {
+
+    },
     "Failed to parse file: %@" : {
       "localizations" : {
         "zh-Hans" : {
@@ -319,21 +331,8 @@
         }
       }
     },
-    "Failed to build rates URL" : {
+    "Failed to write export file: %@" : {
 
-    },
-    "Failed to load rates (HTTP %lld)" : {
-
-    },
-    "Invalid currency code" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "无效的货币代码"
-          }
-        }
-      }
     },
     "Import Failed" : {
       "localizations" : {
@@ -401,6 +400,16 @@
         }
       }
     },
+    "Invalid currency code" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无效的货币代码"
+          }
+        }
+      }
+    },
     "Last Billing Date" : {
       "localizations" : {
         "zh-Hans" : {
@@ -417,6 +426,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "上次计费日期不能晚于今天"
+          }
+        }
+      }
+    },
+    "Merge" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "合并"
           }
         }
       }
@@ -443,16 +462,6 @@
     },
     "Monthly Spend" : {
 
-    },
-    "Merge" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "合并"
-          }
-        }
-      }
     },
     "No Subscriptions" : {
       "localizations" : {
@@ -560,6 +569,16 @@
         }
       }
     },
+    "Replace" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "替换"
+          }
+        }
+      }
+    },
     "Reset" : {
       "localizations" : {
         "zh-Hans" : {
@@ -586,16 +605,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "重置失败"
-          }
-        }
-      }
-    },
-    "Replace" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "替换"
           }
         }
       }
@@ -655,6 +664,9 @@
           }
         }
       }
+    },
+    "Send Debug Renewal Notifications" : {
+
     },
     "Setting" : {
       "localizations" : {

@@ -202,7 +202,10 @@ class SettingController: UIViewController {
     }
 
     private func presentDocumentPicker() {
-        let picker = UIDocumentPickerViewController(forOpeningContentTypes: [.json])
+        // Include multiple content types as JSON files may be identified differently
+        // depending on source (iCloud, email, etc.)
+        let contentTypes: [UTType] = [.json, .plainText, .data]
+        let picker = UIDocumentPickerViewController(forOpeningContentTypes: contentTypes)
         picker.delegate = self
         picker.allowsMultipleSelection = false
         present(picker, animated: true)
@@ -235,6 +238,10 @@ class SettingController: UIViewController {
             title: String(localized: "Cancel"),
             style: .cancel
         ) { [weak self] _ in
+            // Clean up temporary file when user cancels
+            if let url = self?.pendingImportURL {
+                try? FileManager.default.removeItem(at: url)
+            }
             self?.pendingImportURL = nil
         }
 
@@ -254,6 +261,11 @@ class SettingController: UIViewController {
     private func performImport(mode: ImportMode) {
         guard let fileURL = pendingImportURL else { return }
         pendingImportURL = nil
+
+        defer {
+            // Clean up temporary file
+            try? FileManager.default.removeItem(at: fileURL)
+        }
 
         do {
             let result = try importService.importFromJSON(fileURL: fileURL, mode: mode)
@@ -352,6 +364,31 @@ extension SettingController: SettingViewDelegate {
 extension SettingController: UIDocumentPickerDelegate {
     func documentPicker(_: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
         guard let fileURL = urls.first else { return }
-        presentImportModeSelection(for: fileURL)
+
+        // Start accessing security-scoped resource for files from iCloud or external sources
+        guard fileURL.startAccessingSecurityScopedResource() else {
+            presentImportFailureAlert(
+                error: NSError(
+                    domain: "SubZen",
+                    code: -1,
+                    userInfo: [NSLocalizedDescriptionKey: String(localized: "Cannot access the selected file")]
+                )
+            )
+            return
+        }
+
+        // Copy file to temporary location to ensure access after scope ends
+        let tempURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+            .appendingPathExtension("json")
+
+        do {
+            try FileManager.default.copyItem(at: fileURL, to: tempURL)
+            fileURL.stopAccessingSecurityScopedResource()
+            presentImportModeSelection(for: tempURL)
+        } catch {
+            fileURL.stopAccessingSecurityScopedResource()
+            presentImportFailureAlert(error: error)
+        }
     }
 }
