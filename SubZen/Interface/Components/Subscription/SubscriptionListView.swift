@@ -23,6 +23,9 @@ protocol TitleBarDelegate: AnyObject {
 class SubscriptionListView: UIView {
     weak var delegate: SubscriptionListViewDelegate?
 
+    /// Indicates whether any cell is currently showing swipe actions (delete button visible)
+    private(set) var isShowingSwipeActions = false
+
     private let titleBar = TitleBar()
     private let summaryView = SubscriptionSummaryView()
     private let headerStack = UIStackView().with {
@@ -131,6 +134,14 @@ extension SubscriptionListView: UITableViewDelegate {
         let configuration = UISwipeActionsConfiguration(actions: [deleteAction])
         configuration.performsFirstActionWithFullSwipe = true
         return configuration
+    }
+
+    func tableView(_: UITableView, willBeginEditingRowAt _: IndexPath) {
+        isShowingSwipeActions = true
+    }
+
+    func tableView(_: UITableView, didEndEditingRowAt _: IndexPath?) {
+        isShowingSwipeActions = false
     }
 }
 

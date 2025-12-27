@@ -21,6 +21,11 @@ class SubscriptionController: UIViewController {
     private var summaryTask: Task<Void, Never>?
     weak var settingsDelegate: SubscriptionControllerSettingsDelegate?
 
+    /// Indicates whether any subscription cell is currently showing swipe actions
+    var isShowingSwipeActions: Bool {
+        subscriptionListView.isShowingSwipeActions
+    }
+
     deinit {
         NotificationCenter.default.removeObserver(self)
         summaryTask?.cancel()

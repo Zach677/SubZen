@@ -249,27 +249,10 @@ class MainController: UIViewController, UIGestureRecognizerDelegate {
         guard gestureRecognizer is UIPanGestureRecognizer else { return true }
 
         // Disable settings panel gesture when table cells are showing swipe actions
-        if let tableView = findTableView(in: subscriptionController.view) {
-            for cell in tableView.visibleCells {
-                // Cell contentView is offset when swipe actions are visible
-                if cell.contentView.frame.origin.x != 0 {
-                    return false
-                }
-            }
+        if subscriptionController.isShowingSwipeActions {
+            return false
         }
         return true
-    }
-
-    private func findTableView(in view: UIView) -> UITableView? {
-        if let tableView = view as? UITableView {
-            return tableView
-        }
-        for subview in view.subviews {
-            if let found = findTableView(in: subview) {
-                return found
-            }
-        }
-        return nil
     }
 }
 
