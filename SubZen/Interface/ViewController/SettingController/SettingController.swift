@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import UniformTypeIdentifiers
 
 class SettingController: UIViewController {
     private var settingView: SettingView { view as! SettingView }
@@ -13,6 +14,10 @@ class SettingController: UIViewController {
     private let notificationPermissionService: NotificationPermissionService
     private let subscriptionNotificationScheduler: SubscriptionNotificationScheduling
     private let defaultCurrencyProvider: DefaultCurrencyProviding
+    private let exportService: SubscriptionExportService
+    private let importService: SubscriptionImportService
+    private var exportFileURL: URL?
+    private var pendingImportURL: URL?
     #if DEBUG
         private let subscriptionProvider: () -> [Subscription]
 
@@ -20,23 +25,31 @@ class SettingController: UIViewController {
             notificationPermissionService: NotificationPermissionService = .shared,
             subscriptionNotificationScheduler: SubscriptionNotificationScheduling = SubscriptionNotificationService(),
             subscriptionProvider: @escaping () -> [Subscription] = { SubscriptionManager.shared.allSubscriptions() },
-            defaultCurrencyProvider: DefaultCurrencyProviding = DefaultCurrencyProvider()
+            defaultCurrencyProvider: DefaultCurrencyProviding = DefaultCurrencyProvider(),
+            exportService: SubscriptionExportService = SubscriptionExportService(),
+            importService: SubscriptionImportService = SubscriptionImportService()
         ) {
             self.notificationPermissionService = notificationPermissionService
             self.subscriptionNotificationScheduler = subscriptionNotificationScheduler
             self.subscriptionProvider = subscriptionProvider
             self.defaultCurrencyProvider = defaultCurrencyProvider
+            self.exportService = exportService
+            self.importService = importService
             super.init(nibName: nil, bundle: nil)
         }
     #else
         init(
             notificationPermissionService: NotificationPermissionService = .shared,
             subscriptionNotificationScheduler: SubscriptionNotificationScheduling = SubscriptionNotificationService(),
-            defaultCurrencyProvider: DefaultCurrencyProviding = DefaultCurrencyProvider()
+            defaultCurrencyProvider: DefaultCurrencyProviding = DefaultCurrencyProvider(),
+            exportService: SubscriptionExportService = SubscriptionExportService(),
+            importService: SubscriptionImportService = SubscriptionImportService()
         ) {
             self.notificationPermissionService = notificationPermissionService
             self.subscriptionNotificationScheduler = subscriptionNotificationScheduler
             self.defaultCurrencyProvider = defaultCurrencyProvider
+            self.exportService = exportService
+            self.importService = importService
             super.init(nibName: nil, bundle: nil)
         }
     #endif
@@ -143,6 +156,148 @@ class SettingController: UIViewController {
         if let sheet = navigationController.sheetPresentationController { sheet.detents = [.large()] }
         present(navigationController, animated: true)
     }
+
+    private func presentExportActivity() {
+        do {
+            let fileURL = try exportService.exportToJSON()
+            exportFileURL = fileURL
+
+            let activityController = UIActivityViewController(
+                activityItems: [fileURL],
+                applicationActivities: nil
+            )
+
+            activityController.completionWithItemsHandler = { [weak self] _, _, _, _ in
+                if let url = self?.exportFileURL {
+                    self?.exportService.cleanupExportFile(at: url)
+                    self?.exportFileURL = nil
+                }
+            }
+
+            if let popover = activityController.popoverPresentationController {
+                popover.sourceView = view
+                popover.sourceRect = CGRect(x: view.bounds.midX, y: view.bounds.midY, width: 0, height: 0)
+                popover.permittedArrowDirections = []
+            }
+
+            present(activityController, animated: true)
+        } catch {
+            presentExportFailureAlert(error: error)
+        }
+    }
+
+    private func presentExportFailureAlert(error: Error) {
+        let alert = UIAlertController(
+            title: String(localized: "Export Failed"),
+            message: error.localizedDescription,
+            preferredStyle: .alert
+        )
+        alert.addAction(
+            UIAlertAction(
+                title: String(localized: "OK"),
+                style: .default
+            )
+        )
+        present(alert, animated: true)
+    }
+
+    private func presentDocumentPicker() {
+        let picker = UIDocumentPickerViewController(forOpeningContentTypes: [.json])
+        picker.delegate = self
+        picker.allowsMultipleSelection = false
+        present(picker, animated: true)
+    }
+
+    private func presentImportModeSelection(for fileURL: URL) {
+        pendingImportURL = fileURL
+
+        let alert = UIAlertController(
+            title: String(localized: "Import Mode"),
+            message: nil,
+            preferredStyle: .actionSheet
+        )
+
+        let mergeAction = UIAlertAction(
+            title: String(localized: "Merge"),
+            style: .default
+        ) { [weak self] _ in
+            self?.performImport(mode: .merge)
+        }
+
+        let replaceAction = UIAlertAction(
+            title: String(localized: "Replace"),
+            style: .destructive
+        ) { [weak self] _ in
+            self?.performImport(mode: .replace)
+        }
+
+        let cancelAction = UIAlertAction(
+            title: String(localized: "Cancel"),
+            style: .cancel
+        ) { [weak self] _ in
+            self?.pendingImportURL = nil
+        }
+
+        alert.addAction(mergeAction)
+        alert.addAction(replaceAction)
+        alert.addAction(cancelAction)
+
+        if let popover = alert.popoverPresentationController {
+            popover.sourceView = view
+            popover.sourceRect = CGRect(x: view.bounds.midX, y: view.bounds.midY, width: 0, height: 0)
+            popover.permittedArrowDirections = []
+        }
+
+        present(alert, animated: true)
+    }
+
+    private func performImport(mode: ImportMode) {
+        guard let fileURL = pendingImportURL else { return }
+        pendingImportURL = nil
+
+        do {
+            let result = try importService.importFromJSON(fileURL: fileURL, mode: mode)
+            presentImportSuccessAlert(result: result)
+        } catch {
+            presentImportFailureAlert(error: error)
+        }
+    }
+
+    private func presentImportSuccessAlert(result: ImportResult) {
+        let message = if result.skipped > 0 {
+            String(localized: "Imported \(result.imported), skipped \(result.skipped) duplicates")
+        } else {
+            String(localized: "Imported \(result.imported) subscriptions")
+        }
+
+        let alert = UIAlertController(
+            title: String(localized: "Import Successful"),
+            message: message,
+            preferredStyle: .alert
+        )
+        alert.addAction(
+            UIAlertAction(
+                title: String(localized: "OK"),
+                style: .default
+            )
+        )
+        present(alert, animated: true)
+    }
+
+    private func presentImportFailureAlert(error: Error) {
+        let alert = UIAlertController(
+            title: String(localized: "Import Failed"),
+            message: error.localizedDescription,
+            preferredStyle: .alert
+        )
+        alert.addAction(
+            UIAlertAction(
+                title: String(localized: "OK"),
+                style: .default
+            )
+        )
+        present(alert, animated: true)
+    }
 }
 
 extension SettingController: SettingViewDelegate {
@@ -152,6 +307,14 @@ extension SettingController: SettingViewDelegate {
 
     func settingViewDidTapDefaultCurrency(_: SettingView) {
         presentCurrencyPicker()
+    }
+
+    func settingViewDidTapExportSubscriptions(_: SettingView) {
+        presentExportActivity()
+    }
+
+    func settingViewDidTapImportSubscriptions(_: SettingView) {
+        presentDocumentPicker()
     }
 
     func settingViewDidTapPrivacyPolicy(_: SettingView) {
@@ -182,4 +345,13 @@ extension SettingController: SettingViewDelegate {
             }
         }
     #endif
+}
+
+// MARK: - UIDocumentPickerDelegate
+
+extension SettingController: UIDocumentPickerDelegate {
+    func documentPicker(_: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+        guard let fileURL = urls.first else { return }
+        presentImportModeSelection(for: fileURL)
+    }
 }

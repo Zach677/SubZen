@@ -279,6 +279,46 @@
         }
       }
     },
+    "Export Failed" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "导出失败"
+          }
+        }
+      }
+    },
+    "Export Subscriptions" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "导出订阅"
+          }
+        }
+      }
+    },
+    "Failed to parse file: %@" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "解析文件失败：%@"
+          }
+        }
+      }
+    },
+    "Failed to read file: %@" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "读取文件失败：%@"
+          }
+        }
+      }
+    },
     "Failed to build rates URL" : {
 
     },
@@ -291,6 +331,72 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "无效的货币代码"
+          }
+        }
+      }
+    },
+    "Import Failed" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "导入失败"
+          }
+        }
+      }
+    },
+    "Import Mode" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "导入模式"
+          }
+        }
+      }
+    },
+    "Import Subscriptions" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "导入订阅"
+          }
+        }
+      }
+    },
+    "Import Successful" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "导入成功"
+          }
+        }
+      }
+    },
+    "Imported %lld subscriptions" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已导入 %lld 个订阅"
+          }
+        }
+      }
+    },
+    "Imported %lld, skipped %lld duplicates" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Imported %1$lld, skipped %2$lld duplicates"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已导入 %1$lld 个，跳过 %2$lld 个重复"
           }
         }
       }
@@ -338,12 +444,32 @@
     "Monthly Spend" : {
 
     },
+    "Merge" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "合并"
+          }
+        }
+      }
+    },
     "No Subscriptions" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "暂无订阅"
+          }
+        }
+      }
+    },
+    "No subscriptions found in file" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "文件中没有订阅数据"
           }
         }
       }
@@ -460,6 +586,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "重置失败"
+          }
+        }
+      }
+    },
+    "Replace" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "替换"
           }
         }
       }
@@ -665,6 +801,16 @@
     },
     "Unsupported base currency" : {
 
+    },
+    "Unsupported file version: %lld" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "不支持的文件版本：%lld"
+          }
+        }
+      }
     },
     "Version %@ (%d)" : {
       "localizations" : {

@@ -11,6 +11,8 @@ import UIKit
 protocol SettingViewDelegate: AnyObject {
     func settingViewDidTapReset(_ view: SettingView)
     func settingViewDidTapDefaultCurrency(_ view: SettingView)
+    func settingViewDidTapExportSubscriptions(_ view: SettingView)
+    func settingViewDidTapImportSubscriptions(_ view: SettingView)
     func settingViewDidTapPrivacyPolicy(_ view: SettingView)
 
     #if DEBUG
@@ -71,6 +73,48 @@ class SettingView: UIView {
     }
 
     private let privacyChevronView = UIImageView(image: UIImage(systemName: "chevron.right")).with {
+        $0.tintColor = .tertiaryLabel
+        $0.contentMode = .scaleAspectFit
+        $0.setContentHuggingPriority(.required, for: .horizontal)
+        $0.setContentCompressionResistancePriority(.required, for: .horizontal)
+    }
+
+    private let exportRow = UIControl()
+    private let exportIconView = UIImageView(image: UIImage(systemName: "square.and.arrow.up")).with {
+        $0.tintColor = .secondaryLabel
+        $0.contentMode = .scaleAspectFit
+        $0.setContentHuggingPriority(.required, for: .horizontal)
+        $0.setContentCompressionResistancePriority(.required, for: .horizontal)
+    }
+
+    private let exportTitleLabel = UILabel().with {
+        $0.text = String(localized: "Export Subscriptions")
+        $0.font = .systemFont(ofSize: 16, weight: .medium)
+        $0.textColor = .secondaryLabel
+    }
+
+    private let exportChevronView = UIImageView(image: UIImage(systemName: "chevron.right")).with {
+        $0.tintColor = .tertiaryLabel
+        $0.contentMode = .scaleAspectFit
+        $0.setContentHuggingPriority(.required, for: .horizontal)
+        $0.setContentCompressionResistancePriority(.required, for: .horizontal)
+    }
+
+    private let importRow = UIControl()
+    private let importIconView = UIImageView(image: UIImage(systemName: "square.and.arrow.down")).with {
+        $0.tintColor = .secondaryLabel
+        $0.contentMode = .scaleAspectFit
+        $0.setContentHuggingPriority(.required, for: .horizontal)
+        $0.setContentCompressionResistancePriority(.required, for: .horizontal)
+    }
+
+    private let importTitleLabel = UILabel().with {
+        $0.text = String(localized: "Import Subscriptions")
+        $0.font = .systemFont(ofSize: 16, weight: .medium)
+        $0.textColor = .secondaryLabel
+    }
+
+    private let importChevronView = UIImageView(image: UIImage(systemName: "chevron.right")).with {
         $0.tintColor = .tertiaryLabel
         $0.contentMode = .scaleAspectFit
         $0.setContentHuggingPriority(.required, for: .horizontal)
@@ -210,8 +254,44 @@ class SettingView: UIView {
             make.edges.equalToSuperview()
         }
 
+        let exportStack = UIStackView(arrangedSubviews: [exportIconView, exportTitleLabel, UIView(), exportChevronView]).with {
+            $0.axis = .horizontal
+            $0.alignment = .center
+            $0.spacing = 12
+            $0.isLayoutMarginsRelativeArrangement = true
+            $0.layoutMargins = .init(top: 12, left: 16, bottom: 12, right: 16)
+        }
+        exportStack.isUserInteractionEnabled = false
+        exportRow.layer.cornerRadius = 12
+        exportRow.layer.cornerCurve = .continuous
+        exportRow.backgroundColor = UIColor.accent.withAlphaComponent(0.4)
+
+        exportRow.addSubview(exportStack)
+        exportStack.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+
+        let importStack = UIStackView(arrangedSubviews: [importIconView, importTitleLabel, UIView(), importChevronView]).with {
+            $0.axis = .horizontal
+            $0.alignment = .center
+            $0.spacing = 12
+            $0.isLayoutMarginsRelativeArrangement = true
+            $0.layoutMargins = .init(top: 12, left: 16, bottom: 12, right: 16)
+        }
+        importStack.isUserInteractionEnabled = false
+        importRow.layer.cornerRadius = 12
+        importRow.layer.cornerCurve = .continuous
+        importRow.backgroundColor = UIColor.accent.withAlphaComponent(0.4)
+
+        importRow.addSubview(importStack)
+        importStack.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+
         contentStack.addArrangedSubview(titleLabel)
         contentStack.addArrangedSubview(currencyRow)
+        contentStack.addArrangedSubview(exportRow)
+        contentStack.addArrangedSubview(importRow)
         contentStack.addArrangedSubview(privacyRow)
         contentStack.addArrangedSubview(resetSection)
 
@@ -222,6 +302,16 @@ class SettingView: UIView {
 
         privacyRow.addTarget(self, action: #selector(handlePrivacyTapped), for: .touchUpInside)
         privacyRow.snp.makeConstraints { make in
+            make.height.greaterThanOrEqualTo(44)
+        }
+
+        exportRow.addTarget(self, action: #selector(handleExportTapped), for: .touchUpInside)
+        exportRow.snp.makeConstraints { make in
+            make.height.greaterThanOrEqualTo(44)
+        }
+
+        importRow.addTarget(self, action: #selector(handleImportTapped), for: .touchUpInside)
+        importRow.snp.makeConstraints { make in
             make.height.greaterThanOrEqualTo(44)
         }
 
@@ -255,6 +345,14 @@ class SettingView: UIView {
 
     @objc private func handlePrivacyTapped() {
         delegate?.settingViewDidTapPrivacyPolicy(self)
+    }
+
+    @objc private func handleExportTapped() {
+        delegate?.settingViewDidTapExportSubscriptions(self)
+    }
+
+    @objc private func handleImportTapped() {
+        delegate?.settingViewDidTapImportSubscriptions(self)
     }
 
     @objc private func handleResetTapped() {
