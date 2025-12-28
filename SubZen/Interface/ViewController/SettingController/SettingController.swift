@@ -214,6 +214,13 @@ class SettingController: UIViewController {
     private func presentImportModeSelection(for fileURL: URL) {
         pendingImportURL = fileURL
 
+        // Skip mode selection when list is empty - merge and replace are equivalent
+        let existingSubscriptions = SubscriptionManager.shared.allSubscriptions()
+        if existingSubscriptions.isEmpty {
+            performImport(mode: .merge)
+            return
+        }
+
         let alert = UIAlertController(
             title: String(localized: "Import Mode"),
             message: nil,
