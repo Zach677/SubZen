@@ -46,11 +46,11 @@ class EmptyStateView: UIView {
         stackView.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.centerY.equalToSuperview().offset(-50)
-            make.leading.trailing.equalToSuperview().inset(32)
+            make.leading.trailing.equalToSuperview().inset(32).priority(.high)
         }
 
         iconImageView.snp.makeConstraints { make in
-            make.width.height.equalTo(88)
+            make.width.height.equalTo(88).priority(.high)
         }
     }
 

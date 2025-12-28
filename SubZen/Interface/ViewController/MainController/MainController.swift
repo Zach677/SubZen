@@ -245,6 +245,14 @@ class MainController: UIViewController, UIGestureRecognizerDelegate {
 
     // MARK: - UIGestureRecognizerDelegate
 
+    func gestureRecognizer(_: UIGestureRecognizer, shouldReceive _: UITouch) -> Bool {
+        // Don't interfere with presented view controllers (e.g., document picker)
+        if presentedViewController != nil {
+            return false
+        }
+        return true
+    }
+
     func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         guard let panGesture = gestureRecognizer as? UIPanGestureRecognizer else { return true }
 

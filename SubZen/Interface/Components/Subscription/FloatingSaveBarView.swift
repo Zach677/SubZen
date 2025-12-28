@@ -71,8 +71,8 @@ final class FloatingSaveBarView: UIView {
             make.top.equalTo(contentView.layoutMarginsGuide.snp.top)
             make.leading.equalTo(contentView.layoutMarginsGuide.snp.leading)
             make.trailing.equalTo(contentView.layoutMarginsGuide.snp.trailing)
-            make.bottom.equalTo(contentView.layoutMarginsGuide.snp.bottom)
-            make.height.greaterThanOrEqualTo(minimumButtonHeight)
+            make.bottom.equalTo(contentView.layoutMarginsGuide.snp.bottom).priority(.high)
+            make.height.greaterThanOrEqualTo(minimumButtonHeight).priority(.high)
         }
     }
 
