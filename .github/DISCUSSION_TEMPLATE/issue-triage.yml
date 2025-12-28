@@ -1,0 +1,62 @@
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ### Not sure if it's a bug?
+        Use this form to discuss potential issues. If we confirm it's a bug, we'll ask you to open a formal Issue.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What is the behavior you're seeing and what did you expect?
+      placeholder: |
+        Example: When I run 'xxx --flag', it crashes with error Y, but I expected it to do Z.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: How to Reproduce
+      description: Please list the steps to reproduce the behavior.
+      placeholder: |
+        1. Run '...'
+        2. Click on '...'
+        3. See error
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version/Commit
+      description: What version of the software are you using? (e.g., v1.0.1 or commit hash)
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating System
+      description: e.g. macOS 14.5, Ubuntu 22.04, Windows 11
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: Additional Context
+      description: Add any other context, screenshots, or logs about the problem here.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I have searched for existing discussions or issues.
+          required: true
+        - label: I am using the latest version of the project.
+          required: true
