@@ -16,7 +16,8 @@ final class CustomCyclePickerView: UIView {
         static let labelLeadingPadding: CGFloat = 16
     }
 
-    private let pickerView = UIPickerView()
+    private let valuePicker = UIPickerView()
+    private let unitPicker = UIPickerView()
     private let containerView = UIView()
     private let everyLabel = UILabel().with {
         $0.font = UIFont.systemFont(ofSize: 15, weight: .medium)
@@ -45,18 +46,21 @@ final class CustomCyclePickerView: UIView {
         containerView.layer.cornerRadius = Layout.cornerRadius
         containerView.layer.cornerCurve = .continuous
 
-        pickerView.dataSource = self
-        pickerView.delegate = self
+        valuePicker.dataSource = self
+        valuePicker.delegate = self
+        unitPicker.dataSource = self
+        unitPicker.delegate = self
 
         // Set initial selection: 2 months
-        pickerView.selectRow(1, inComponent: 0, animated: false) // "2"
-        pickerView.selectRow(1, inComponent: 1, animated: false) // "month"
+        valuePicker.selectRow(1, inComponent: 0, animated: false) // "2"
+        unitPicker.selectRow(1, inComponent: 0, animated: false) // "month"
     }
 
     private func buildHierarchy() {
         addSubview(containerView)
         containerView.addSubview(everyLabel)
-        containerView.addSubview(pickerView)
+        containerView.addSubview(valuePicker)
+        containerView.addSubview(unitPicker)
     }
 
     private func setupConstraints() {
@@ -69,9 +73,19 @@ final class CustomCyclePickerView: UIView {
             make.leading.equalToSuperview().offset(Layout.labelLeadingPadding)
         }
 
-        pickerView.snp.makeConstraints { make in
-            make.top.equalTo(everyLabel.snp.bottom).offset(-8) // Negative offset to pull picker closer to label while keeping it below
-            make.leading.trailing.bottom.equalToSuperview()
+        valuePicker.snp.makeConstraints { make in
+            make.top.equalTo(everyLabel.snp.bottom).offset(-8)
+            make.leading.equalToSuperview().offset(12)
+            make.bottom.equalToSuperview()
+            make.height.equalTo(Layout.pickerHeight)
+            make.width.equalTo(unitPicker)
+        }
+
+        unitPicker.snp.makeConstraints { make in
+            make.top.equalTo(valuePicker)
+            make.leading.equalTo(valuePicker.snp.trailing).offset(4)
+            make.trailing.equalToSuperview().inset(12)
+            make.bottom.equalToSuperview()
             make.height.equalTo(Layout.pickerHeight)
         }
     }
@@ -81,10 +95,10 @@ final class CustomCyclePickerView: UIView {
         selectedUnit = unit
 
         if let valueIndex = valueRange.firstIndex(of: value) {
-            pickerView.selectRow(valueIndex, inComponent: 0, animated: false)
+            valuePicker.selectRow(valueIndex, inComponent: 0, animated: false)
         }
         if let unitIndex = units.firstIndex(of: unit) {
-            pickerView.selectRow(unitIndex, inComponent: 1, animated: false)
+            unitPicker.selectRow(unitIndex, inComponent: 0, animated: false)
         }
     }
 
@@ -94,9 +108,10 @@ final class CustomCyclePickerView: UIView {
 
     func updateAppearance(reduceTransparencyActive newValue: Bool) {
         reduceTransparencyActive = newValue
-        containerView.backgroundColor = newValue
-            ? UIColor.secondarySystemBackground
-            : UIColor.secondarySystemBackground.withAlphaComponent(0.7)
+        containerView.backgroundColor =
+            newValue
+                ? UIColor.secondarySystemBackground
+                : UIColor.secondarySystemBackground.withAlphaComponent(0.7)
     }
 
     @available(*, unavailable)
@@ -108,34 +123,32 @@ final class CustomCyclePickerView: UIView {
 // MARK: - UIPickerViewDataSource & UIPickerViewDelegate
 
 extension CustomCyclePickerView: UIPickerViewDataSource, UIPickerViewDelegate {
-    func numberOfComponents(in _: UIPickerView) -> Int { 2 }
+    func numberOfComponents(in _: UIPickerView) -> Int { 1 }
 
-    func pickerView(_: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        component == 0 ? valueRange.count : units.count
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent _: Int) -> Int {
+        pickerView == valuePicker ? valueRange.count : units.count
     }
 
-    func pickerView(_: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        if component == 0 {
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent _: Int) -> String? {
+        if pickerView == valuePicker {
             return "\(valueRange[row])"
         } else {
             let unit = units[row]
-            // Use plural form based on current value selection
             return selectedValue == 1 ? unit.localizedName : unit.localizedPluralName
         }
     }
 
-    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        if component == 0 {
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent _: Int) {
+        if pickerView == valuePicker {
             selectedValue = valueRange[row]
-            // Refresh unit column to update singular/plural
-            pickerView.reloadComponent(1)
+            unitPicker.reloadAllComponents()
         } else {
             selectedUnit = units[row]
         }
         onSelectionChanged?(selectedValue, selectedUnit)
     }
 
-    func pickerView(_: UIPickerView, widthForComponent component: Int) -> CGFloat {
-        component == 0 ? 80 : 120
+    func pickerView(_: UIPickerView, widthForComponent _: Int) -> CGFloat {
+        140
     }
 }
