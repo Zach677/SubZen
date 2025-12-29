@@ -10,12 +10,19 @@ import UIKit
 
 final class CustomCyclePickerView: UIView {
     private enum Layout {
-        static let pickerHeight: CGFloat = 120
-        static let cornerRadius: CGFloat = 14
+        static let pickerHeight: CGFloat = 160
+        static let cornerRadius: CGFloat = 16
+        static let labelTopPadding: CGFloat = 12
+        static let labelLeadingPadding: CGFloat = 16
     }
 
     private let pickerView = UIPickerView()
     private let containerView = UIView()
+    private let everyLabel = UILabel().with {
+        $0.font = UIFont.systemFont(ofSize: 15, weight: .medium)
+        $0.textColor = .secondaryLabel
+        $0.text = String(localized: "Every")
+    }
 
     private let valueRange = Array(1 ... 99)
     private let units = CycleUnit.selectableUnits
@@ -48,6 +55,7 @@ final class CustomCyclePickerView: UIView {
 
     private func buildHierarchy() {
         addSubview(containerView)
+        containerView.addSubview(everyLabel)
         containerView.addSubview(pickerView)
     }
 
@@ -56,8 +64,14 @@ final class CustomCyclePickerView: UIView {
             make.edges.equalToSuperview()
         }
 
+        everyLabel.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(Layout.labelTopPadding)
+            make.leading.equalToSuperview().offset(Layout.labelLeadingPadding)
+        }
+
         pickerView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.top.equalTo(everyLabel.snp.bottom).offset(-8) // Negative offset to pull picker closer to label while keeping it below
+            make.leading.trailing.bottom.equalToSuperview()
             make.height.equalTo(Layout.pickerHeight)
         }
     }
