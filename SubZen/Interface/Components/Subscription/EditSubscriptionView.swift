@@ -390,39 +390,27 @@ final class EditSubscriptionView: UIView {
     }
 
     func setCustomPickerVisible(_ visible: Bool, animated: Bool) {
-        guard customCyclePickerView.isHidden == visible else { return }
-
-        if visible {
-            customCyclePickerView.alpha = 0
-            customCyclePickerView.isHidden = false
-        }
+        let isCurrentlyHidden = customCyclePickerView.isHidden
+        guard isCurrentlyHidden == visible else { return }
 
         let animations = { [weak self] in
+            self?.customCyclePickerView.isHidden = !visible
             self?.customCyclePickerView.alpha = visible ? 1 : 0
-            self?.layoutIfNeeded()
-        }
-
-        let completion: () -> Void = { [weak self] in
-            if !visible {
-                self?.customCyclePickerView.isHidden = true
-            }
+            self?.mainStackView.layoutIfNeeded()
         }
 
         if animated {
             UIView.animate(
-                withDuration: 0.3,
+                withDuration: 0.4,
                 delay: 0,
-                usingSpringWithDamping: 0.85,
-                initialSpringVelocity: 0.2,
-                options: [.curveEaseOut]
+                usingSpringWithDamping: 0.9,
+                initialSpringVelocity: 0.1,
+                options: [.curveEaseInOut, .beginFromCurrentState]
             ) {
                 animations()
-            } completion: { _ in
-                completion()
             }
         } else {
             animations()
-            completion()
         }
     }
 
