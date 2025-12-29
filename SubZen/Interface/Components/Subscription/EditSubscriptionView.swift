@@ -125,7 +125,7 @@ final class EditSubscriptionView: UIView {
 
     private let scrollView = UIScrollView().with {
         $0.alwaysBounceVertical = true
-        $0.keyboardDismissMode = .interactive
+        $0.keyboardDismissMode = .onDrag
         $0.showsVerticalScrollIndicator = false
         $0.backgroundColor = .clear
     }
