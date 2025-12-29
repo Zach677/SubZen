@@ -83,7 +83,9 @@ final class EditSubscriptionView: UIView {
         $0.text = String(localized: "Cycle")
     }
 
-    let cycleSegmentedControl = UISegmentedControl(items: BillingCycle.allCases.map(\.localizedName))
+    let cycleSegmentedControl = UISegmentedControl(
+        items: BillingCycle.presetCases.map(\.shortLocalizedName) + [String(localized: "Custom")]
+    )
 
     let dateLabel = UILabel().with {
         $0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
@@ -121,6 +123,8 @@ final class EditSubscriptionView: UIView {
         cornerRadius: Layout.segmentedCornerRadius
     )
 
+    let customCyclePickerView = CustomCyclePickerView()
+
     private let bottomSpacer = UIView().with {
         $0.isUserInteractionEnabled = false
     }
@@ -144,9 +148,17 @@ final class EditSubscriptionView: UIView {
         $0.addArrangedSubview(reminderBannerView)
     }
 
+    private lazy var cycleContentStack = UIStackView().with {
+        $0.axis = .vertical
+        $0.spacing = Layout.groupSpacing
+        $0.alignment = .fill
+        $0.addArrangedSubview(cycleSegmentedControl)
+        $0.addArrangedSubview(customCyclePickerView)
+    }
+
     private lazy var nameSectionView = makeVerticalFormSection(label: nameLabel, content: nameTextField)
     private lazy var priceSectionView = makeVerticalFormSection(label: priceLabel, content: priceInputStackView)
-    private lazy var cycleSectionView = makeVerticalFormSection(label: cycleLabel, content: cycleSegmentedControl)
+    private lazy var cycleSectionView = makeVerticalFormSection(label: cycleLabel, content: cycleContentStack)
     private lazy var dateSectionView = makeVerticalFormSection(label: dateLabel, content: datePicker, alignment: .leading)
     private lazy var reminderSectionView = makeVerticalFormSection(label: reminderLabel, content: reminderContentStack)
 
@@ -169,6 +181,8 @@ final class EditSubscriptionView: UIView {
     var onCurrencyTapped: (() -> Void)?
     var onReminderSelectionChanged: ((Int?) -> Void)?
     var onReminderBannerTapped: (() -> Void)?
+    var onCycleSegmentChanged: ((Int) -> Void)?
+    var onCustomCycleChanged: ((Int, CycleUnit) -> Void)?
 
     init() {
         super.init(frame: .zero)
@@ -185,6 +199,10 @@ final class EditSubscriptionView: UIView {
         reminderBannerView.onTap = { [weak self] in
             self?.onReminderBannerTapped?()
         }
+        customCyclePickerView.onSelectionChanged = { [weak self] value, unit in
+            self?.onCustomCycleChanged?(value, unit)
+        }
+        customCyclePickerView.isHidden = true
         updateMaterialAppearance()
     }
 
@@ -240,6 +258,11 @@ final class EditSubscriptionView: UIView {
             self,
             action: #selector(currencyTapped),
             for: UIControl.Event.touchUpInside
+        )
+        cycleSegmentedControl.addTarget(
+            self,
+            action: #selector(cycleSegmentChanged(_:)),
+            for: UIControl.Event.valueChanged
         )
 
         if #available(iOS 26.0, *) {
@@ -331,6 +354,7 @@ final class EditSubscriptionView: UIView {
         )
         reminderPickerView.updateAppearance(reduceTransparencyActive: reduceTransparency)
         reminderBannerView.updateAppearance(reduceTransparencyActive: reduceTransparency)
+        customCyclePickerView.updateAppearance(reduceTransparencyActive: reduceTransparency)
     }
 
     override func layoutSubviews() {
@@ -357,8 +381,49 @@ final class EditSubscriptionView: UIView {
         onCurrencyTapped?()
     }
 
+    @objc private func cycleSegmentChanged(_ sender: UISegmentedControl) {
+        onCycleSegmentChanged?(sender.selectedSegmentIndex)
+    }
+
     func setReminderIntervals(_ intervals: [Int]) {
         reminderPickerView.selectedInterval = intervals.first
+    }
+
+    func setCustomPickerVisible(_ visible: Bool, animated: Bool) {
+        guard customCyclePickerView.isHidden == visible else { return }
+
+        if visible {
+            customCyclePickerView.alpha = 0
+            customCyclePickerView.isHidden = false
+        }
+
+        let animations = { [weak self] in
+            self?.customCyclePickerView.alpha = visible ? 1 : 0
+            self?.layoutIfNeeded()
+        }
+
+        let completion: () -> Void = { [weak self] in
+            if !visible {
+                self?.customCyclePickerView.isHidden = true
+            }
+        }
+
+        if animated {
+            UIView.animate(
+                withDuration: 0.3,
+                delay: 0,
+                usingSpringWithDamping: 0.85,
+                initialSpringVelocity: 0.2,
+                options: [.curveEaseOut]
+            ) {
+                animations()
+            } completion: { _ in
+                completion()
+            }
+        } else {
+            animations()
+            completion()
+        }
     }
 
     func selectedReminderIntervals() -> [Int] {

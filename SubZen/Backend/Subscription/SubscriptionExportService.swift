@@ -14,7 +14,7 @@ struct SubscriptionExportData: Codable {
     let exportedAt: Date
     let subscriptions: [Subscription]
 
-    static let currentVersion = 1
+    static let currentVersion = 2
 }
 
 // MARK: - Export Error
@@ -91,6 +91,6 @@ final class SubscriptionExportService {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
         let dateString = dateFormatter.string(from: Date())
-        return "SubZen-Subscriptions-\(dateString).json"
+        return "SubZen-\(dateString).json"
     }
 }

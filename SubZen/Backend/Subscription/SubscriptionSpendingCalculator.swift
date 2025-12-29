@@ -87,8 +87,21 @@ struct SubscriptionSpendingCalculator {
             subscription.price / Decimal(12)
         case .weekly:
             subscription.price * weeksPerYear / Decimal(12)
-        case .daily:
-            subscription.price * averageDaysInMonth
+        case let .custom(value, unit):
+            switch unit {
+            case .day:
+                // Every N days: price * (days in month / N)
+                subscription.price * averageDaysInMonth / Decimal(value)
+            case .week:
+                // Every N weeks: price * (52 / N) / 12
+                subscription.price * weeksPerYear / Decimal(value) / Decimal(12)
+            case .month:
+                // Every N months: price / N
+                subscription.price / Decimal(value)
+            case .year:
+                // Every N years: price / N / 12
+                subscription.price / Decimal(value) / Decimal(12)
+            }
         }
     }
 }

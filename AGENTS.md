@@ -40,6 +40,7 @@ SubZen is a privacy-first subscription manager for iOS and macOS Catalyst built 
 - Prefer value types for models; mark classes `final` unless subclassing is required.
 - Route async work (`Task`, `async/await`) through services instead of running it in view layers.
 - Fence Catalyst-only tweaks behind platform checks or dedicated extensions.
+- **No Excessive Backward Compatibility**: This is a solo developer project with a small user base. Avoid writing complex migration shims or maintaining multiple data format versions. When data models change, prefer clean breaks over compatibility layers—old data can be discarded or users can re-enter it. Keep Codable implementations simple without legacy format fallbacks.
 
 ## Development Commands
 

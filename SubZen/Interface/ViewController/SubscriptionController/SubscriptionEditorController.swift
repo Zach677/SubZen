@@ -10,7 +10,6 @@ import UIKit
 import UserNotifications
 
 class SubscriptionEditorController: UIViewController {
-    private let cycles = BillingCycle.allCases
     private let editSubscriptionView = EditSubscriptionView()
     private let subscriptionManager = SubscriptionManager.shared
     private let editSubscription: Subscription?
@@ -18,6 +17,7 @@ class SubscriptionEditorController: UIViewController {
     private let reminderPermissionPresenter: ReminderPermissionPresenter
     private let defaultCurrencyProvider: DefaultCurrencyProviding
     private var selectedCurrency: Currency
+    private var selectedCycle: BillingCycle = .monthly
 
     init(
         subscription: Subscription? = nil,
@@ -53,8 +53,14 @@ class SubscriptionEditorController: UIViewController {
             editSubscriptionView.nameTextField.text = existingSubscription.name
             editSubscriptionView.priceTextField.text = NSDecimalNumber(decimal: existingSubscription.price).stringValue
             editSubscriptionView.datePicker.date = existingSubscription.lastBillingDate
-            editSubscriptionView.cycleSegmentedControl.selectedSegmentIndex = cycles.firstIndex(of: existingSubscription.cycle) ?? 2
             editSubscriptionView.setReminderIntervals(existingSubscription.reminderIntervals)
+
+            selectedCycle = existingSubscription.cycle
+            configureUIForCycle(existingSubscription.cycle, animated: false)
+        } else {
+            // Default to monthly for new subscription
+            selectedCycle = .monthly
+            editSubscriptionView.cycleSegmentedControl.selectedSegmentIndex = 1
         }
         editSubscriptionView.updateSelectedCurrencyDisplay(with: selectedCurrency)
         editSubscriptionView.onSaveTapped = { [weak self] in
@@ -68,6 +74,12 @@ class SubscriptionEditorController: UIViewController {
         }
         editSubscriptionView.onReminderBannerTapped = { [weak self] in
             self?.handleReminderBannerTapped()
+        }
+        editSubscriptionView.onCycleSegmentChanged = { [weak self] index in
+            self?.handleCycleSegmentChanged(index)
+        }
+        editSubscriptionView.onCustomCycleChanged = { [weak self] value, unit in
+            self?.handleCustomCycleChanged(value: value, unit: unit)
         }
 
         updateReminderPermissionBanner()
@@ -85,9 +97,33 @@ class SubscriptionEditorController: UIViewController {
         }
     }
 
-    private func selectedCycle() -> BillingCycle {
-        let selectedIndex = editSubscriptionView.cycleSegmentedControl.selectedSegmentIndex
-        return (0 ..< cycles.count).contains(selectedIndex) ? cycles[selectedIndex] : .monthly
+    private func configureUIForCycle(_ cycle: BillingCycle, animated: Bool) {
+        let presets = BillingCycle.presetCases
+        if let index = presets.firstIndex(of: cycle) {
+            editSubscriptionView.cycleSegmentedControl.selectedSegmentIndex = index
+            editSubscriptionView.setCustomPickerVisible(false, animated: animated)
+        } else if case let .custom(value, unit) = cycle {
+            editSubscriptionView.cycleSegmentedControl.selectedSegmentIndex = presets.count // Custom segment
+            editSubscriptionView.customCyclePickerView.configure(value: value, unit: unit)
+            editSubscriptionView.setCustomPickerVisible(true, animated: animated)
+        }
+    }
+
+    private func handleCycleSegmentChanged(_ index: Int) {
+        let presets = BillingCycle.presetCases
+        if index < presets.count {
+            selectedCycle = presets[index]
+            editSubscriptionView.setCustomPickerVisible(false, animated: true)
+        } else {
+            // Custom selected - use current picker values
+            let (value, unit) = editSubscriptionView.customCyclePickerView.currentSelection()
+            selectedCycle = .custom(value: value, unit: unit)
+            editSubscriptionView.setCustomPickerVisible(true, animated: true)
+        }
+    }
+
+    private func handleCustomCycleChanged(value: Int, unit: CycleUnit) {
+        selectedCycle = .custom(value: value, unit: unit)
     }
 
     private func handleSave() {
@@ -98,7 +134,7 @@ class SubscriptionEditorController: UIViewController {
 
     @MainActor
     private func performSave() async {
-        let cycle = selectedCycle()
+        let cycle = selectedCycle
         view.endEditing(true)
 
         let name = (editSubscriptionView.nameTextField.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)

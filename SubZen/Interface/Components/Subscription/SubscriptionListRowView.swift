@@ -21,6 +21,13 @@ class SubscriptionListRowView: UIView {
         let symbol = CurrencyList.displaySymbol(for: code)
         let cycleDisplayUnit = subscription.cycle.displayUnit
 
+        // For custom cycles with value > 1, show "/ 2 months" instead of "/ months"
+        let cycleDisplay = if case let .custom(value, _) = subscription.cycle, value > 1 {
+            " / \(value) \(cycleDisplayUnit)"
+        } else {
+            " / \(cycleDisplayUnit)"
+        }
+
         let amount = SubscriptionListRowView.amountFormatter(for: decimals)
             .string(from: subscription.price as NSDecimalNumber) ?? "\(subscription.price)"
 
@@ -59,7 +66,7 @@ class SubscriptionListRowView: UIView {
         )
         attributed.append(
             NSAttributedString(
-                string: " / \(cycleDisplayUnit)",
+                string: cycleDisplay,
                 attributes: [
                     .font: metaFont,
                     .foregroundColor: color.withAlphaComponent(0.7),
@@ -68,7 +75,8 @@ class SubscriptionListRowView: UIView {
         )
 
         priceLabel.attributedText = attributed
-        let accessibilityAmountDescription = String(localized: "\(code) \(symbol) \(amount) per \(cycleDisplayUnit)")
+        let accessibilityCycleDisplay = cycleDisplay.trimmingCharacters(in: .whitespaces).replacingOccurrences(of: "/ ", with: "per ")
+        let accessibilityAmountDescription = String(localized: "\(code) \(symbol) \(amount) \(accessibilityCycleDisplay)")
         priceLabel.accessibilityLabel = accessibilityAmountDescription
 
         let remainingDays = subscription.remainingDays

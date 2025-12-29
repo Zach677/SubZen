@@ -7,52 +7,174 @@
 
 import Foundation
 
+// MARK: - CycleUnit Enum
+
+enum CycleUnit: String, Codable, CaseIterable {
+    case day
+    case week
+    case month
+    case year
+
+    /// Units available for user selection in custom picker (excludes day)
+    static var selectableUnits: [CycleUnit] {
+        [.week, .month, .year]
+    }
+
+    var calendarComponent: Calendar.Component {
+        switch self {
+        case .day: .day
+        case .week: .weekOfYear
+        case .month: .month
+        case .year: .year
+        }
+    }
+
+    var localizedName: String {
+        switch self {
+        case .day: String(localized: "day")
+        case .week: String(localized: "week")
+        case .month: String(localized: "month")
+        case .year: String(localized: "year")
+        }
+    }
+
+    var localizedPluralName: String {
+        switch self {
+        case .day: String(localized: "days")
+        case .week: String(localized: "weeks")
+        case .month: String(localized: "months")
+        case .year: String(localized: "years")
+        }
+    }
+
+    /// Approximate days per unit for progress calculations
+    var approximateDays: Int {
+        switch self {
+        case .day: 1
+        case .week: 7
+        case .month: 30
+        case .year: 365
+        }
+    }
+}
+
 // MARK: - BillingCycle Enum
 
-enum BillingCycle: String, CaseIterable, Codable {
-    case daily = "Daily"
-    case weekly = "Weekly"
-    case monthly = "Monthly"
-    case yearly = "Yearly"
+enum BillingCycle: Codable, Equatable, Hashable {
+    case weekly
+    case monthly
+    case yearly
+    case custom(value: Int, unit: CycleUnit)
+
+    /// Preset cases for UI segmented control
+    static var presetCases: [BillingCycle] {
+        [.weekly, .monthly, .yearly]
+    }
 
     /// Returns the calendar component for date calculations
     var calendarComponent: Calendar.Component {
         switch self {
-        case .daily: .day
         case .weekly: .weekOfYear
         case .monthly: .month
         case .yearly: .year
+        case let .custom(_, unit): unit.calendarComponent
         }
     }
 
     /// Returns the value for date calculations
-    var calendarValue: Int { 1 }
+    var calendarValue: Int {
+        switch self {
+        case .weekly, .monthly, .yearly: 1
+        case let .custom(value, _): value
+        }
+    }
 
     /// Returns a short display name for UI labels
     var displayUnit: String {
         switch self {
-        case .daily:
-            String(localized: "day")
-        case .weekly:
-            String(localized: "week")
-        case .monthly:
-            String(localized: "month")
-        case .yearly:
-            String(localized: "year")
+        case .weekly: String(localized: "week")
+        case .monthly: String(localized: "month")
+        case .yearly: String(localized: "year")
+        case let .custom(value, unit):
+            value == 1 ? unit.localizedName : unit.localizedPluralName
         }
     }
 
     /// Localized display name suitable for segmented controls or pickers
     var localizedName: String {
         switch self {
-        case .daily:
-            String(localized: "Daily")
         case .weekly:
-            String(localized: "Weekly")
+            return String(localized: "Weekly")
         case .monthly:
-            String(localized: "Monthly")
+            return String(localized: "Monthly")
         case .yearly:
-            String(localized: "Yearly")
+            return String(localized: "Yearly")
+        case let .custom(value, unit):
+            let unitName = value == 1 ? unit.localizedName : unit.localizedPluralName
+            return String(localized: "Every \(value) \(unitName)")
+        }
+    }
+
+    /// Short display name for segmented control
+    var shortLocalizedName: String {
+        switch self {
+        case .weekly: String(localized: "Weekly")
+        case .monthly: String(localized: "Monthly")
+        case .yearly: String(localized: "Yearly")
+        case .custom: String(localized: "Custom")
+        }
+    }
+
+    var isCustom: Bool {
+        if case .custom = self { return true }
+        return false
+    }
+
+    /// Approximate number of days in this billing cycle
+    var cycleDurationInDays: Int {
+        switch self {
+        case .weekly: 7
+        case .monthly: 30
+        case .yearly: 365
+        case let .custom(value, unit): value * unit.approximateDays
+        }
+    }
+
+    // MARK: - Codable
+
+    private enum CodingKeys: String, CodingKey {
+        case type, value, unit
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let type = try container.decode(String.self, forKey: .type)
+        switch type {
+        case "weekly": self = .weekly
+        case "monthly": self = .monthly
+        case "yearly": self = .yearly
+        case "custom":
+            let value = try container.decode(Int.self, forKey: .value)
+            let unit = try container.decode(CycleUnit.self, forKey: .unit)
+            self = .custom(value: value, unit: unit)
+        default:
+            self = .monthly
+        }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        switch self {
+        case .weekly:
+            try container.encode("weekly", forKey: .type)
+        case .monthly:
+            try container.encode("monthly", forKey: .type)
+        case .yearly:
+            try container.encode("yearly", forKey: .type)
+        case let .custom(value, unit):
+            try container.encode("custom", forKey: .type)
+            try container.encode(value, forKey: .value)
+            try container.encode(unit, forKey: .unit)
         }
     }
 }
@@ -115,22 +237,6 @@ final class Subscription: Codable, Identifiable, Equatable {
         self.reminderIntervals = reminderIntervals
     }
 
-    /// Convenience initializer for existing data migration
-    convenience init(
-        name: String = "",
-        price: Decimal = 0.0,
-        cycleString: String = "Monthly",
-        lastBillingDate: Date = .now,
-        currencyCode: String = "USD",
-        reminderIntervals: [Int] = []
-    ) {
-        let cycle = BillingCycle(rawValue: cycleString) ?? .monthly
-        try! self.init(
-            name: name, price: price, cycle: cycle, lastBillingDate: lastBillingDate,
-            currencyCode: currencyCode, reminderIntervals: reminderIntervals
-        )
-    }
-
     /// Input validation
     private static func validateInputs(
         name: String, price: Decimal, lastBillingDate: Date, currencyCode: String
@@ -167,12 +273,8 @@ final class Subscription: Codable, Identifiable, Equatable {
         name = try container.decode(String.self, forKey: .name)
         price = try container.decode(Decimal.self, forKey: .price)
 
-        // Handle backward compatibility for string-based cycle
-        if let cycleString = try? container.decode(String.self, forKey: .cycle) {
-            cycle = BillingCycle(rawValue: cycleString) ?? .monthly
-        } else {
-            cycle = try container.decode(BillingCycle.self, forKey: .cycle)
-        }
+        // BillingCycle handles both new format and legacy string format
+        cycle = try container.decode(BillingCycle.self, forKey: .cycle)
 
         lastBillingDate = try container.decode(Date.self, forKey: .lastBillingDate)
         currencyCode = try container.decode(String.self, forKey: .currencyCode).uppercased()
@@ -186,7 +288,7 @@ final class Subscription: Codable, Identifiable, Equatable {
         try container.encode(id, forKey: .id)
         try container.encode(name, forKey: .name)
         try container.encode(price, forKey: .price)
-        try container.encode(cycle.rawValue, forKey: .cycle) // Encode as string for compatibility
+        try container.encode(cycle, forKey: .cycle)
         try container.encode(lastBillingDate, forKey: .lastBillingDate)
         try container.encode(currencyCode, forKey: .currencyCode)
         try container.encode(reminderIntervals, forKey: .reminderIntervals)
@@ -275,12 +377,7 @@ final class Subscription: Codable, Identifiable, Equatable {
 
     /// Approximate number of days in the current billing cycle
     var cycleDurationInDays: Int {
-        switch cycle {
-        case .daily: 1
-        case .weekly: 7
-        case .monthly: 30
-        case .yearly: 365
-        }
+        cycle.cycleDurationInDays
     }
 
     /// Progress toward expiration (0.0 = just renewed, 1.0 = expiring today)

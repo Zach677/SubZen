@@ -17,7 +17,18 @@
         }
       }
     },
+    "%@ %@ %@ %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@ %3$@ %4$@"
+          }
+        }
+      }
+    },
     "%@ %@ %@ per %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -192,6 +203,9 @@
         }
       }
     },
+    "Custom" : {
+
+    },
     "Cycle" : {
       "localizations" : {
         "zh-Hans" : {
@@ -203,6 +217,7 @@
       }
     },
     "Daily" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -221,6 +236,9 @@
           }
         }
       }
+    },
+    "days" : {
+
     },
     "Delete" : {
       "localizations" : {
@@ -278,6 +296,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "错误"
+          }
+        }
+      }
+    },
+    "Every %lld %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Every %1$lld %2$@"
           }
         }
       }
@@ -461,6 +489,9 @@
       }
     },
     "Monthly Spend" : {
+
+    },
+    "months" : {
 
     },
     "No Subscriptions" : {
@@ -854,6 +885,9 @@
         }
       }
     },
+    "weeks" : {
+
+    },
     "year" : {
       "localizations" : {
         "zh-Hans" : {
@@ -873,6 +907,9 @@
           }
         }
       }
+    },
+    "years" : {
+
     }
   },
   "version" : "1.1"
