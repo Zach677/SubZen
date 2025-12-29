@@ -14,7 +14,7 @@ extension SubscriptionController {
 
     func presentSubscriptionEditor(for subscription: Subscription? = nil) {
         let editorController = SubscriptionEditorController(subscription: subscription)
-        present(editorController, animated: true)
+        navigationController?.pushViewController(editorController, animated: true)
     }
 
     func deleteSubscription(_ subscription: Subscription) {

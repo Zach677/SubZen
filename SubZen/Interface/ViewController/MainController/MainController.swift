@@ -183,13 +183,15 @@ class MainController: UIViewController, UIGestureRecognizerDelegate {
         setupSettingsStack()
         setupDimmingOverlay()
 
-        addChild(subscriptionController)
-        subscriptionController.view.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(subscriptionController.view)
-        subscriptionController.view.snp.makeConstraints { make in
+        let navigationController = UINavigationController(rootViewController: subscriptionController)
+        navigationController.isNavigationBarHidden = true
+        addChild(navigationController)
+        navigationController.view.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(navigationController.view)
+        navigationController.view.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
-        subscriptionController.didMove(toParent: self)
+        navigationController.didMove(toParent: self)
 
         subscriptionController.settingsDelegate = self
 
@@ -258,6 +260,11 @@ class MainController: UIViewController, UIGestureRecognizerDelegate {
 
         // Disable settings panel gesture when table cells are showing swipe actions
         if subscriptionController.isShowingSwipeActions {
+            return false
+        }
+
+        // Disable settings pan when navigation stack has more than one controller (e.g., in editor)
+        if let nav = subscriptionController.navigationController, nav.viewControllers.count > 1 {
             return false
         }
 

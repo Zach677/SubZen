@@ -85,6 +85,9 @@ class SubscriptionEditorController: UIViewController {
             self?.handleDateTapped()
         }
 
+        title = editSubscription == nil ? String(localized: "New Subscription") : String(localized: "Edit Subscription")
+        navigationItem.backButtonTitle = "<"
+
         updateLastBillingDisplay()
         updateNextBillingHint()
         updateReminderPermissionBanner()
@@ -92,6 +95,7 @@ class SubscriptionEditorController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
         notificationPermissionService.checkCurrentPermissionStatus()
 
         Task { [weak self] in
@@ -99,6 +103,14 @@ class SubscriptionEditorController: UIViewController {
             await MainActor.run {
                 self?.updateReminderPermissionBanner()
             }
+        }
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        // Only hide if we are popping back to the root (SubscriptionController)
+        if isMovingFromParent || navigationController?.isBeingDismissed == true {
+            navigationController?.setNavigationBarHidden(true, animated: animated)
         }
     }
 
@@ -187,7 +199,7 @@ class SubscriptionEditorController: UIViewController {
                     reminderIntervals: reminderIntervals
                 )
             }
-            dismiss(animated: true)
+            navigationController?.popViewController(animated: true)
         } catch {
             showAlert(error.localizedDescription)
         }
