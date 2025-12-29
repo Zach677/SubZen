@@ -81,7 +81,12 @@ class SubscriptionEditorController: UIViewController {
         editSubscriptionView.onCustomCycleChanged = { [weak self] value, unit in
             self?.handleCustomCycleChanged(value: value, unit: unit)
         }
+        editSubscriptionView.onDateTapped = { [weak self] in
+            self?.handleDateTapped()
+        }
 
+        updateLastBillingDisplay()
+        updateNextBillingHint()
         updateReminderPermissionBanner()
     }
 
@@ -120,10 +125,12 @@ class SubscriptionEditorController: UIViewController {
             selectedCycle = .custom(value: value, unit: unit)
             editSubscriptionView.setCustomPickerVisible(true, animated: true)
         }
+        updateNextBillingHint()
     }
 
     private func handleCustomCycleChanged(value: Int, unit: CycleUnit) {
         selectedCycle = .custom(value: value, unit: unit)
+        updateNextBillingHint()
     }
 
     private func handleSave() {
@@ -300,5 +307,78 @@ class SubscriptionEditorController: UIViewController {
             )
         )
         present(alert, animated: true)
+    }
+
+    @objc private func datePickerChanged() {
+        updateLastBillingDisplay()
+        updateNextBillingHint()
+    }
+
+    private func updateLastBillingDisplay() {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .long
+        formatter.timeStyle = .none
+        let dateString = formatter.string(from: editSubscriptionView.datePicker.date)
+        editSubscriptionView.updateLastBillingDisplay(dateString: dateString)
+    }
+
+    private func updateNextBillingHint() {
+        let lastDate = editSubscriptionView.datePicker.date
+        let cycle = selectedCycle
+
+        // Calculate next billing date
+        let calendar = Calendar.current
+        var nextDate = lastDate
+
+        // Start from last billing date and find next future billing date
+        while nextDate <= Date() {
+            guard let next = calendar.date(
+                byAdding: cycle.calendarComponent,
+                value: cycle.calendarValue,
+                to: nextDate
+            ) else { break }
+            nextDate = next
+        }
+
+        let formatter = DateFormatter()
+        formatter.dateStyle = .long
+        formatter.timeStyle = .none
+        let dateString = formatter.string(from: nextDate)
+
+        let fullText = String(localized: "Next billing date will be on \(dateString)")
+        let range = (fullText as NSString).range(of: dateString)
+
+        editSubscriptionView.updateNextBillingHint(hint: fullText, highlightRange: range)
+    }
+
+    private func handleDateTapped() {
+        let pickerController = UIViewController()
+        pickerController.view.backgroundColor = .systemBackground
+
+        let picker = UIDatePicker().with {
+            $0.datePickerMode = .date
+            $0.preferredDatePickerStyle = .inline
+            $0.date = editSubscriptionView.datePicker.date
+            $0.maximumDate = Date()
+        }
+
+        pickerController.view.addSubview(picker)
+        picker.snp.makeConstraints { make in
+            make.top.leading.trailing.equalToSuperview().inset(16)
+        }
+
+        picker.addTarget(self, action: #selector(inlineDatePickerChanged(_:)), for: .valueChanged)
+
+        if let sheet = pickerController.sheetPresentationController {
+            sheet.detents = [.medium(), .large()]
+            sheet.prefersGrabberVisible = true
+        }
+
+        present(pickerController, animated: true)
+    }
+
+    @objc private func inlineDatePickerChanged(_ sender: UIDatePicker) {
+        editSubscriptionView.datePicker.date = sender.date
+        datePickerChanged()
     }
 }

@@ -70,8 +70,6 @@ final class EditSubscriptionView: UIView {
         $0.tintColor = .secondaryLabel
         $0.layer.cornerRadius = Layout.currencyButtonCornerRadius
         $0.layer.cornerCurve = .continuous
-        $0.layer.borderWidth = 1
-        $0.layer.borderColor = UIColor.separator.withAlphaComponent(0.2).cgColor
         $0.backgroundColor = UIColor.secondarySystemBackground.withAlphaComponent(0.6)
         $0.setContentCompressionResistancePriority(.required, for: .horizontal)
         $0.setContentHuggingPriority(.required, for: .horizontal)
@@ -103,6 +101,26 @@ final class EditSubscriptionView: UIView {
         $0.datePickerMode = .date
         $0.preferredDatePickerStyle = .compact
         $0.maximumDate = Date()
+        $0.isHidden = true
+    }
+
+    let dateValueButton = UIButton(type: .system).with {
+        var configuration = EditSubscriptionButtonStyler.makeCurrencyButtonBaseConfiguration(
+            contentInsets: Layout.currencyButtonContentInsets
+        )
+        configuration.image = UIImage(systemName: "calendar")
+        $0.configuration = configuration
+        $0.tintColor = .systemBlue
+        $0.layer.cornerRadius = Layout.currencyButtonCornerRadius
+        $0.layer.cornerCurve = .continuous
+        $0.backgroundColor = UIColor.secondarySystemBackground.withAlphaComponent(0.6)
+        $0.contentHorizontalAlignment = .fill
+    }
+
+    let nextBillingHintLabel = UILabel().with {
+        $0.font = UIFont.systemFont(ofSize: 13, weight: .regular)
+        $0.textColor = .secondaryLabel
+        $0.numberOfLines = 0
     }
 
     private let scrollView = UIScrollView().with {
@@ -156,10 +174,18 @@ final class EditSubscriptionView: UIView {
         $0.addArrangedSubview(customCyclePickerView)
     }
 
+    private lazy var dateContentStack = UIStackView().with {
+        $0.axis = .vertical
+        $0.spacing = 8
+        $0.alignment = .fill
+        $0.addArrangedSubview(dateValueButton)
+        $0.addArrangedSubview(nextBillingHintLabel)
+    }
+
     private lazy var nameSectionView = makeVerticalFormSection(label: nameLabel, content: nameTextField)
     private lazy var priceSectionView = makeVerticalFormSection(label: priceLabel, content: priceInputStackView)
     private lazy var cycleSectionView = makeVerticalFormSection(label: cycleLabel, content: cycleContentStack)
-    private lazy var dateSectionView = makeVerticalFormSection(label: dateLabel, content: datePicker, alignment: .leading)
+    private lazy var dateSectionView = makeVerticalFormSection(label: dateLabel, content: dateContentStack)
     private lazy var reminderSectionView = makeVerticalFormSection(label: reminderLabel, content: reminderContentStack)
 
     private lazy var mainStackView = UIStackView().with {
@@ -183,6 +209,7 @@ final class EditSubscriptionView: UIView {
     var onReminderBannerTapped: (() -> Void)?
     var onCycleSegmentChanged: ((Int) -> Void)?
     var onCustomCycleChanged: ((Int, CycleUnit) -> Void)?
+    var onDateTapped: (() -> Void)?
 
     init() {
         super.init(frame: .zero)
@@ -263,6 +290,11 @@ final class EditSubscriptionView: UIView {
             self,
             action: #selector(cycleSegmentChanged(_:)),
             for: UIControl.Event.valueChanged
+        )
+        dateValueButton.addTarget(
+            self,
+            action: #selector(dateTapped),
+            for: UIControl.Event.touchUpInside
         )
 
         if #available(iOS 26.0, *) {
@@ -355,6 +387,14 @@ final class EditSubscriptionView: UIView {
         reminderPickerView.updateAppearance(reduceTransparencyActive: reduceTransparency)
         reminderBannerView.updateAppearance(reduceTransparencyActive: reduceTransparency)
         customCyclePickerView.updateAppearance(reduceTransparencyActive: reduceTransparency)
+
+        EditSubscriptionButtonStyler.applyCurrencyButtonStyle(
+            to: dateValueButton,
+            reduceTransparencyActive: reduceTransparency,
+            contentInsets: Layout.currencyButtonContentInsets
+        )
+        dateValueButton.configuration?.image = UIImage(systemName: "calendar")
+        dateValueButton.tintColor = .systemBlue
     }
 
     override func layoutSubviews() {
@@ -383,6 +423,10 @@ final class EditSubscriptionView: UIView {
 
     @objc private func cycleSegmentChanged(_ sender: UISegmentedControl) {
         onCycleSegmentChanged?(sender.selectedSegmentIndex)
+    }
+
+    @objc private func dateTapped() {
+        onDateTapped?()
     }
 
     func setReminderIntervals(_ intervals: [Int]) {
@@ -445,6 +489,23 @@ final class EditSubscriptionView: UIView {
     func updateReminderPermissionBanner(isVisible: Bool, message: String?) {
         reminderBannerView.update(message: message)
         reminderBannerView.isHidden = !isVisible
+    }
+
+    func updateLastBillingDisplay(dateString: String) {
+        dateValueButton.setTitle(dateString, for: .normal)
+        if var configuration = dateValueButton.configuration {
+            configuration.title = dateString
+            dateValueButton.configuration = configuration
+        }
+    }
+
+    func updateNextBillingHint(hint: String, highlightRange: NSRange?) {
+        let attributedString = NSMutableAttributedString(string: hint)
+        if let range = highlightRange {
+            attributedString.addAttribute(.foregroundColor, value: UIColor.systemBlue, range: range)
+            attributedString.addAttribute(.font, value: UIFont.systemFont(ofSize: 13, weight: .semibold), range: range)
+        }
+        nextBillingHintLabel.attributedText = attributedString
     }
 
     deinit {
