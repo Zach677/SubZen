@@ -260,6 +260,9 @@
         }
       }
     },
+    "Edit Subscription" : {
+
+    },
     "Enable notifications to receive reminders. Tap to open notification settings." : {
       "localizations" : {
         "zh-Hans" : {
@@ -299,6 +302,9 @@
           }
         }
       }
+    },
+    "Every" : {
+
     },
     "Every %lld %@" : {
       "localizations" : {
@@ -492,6 +498,12 @@
 
     },
     "months" : {
+
+    },
+    "New Subscription" : {
+
+    },
+    "Next billing date will be on %@" : {
 
     },
     "No Subscriptions" : {

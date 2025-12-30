@@ -95,7 +95,8 @@ class SubscriptionEditorController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        navigationController?.setNavigationBarHidden(false, animated: animated)
+        // 禁用导航栏动画以避免与布局更新冲突
+        navigationController?.setNavigationBarHidden(false, animated: false)
         notificationPermissionService.checkCurrentPermissionStatus()
 
         Task { [weak self] in
