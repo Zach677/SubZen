@@ -169,73 +169,17 @@ class SettingView: UIView {
             $0.alignment = .fill
         }
 
-        let currencyStack = UIStackView(arrangedSubviews: [currencyIconView, currencyTitleLabel, UIView(), currencyNameLabel]).with {
-            $0.axis = .horizontal
-            $0.alignment = .center
-            $0.spacing = 12
-            $0.isLayoutMarginsRelativeArrangement = true
-            $0.layoutMargins = .init(top: 12, left: 16, bottom: 12, right: 16)
-        }
-        currencyStack.isUserInteractionEnabled = false
-        currencyRow.layer.cornerRadius = 12
-        currencyRow.layer.cornerCurve = .continuous
-        currencyRow.backgroundColor = UIColor.accent.withAlphaComponent(0.4)
+        let currencyStack = makeSettingRowStack(with: [currencyIconView, currencyTitleLabel, UIView(), currencyNameLabel])
+        configureSettingRow(currencyRow, with: currencyStack)
 
-        currencyRow.addSubview(currencyStack)
-        currencyStack.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
+        let privacyStack = makeSettingRowStack(with: [privacyIconView, privacyTitleLabel, UIView(), privacyChevronView])
+        configureSettingRow(privacyRow, with: privacyStack)
 
-        let privacyStack = UIStackView(arrangedSubviews: [privacyIconView, privacyTitleLabel, UIView(), privacyChevronView]).with {
-            $0.axis = .horizontal
-            $0.alignment = .center
-            $0.spacing = 12
-            $0.isLayoutMarginsRelativeArrangement = true
-            $0.layoutMargins = .init(top: 12, left: 16, bottom: 12, right: 16)
-        }
-        privacyStack.isUserInteractionEnabled = false
-        privacyRow.layer.cornerRadius = 12
-        privacyRow.layer.cornerCurve = .continuous
-        privacyRow.backgroundColor = UIColor.accent.withAlphaComponent(0.4)
+        let exportStack = makeSettingRowStack(with: [exportIconView, exportTitleLabel, UIView(), exportChevronView])
+        configureSettingRow(exportRow, with: exportStack)
 
-        privacyRow.addSubview(privacyStack)
-        privacyStack.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-
-        let exportStack = UIStackView(arrangedSubviews: [exportIconView, exportTitleLabel, UIView(), exportChevronView]).with {
-            $0.axis = .horizontal
-            $0.alignment = .center
-            $0.spacing = 12
-            $0.isLayoutMarginsRelativeArrangement = true
-            $0.layoutMargins = .init(top: 12, left: 16, bottom: 12, right: 16)
-        }
-        exportStack.isUserInteractionEnabled = false
-        exportRow.layer.cornerRadius = 12
-        exportRow.layer.cornerCurve = .continuous
-        exportRow.backgroundColor = UIColor.accent.withAlphaComponent(0.4)
-
-        exportRow.addSubview(exportStack)
-        exportStack.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-
-        let importStack = UIStackView(arrangedSubviews: [importIconView, importTitleLabel, UIView(), importChevronView]).with {
-            $0.axis = .horizontal
-            $0.alignment = .center
-            $0.spacing = 12
-            $0.isLayoutMarginsRelativeArrangement = true
-            $0.layoutMargins = .init(top: 12, left: 16, bottom: 12, right: 16)
-        }
-        importStack.isUserInteractionEnabled = false
-        importRow.layer.cornerRadius = 12
-        importRow.layer.cornerCurve = .continuous
-        importRow.backgroundColor = UIColor.accent.withAlphaComponent(0.4)
-
-        importRow.addSubview(importStack)
-        importStack.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
+        let importStack = makeSettingRowStack(with: [importIconView, importTitleLabel, UIView(), importChevronView])
+        configureSettingRow(importRow, with: importStack)
 
         contentStack.addArrangedSubview(titleLabel)
         contentStack.addArrangedSubview(currencyRow)
@@ -275,6 +219,27 @@ class SettingView: UIView {
 
         contentStack.addArrangedSubview(UIView()) // Spacer
         contentStack.addArrangedSubview(versionFooterStack)
+    }
+
+    private func configureSettingRow(_ row: UIControl, with stack: UIStackView) {
+        stack.isUserInteractionEnabled = false
+        row.layer.cornerRadius = 12
+        row.layer.cornerCurve = .continuous
+        row.backgroundColor = UIColor.accent.withAlphaComponent(0.4)
+        row.addSubview(stack)
+        stack.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+    }
+
+    private func makeSettingRowStack(with arrangedSubviews: [UIView]) -> UIStackView {
+        UIStackView(arrangedSubviews: arrangedSubviews).with {
+            $0.axis = .horizontal
+            $0.alignment = .center
+            $0.spacing = 12
+            $0.isLayoutMarginsRelativeArrangement = true
+            $0.layoutMargins = .init(top: 12, left: 16, bottom: 12, right: 16)
+        }
     }
 
     func setResetEnabled(_ enabled: Bool) {
