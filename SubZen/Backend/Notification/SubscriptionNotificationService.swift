@@ -8,6 +8,19 @@
 import Foundation
 import UserNotifications
 
+protocol NotificationCenterManaging {
+    func authorizationStatus() async -> UNAuthorizationStatus
+    func pendingNotificationRequests() async -> [UNNotificationRequest]
+    func removePendingNotificationRequests(withIdentifiers identifiers: [String])
+    func add(_ request: UNNotificationRequest) async throws
+}
+
+extension UNUserNotificationCenter: NotificationCenterManaging {
+    func authorizationStatus() async -> UNAuthorizationStatus {
+        await notificationSettings().authorizationStatus
+    }
+}
+
 protocol SubscriptionNotificationScheduling {
     #if DEBUG
         func triggerDebugExpirationPreview(for subscription: Subscription) async throws
@@ -18,9 +31,9 @@ protocol SubscriptionNotificationScheduling {
 }
 
 class SubscriptionNotificationService: SubscriptionNotificationScheduling {
-    private let notificationCenter: UNUserNotificationCenter
+    private let notificationCenter: NotificationCenterManaging
 
-    init(notificationCenter: UNUserNotificationCenter = .current()) {
+    init(notificationCenter: NotificationCenterManaging = UNUserNotificationCenter.current()) {
         self.notificationCenter = notificationCenter
     }
 
@@ -65,11 +78,13 @@ class SubscriptionNotificationService: SubscriptionNotificationScheduling {
 
     /// Schedule notifications for a subscription based on its reminder intervals
     func scheduleNotifications(for subscription: Subscription) async throws {
-        let settings = await notificationCenter.notificationSettings()
+        await cancelNotifications(for: subscription)
+
+        let authorizationStatus = await notificationCenter.authorizationStatus()
         let allowedStatuses: Set<UNAuthorizationStatus> = [.authorized, .provisional, .ephemeral]
 
-        guard allowedStatuses.contains(settings.authorizationStatus) else {
-            print("Notification permission not granted (status: \(settings.authorizationStatus)), skipping scheduling for '\(subscription.name)'")
+        guard allowedStatuses.contains(authorizationStatus) else {
+            print("Notification permission not granted (status: \(authorizationStatus)), skipping scheduling for '\(subscription.name)'")
             return
         }
 
