@@ -37,18 +37,9 @@ class SettingView: UIView {
     }
 
     private let currencyRow = UIControl()
-    private let currencyIconView = UIImageView(image: UIImage(systemName: "dollarsign.arrow.circlepath")).with {
-        $0.tintColor = .secondaryLabel
-        $0.contentMode = .scaleAspectFit
-        $0.setContentHuggingPriority(.required, for: .horizontal)
-        $0.setContentCompressionResistancePriority(.required, for: .horizontal)
-    }
+    private let currencyIconView = UIImageView.makeSettingIconView(systemName: "dollarsign.arrow.circlepath")
 
-    private let currencyTitleLabel = UILabel().with {
-        $0.text = String(localized: "Currency") + " : "
-        $0.font = .systemFont(ofSize: 16, weight: .medium)
-        $0.textColor = .secondaryLabel
-    }
+    private let currencyTitleLabel = UILabel.makeSettingTitleLabel(text: String(localized: "Currency") + " : ")
 
     private let currencyNameLabel = UILabel().with {
         $0.font = .systemFont(ofSize: 16, weight: .semibold)
@@ -59,67 +50,25 @@ class SettingView: UIView {
     }
 
     private let privacyRow = UIControl()
-    private let privacyIconView = UIImageView(image: UIImage(systemName: "lock.shield")).with {
-        $0.tintColor = .secondaryLabel
-        $0.contentMode = .scaleAspectFit
-        $0.setContentHuggingPriority(.required, for: .horizontal)
-        $0.setContentCompressionResistancePriority(.required, for: .horizontal)
-    }
+    private let privacyIconView = UIImageView.makeSettingIconView(systemName: "lock.shield")
 
-    private let privacyTitleLabel = UILabel().with {
-        $0.text = String(localized: "Privacy Policy")
-        $0.font = .systemFont(ofSize: 16, weight: .medium)
-        $0.textColor = .secondaryLabel
-    }
+    private let privacyTitleLabel = UILabel.makeSettingTitleLabel(text: String(localized: "Privacy Policy"))
 
-    private let privacyChevronView = UIImageView(image: UIImage(systemName: "chevron.right")).with {
-        $0.tintColor = .tertiaryLabel
-        $0.contentMode = .scaleAspectFit
-        $0.setContentHuggingPriority(.required, for: .horizontal)
-        $0.setContentCompressionResistancePriority(.required, for: .horizontal)
-    }
+    private let privacyChevronView = UIImageView.makeChevronView()
 
     private let exportRow = UIControl()
-    private let exportIconView = UIImageView(image: UIImage(systemName: "square.and.arrow.up")).with {
-        $0.tintColor = .secondaryLabel
-        $0.contentMode = .scaleAspectFit
-        $0.setContentHuggingPriority(.required, for: .horizontal)
-        $0.setContentCompressionResistancePriority(.required, for: .horizontal)
-    }
+    private let exportIconView = UIImageView.makeSettingIconView(systemName: "square.and.arrow.up")
 
-    private let exportTitleLabel = UILabel().with {
-        $0.text = String(localized: "Export Subscriptions")
-        $0.font = .systemFont(ofSize: 16, weight: .medium)
-        $0.textColor = .secondaryLabel
-    }
+    private let exportTitleLabel = UILabel.makeSettingTitleLabel(text: String(localized: "Export Subscriptions"))
 
-    private let exportChevronView = UIImageView(image: UIImage(systemName: "chevron.right")).with {
-        $0.tintColor = .tertiaryLabel
-        $0.contentMode = .scaleAspectFit
-        $0.setContentHuggingPriority(.required, for: .horizontal)
-        $0.setContentCompressionResistancePriority(.required, for: .horizontal)
-    }
+    private let exportChevronView = UIImageView.makeChevronView()
 
     private let importRow = UIControl()
-    private let importIconView = UIImageView(image: UIImage(systemName: "square.and.arrow.down")).with {
-        $0.tintColor = .secondaryLabel
-        $0.contentMode = .scaleAspectFit
-        $0.setContentHuggingPriority(.required, for: .horizontal)
-        $0.setContentCompressionResistancePriority(.required, for: .horizontal)
-    }
+    private let importIconView = UIImageView.makeSettingIconView(systemName: "square.and.arrow.down")
 
-    private let importTitleLabel = UILabel().with {
-        $0.text = String(localized: "Import Subscriptions")
-        $0.font = .systemFont(ofSize: 16, weight: .medium)
-        $0.textColor = .secondaryLabel
-    }
+    private let importTitleLabel = UILabel.makeSettingTitleLabel(text: String(localized: "Import Subscriptions"))
 
-    private let importChevronView = UIImageView(image: UIImage(systemName: "chevron.right")).with {
-        $0.tintColor = .tertiaryLabel
-        $0.contentMode = .scaleAspectFit
-        $0.setContentHuggingPriority(.required, for: .horizontal)
-        $0.setContentCompressionResistancePriority(.required, for: .horizontal)
-    }
+    private let importChevronView = UIImageView.makeChevronView()
 
     private lazy var resetButton = UIButton().with { button in
         let title = String(localized: "Reset All Data")

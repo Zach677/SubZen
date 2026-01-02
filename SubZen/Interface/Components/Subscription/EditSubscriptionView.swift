@@ -32,34 +32,16 @@ final class EditSubscriptionView: UIView {
 
     private let reminderOptions = [1, 3, 7]
 
-    let nameLabel = UILabel().with {
-        $0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        $0.textColor = .label
-        $0.text = String(localized: "Subscription Name")
-    }
+    let nameLabel = UILabel.makeFormFieldLabel(text: String(localized: "Subscription Name"))
 
-    let nameTextField = UITextField().with {
-        $0.borderStyle = .none
-        $0.placeholder = String(localized: "Enter subscription name")
-        $0.clearButtonMode = .whileEditing
-        $0.autocapitalizationType = .none
-        $0.autocorrectionType = .no
-    }
+    let nameTextField = UITextField.makeFormTextField(placeholder: String(localized: "Enter subscription name"))
 
-    let priceLabel = UILabel().with {
-        $0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        $0.textColor = .label
-        $0.text = String(localized: "Price")
-    }
+    let priceLabel = UILabel.makeFormFieldLabel(text: String(localized: "Price"))
 
-    let priceTextField = UITextField().with {
-        $0.borderStyle = .none
-        $0.placeholder = String(localized: "Enter price")
-        $0.keyboardType = .decimalPad
-        $0.clearButtonMode = .whileEditing
-        $0.autocapitalizationType = .none
-        $0.autocorrectionType = .no
-    }
+    let priceTextField = UITextField.makeFormTextField(
+        placeholder: String(localized: "Enter price"),
+        keyboardType: .decimalPad
+    )
 
     let currencyButton = UIButton(type: .system).with {
         var configuration = EditSubscriptionButtonStyler.makeCurrencyButtonBaseConfiguration(
@@ -75,27 +57,15 @@ final class EditSubscriptionView: UIView {
         $0.setContentHuggingPriority(.required, for: .horizontal)
     }
 
-    let cycleLabel = UILabel().with {
-        $0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        $0.textColor = .label
-        $0.text = String(localized: "Cycle")
-    }
+    let cycleLabel = UILabel.makeFormFieldLabel(text: String(localized: "Cycle"))
 
     let cycleSegmentedControl = UISegmentedControl(
         items: BillingCycle.presetCases.map(\.shortLocalizedName) + [String(localized: "Custom")]
     )
 
-    let dateLabel = UILabel().with {
-        $0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        $0.textColor = .label
-        $0.text = String(localized: "Last Billing Date")
-    }
+    let dateLabel = UILabel.makeFormFieldLabel(text: String(localized: "Last Billing Date"))
 
-    let reminderLabel = UILabel().with {
-        $0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        $0.textColor = .label
-        $0.text = String(localized: "Remind Me")
-    }
+    let reminderLabel = UILabel.makeFormFieldLabel(text: String(localized: "Remind Me"))
 
     let datePicker = UIDatePicker().with {
         $0.datePickerMode = .date
