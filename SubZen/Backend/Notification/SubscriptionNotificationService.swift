@@ -37,13 +37,7 @@ class SubscriptionNotificationService: SubscriptionNotificationScheduling {
             }
 
             let debugIdentifierPrefix = "debug.subscription.preview.\(subscription.id.uuidString)."
-
-            let pendingRequests = await notificationCenter.pendingNotificationRequests()
-            let identifiersToRemove = pendingRequests
-                .filter { $0.identifier.hasPrefix(debugIdentifierPrefix) }
-                .map(\.identifier)
-
-            notificationCenter.removePendingNotificationRequests(withIdentifiers: identifiersToRemove)
+            _ = await removePendingNotifications { $0.identifier.hasPrefix(debugIdentifierPrefix) }
 
             var delay: TimeInterval = 1
 
@@ -143,23 +137,26 @@ class SubscriptionNotificationService: SubscriptionNotificationScheduling {
 
     // MARK: - Notification Management
 
+    /// Helper method to filter and remove pending notification requests
+    private func removePendingNotifications(matching filter: (UNNotificationRequest) -> Bool) async -> [String] {
+        let pendingRequests = await notificationCenter.pendingNotificationRequests()
+        let identifiersToRemove = pendingRequests.filter(filter).map(\.identifier)
+        notificationCenter.removePendingNotificationRequests(withIdentifiers: identifiersToRemove)
+        return identifiersToRemove
+    }
+
     /// Cancel all scheduled subscription notifications
     func cancelAllScheduledNotifications() async {
-        let pendingRequests = await notificationCenter.pendingNotificationRequests()
-        let subscriptionIdentifiers = pendingRequests.filter { $0.identifier.contains(".expiry.") }.map(\.identifier)
-
-        notificationCenter.removePendingNotificationRequests(withIdentifiers: subscriptionIdentifiers)
-        guard !subscriptionIdentifiers.isEmpty else { return }
-        print("Cancelled \(subscriptionIdentifiers.count) scheduled subscription notifications")
+        let removedIdentifiers = await removePendingNotifications { $0.identifier.contains(".expiry.") }
+        guard !removedIdentifiers.isEmpty else { return }
+        print("Cancelled \(removedIdentifiers.count) scheduled subscription notifications")
     }
 
     /// Cancel notifications for a specific subscription
     func cancelNotifications(for subscription: Subscription) async {
-        let pendingRequests = await notificationCenter.pendingNotificationRequests()
-        let subscriptionIdentifiers = pendingRequests.filter { $0.identifier.hasPrefix("\(subscription.id.uuidString).expiry.") }.map(\.identifier)
-
-        notificationCenter.removePendingNotificationRequests(withIdentifiers: subscriptionIdentifiers)
-        guard !subscriptionIdentifiers.isEmpty else { return }
-        print("Cancelled \(subscriptionIdentifiers.count) notifications for '\(subscription.name)'")
+        let prefix = "\(subscription.id.uuidString).expiry."
+        let removedIdentifiers = await removePendingNotifications { $0.identifier.hasPrefix(prefix) }
+        guard !removedIdentifiers.isEmpty else { return }
+        print("Cancelled \(removedIdentifiers.count) notifications for '\(subscription.name)'")
     }
 }
