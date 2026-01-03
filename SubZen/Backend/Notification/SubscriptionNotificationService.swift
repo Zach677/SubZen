@@ -24,6 +24,30 @@ class SubscriptionNotificationService: SubscriptionNotificationScheduling {
         self.notificationCenter = notificationCenter
     }
 
+    struct DeliveredNotificationSnapshot: Equatable {
+        let identifier: String
+        let date: Date
+    }
+
+    static func wasAlreadyDelivered(
+        identifier: String,
+        scheduledDate: Date,
+        deliveredNotifications: [DeliveredNotificationSnapshot]
+    ) -> Bool {
+        let deliveryThreshold = scheduledDate.addingTimeInterval(-1)
+        return deliveredNotifications.contains { snapshot in
+            snapshot.identifier == identifier && snapshot.date >= deliveryThreshold
+        }
+    }
+
+    private func fetchDeliveredNotifications() async -> [UNNotification] {
+        await withCheckedContinuation { continuation in
+            notificationCenter.getDeliveredNotifications { notifications in
+                continuation.resume(returning: notifications)
+            }
+        }
+    }
+
     #if DEBUG
 
         // MARK: - Debug Preview
@@ -75,6 +99,8 @@ class SubscriptionNotificationService: SubscriptionNotificationScheduling {
 
         let remainingDays = subscription.remainingDays
         let nextBillingDate = subscription.nextBillingDate()
+        let now = Date()
+        var deliveredNotifications: [DeliveredNotificationSnapshot]?
 
         guard remainingDays > 0 else {
             print("Subscription '\(subscription.name)' has already expired or expires today, skipping notification")
@@ -96,13 +122,35 @@ class SubscriptionNotificationService: SubscriptionNotificationScheduling {
             let identifier = "\(subscription.id.uuidString).expiry.\(daysBefore)days"
             let content = createNotificationContent(for: subscription, daysBefore: daysBefore)
 
+            let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: notificationDate)
+            let scheduledDate = Calendar.current.date(from: components) ?? notificationDate
+
             let trigger: UNNotificationTrigger
-            if notificationDate <= Date() {
+            if scheduledDate <= now {
+                if deliveredNotifications == nil {
+                    deliveredNotifications = await fetchDeliveredNotifications().map { notification in
+                        DeliveredNotificationSnapshot(
+                            identifier: notification.request.identifier,
+                            date: notification.date
+                        )
+                    }
+                }
+
+                let alreadyDeliveredForCurrentCycle = Self.wasAlreadyDelivered(
+                    identifier: identifier,
+                    scheduledDate: scheduledDate,
+                    deliveredNotifications: deliveredNotifications ?? []
+                )
+
+                guard !alreadyDeliveredForCurrentCycle else {
+                    print("Notification for '\(subscription.name)' \(daysBefore)-day reminder already delivered, skipping fallback")
+                    continue
+                }
+
                 let fallbackInterval: TimeInterval = 5
                 trigger = UNTimeIntervalNotificationTrigger(timeInterval: fallbackInterval, repeats: false)
                 print("Notification date for \(daysBefore)-day reminder already passed, scheduling immediate fallback")
             } else {
-                let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: notificationDate)
                 trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
             }
 
