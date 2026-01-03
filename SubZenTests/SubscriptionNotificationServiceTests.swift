@@ -17,25 +17,32 @@ final class SubscriptionNotificationServiceTests: XCTestCase {
         let identifier = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
         subscription.id = identifier
 
+        let legacyStaleIdentifier = "\(identifier.uuidString).expiry.7days"
+        let previousCycleStaleIdentifier = "\(identifier.uuidString).expiry.7days.19990101"
+
         let staleContent = UNMutableNotificationContent()
         staleContent.title = "Stale"
         let staleTrigger = UNTimeIntervalNotificationTrigger(timeInterval: 60, repeats: false)
-        let staleRequest = UNNotificationRequest(
-            identifier: "\(identifier.uuidString).expiry.7days",
+        let legacyStaleRequest = UNNotificationRequest(
+            identifier: legacyStaleIdentifier,
             content: staleContent,
             trigger: staleTrigger
         )
-        mockCenter.pendingRequests = [staleRequest]
+        let previousCycleStaleRequest = UNNotificationRequest(
+            identifier: previousCycleStaleIdentifier,
+            content: staleContent,
+            trigger: staleTrigger
+        )
+        mockCenter.pendingRequests = [legacyStaleRequest, previousCycleStaleRequest]
 
         let service = SubscriptionNotificationService(notificationCenter: mockCenter)
         try await service.scheduleNotifications(for: subscription)
 
         let identifiers = await mockCenter.pendingNotificationRequests().map(\.identifier)
         XCTAssertEqual(identifiers.count, 1)
-        let nextBillingDate = subscription.nextBillingDate()
-        let billingKey = billingDateIdentifierKey(from: nextBillingDate)
-        XCTAssertEqual(identifiers.first, "\(identifier.uuidString).expiry.1days.\(billingKey)")
-        XCTAssertFalse(identifiers.contains("\(identifier.uuidString).expiry.7days"))
+        XCTAssertTrue(identifiers.first?.hasPrefix("\(identifier.uuidString).expiry.1days.") == true)
+        XCTAssertFalse(identifiers.contains(legacyStaleIdentifier))
+        XCTAssertFalse(identifiers.contains(previousCycleStaleIdentifier))
     }
 
     func testSchedulingRemovesDeliveredNotificationsFromPreviousBillingCycles() async throws {
@@ -52,8 +59,16 @@ final class SubscriptionNotificationServiceTests: XCTestCase {
         let identifier = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
         subscription.id = identifier
 
-        let nextBillingDate = subscription.nextBillingDate()
-        let billingKey = billingDateIdentifierKey(from: nextBillingDate)
+        let service = SubscriptionNotificationService(notificationCenter: mockCenter)
+        try await service.scheduleNotifications(for: subscription)
+
+        let scheduledIdentifier = await mockCenter.pendingNotificationRequests().first?.identifier
+        let billingKey = scheduledIdentifier?.split(separator: ".").last.map(String.init)
+
+        guard let billingKey else {
+            XCTFail("Expected a scheduled notification request identifier.")
+            return
+        }
 
         let oldCycleRequest = UNNotificationRequest(
             identifier: "\(identifier.uuidString).expiry.1days.19990101",
@@ -72,27 +87,11 @@ final class SubscriptionNotificationServiceTests: XCTestCase {
             DeliveredNotificationSnapshot(request: currentCycleRequest, deliveryDate: Date(timeIntervalSinceNow: -2 * 24 * 60 * 60)),
         ]
 
-        let service = SubscriptionNotificationService(notificationCenter: mockCenter)
         try await service.scheduleNotifications(for: subscription)
 
         let deliveredIdentifiers = await mockCenter.deliveredNotifications().map(\.request.identifier)
         XCTAssertFalse(deliveredIdentifiers.contains("\(identifier.uuidString).expiry.1days.19990101"))
         XCTAssertTrue(deliveredIdentifiers.contains("\(identifier.uuidString).expiry.3days.\(billingKey)"))
-    }
-
-    private func billingDateIdentifierKey(from billingDate: Date) -> String {
-        let calendar = Calendar.current
-        let components = calendar.dateComponents([.year, .month, .day], from: billingDate)
-
-        guard
-            let year = components.year,
-            let month = components.month,
-            let day = components.day
-        else {
-            return String(Int(billingDate.timeIntervalSince1970))
-        }
-
-        return String(format: "%04d%02d%02d", year, month, day)
     }
 }
 

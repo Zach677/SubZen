@@ -135,13 +135,15 @@ class SubscriptionNotificationService: SubscriptionNotificationScheduling {
         )
 
         let now = Date()
+        let calendar = Calendar.current
         let hasDeliveredExpiryNotificationToday = deliveredExpiryNotifications.contains { notification in
-            Calendar.current.isDate(notification.deliveryDate, inSameDayAs: now)
+            calendar.isDate(notification.deliveryDate, inSameDayAs: now)
         }
         let deliveredIdentifiersToRemove = deliveredExpiryNotifications
             .filter { notification in
-                guard !notification.request.identifier.hasSuffix(".\(currentBillingKey)") else { return false }
-                return !Calendar.current.isDate(notification.deliveryDate, inSameDayAs: now)
+                let isCurrentBilling = notification.request.identifier.hasSuffix(".\(currentBillingKey)")
+                let deliveredToday = calendar.isDate(notification.deliveryDate, inSameDayAs: now)
+                return !isCurrentBilling && !deliveredToday
             }
             .map(\.request.identifier)
 
