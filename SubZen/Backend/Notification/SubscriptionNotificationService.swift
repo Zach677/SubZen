@@ -8,16 +8,33 @@
 import Foundation
 import UserNotifications
 
+struct DeliveredNotificationSnapshot {
+    let request: UNNotificationRequest
+    let deliveryDate: Date
+}
+
 protocol NotificationCenterManaging {
     func authorizationStatus() async -> UNAuthorizationStatus
     func pendingNotificationRequests() async -> [UNNotificationRequest]
+    func deliveredNotifications() async -> [DeliveredNotificationSnapshot]
     func removePendingNotificationRequests(withIdentifiers identifiers: [String])
+    func removeDeliveredNotifications(withIdentifiers identifiers: [String])
     func add(_ request: UNNotificationRequest) async throws
 }
 
 extension UNUserNotificationCenter: NotificationCenterManaging {
     func authorizationStatus() async -> UNAuthorizationStatus {
         await notificationSettings().authorizationStatus
+    }
+
+    func deliveredNotifications() async -> [DeliveredNotificationSnapshot] {
+        await withCheckedContinuation { continuation in
+            getDeliveredNotifications { notifications in
+                continuation.resume(returning: notifications)
+            }
+        }.map { notification in
+            DeliveredNotificationSnapshot(request: notification.request, deliveryDate: notification.date)
+        }
     }
 }
 
@@ -31,6 +48,11 @@ protocol SubscriptionNotificationScheduling {
 }
 
 class SubscriptionNotificationService: SubscriptionNotificationScheduling {
+    private enum Constants {
+        static let reminderHour = 9
+        static let reminderMinute = 0
+    }
+
     private let notificationCenter: NotificationCenterManaging
 
     init(notificationCenter: NotificationCenterManaging = UNUserNotificationCenter.current()) {
@@ -58,6 +80,13 @@ class SubscriptionNotificationService: SubscriptionNotificationScheduling {
 
             notificationCenter.removePendingNotificationRequests(withIdentifiers: identifiersToRemove)
 
+            let deliveredNotifications = await notificationCenter.deliveredNotifications()
+            let deliveredIdentifiersToRemove = deliveredNotifications
+                .map(\.request.identifier)
+                .filter { $0.hasPrefix(debugIdentifierPrefix) }
+
+            notificationCenter.removeDeliveredNotifications(withIdentifiers: deliveredIdentifiersToRemove)
+
             var delay: TimeInterval = 1
 
             for daysBefore in intervals {
@@ -78,7 +107,47 @@ class SubscriptionNotificationService: SubscriptionNotificationScheduling {
 
     /// Schedule notifications for a subscription based on its reminder intervals
     func scheduleNotifications(for subscription: Subscription) async throws {
-        await cancelNotifications(for: subscription)
+        let subscriptionId = subscription.id.uuidString
+        let nextBillingDate = subscription.nextBillingDate()
+        let currentBillingKey = billingDateIdentifierKey(from: nextBillingDate)
+
+        async let pendingRequestsTask = notificationCenter.pendingNotificationRequests()
+        async let deliveredNotificationsTask = notificationCenter.deliveredNotifications()
+
+        let pendingRequests = await pendingRequestsTask
+        let deliveredNotifications = await deliveredNotificationsTask
+
+        let pendingIdentifiersToRemove = pendingRequests
+            .filter { isSubscriptionExpiryNotification($0, subscriptionId: subscriptionId) }
+            .map(\.identifier)
+
+        if !pendingIdentifiersToRemove.isEmpty {
+            notificationCenter.removePendingNotificationRequests(withIdentifiers: pendingIdentifiersToRemove)
+        }
+
+        let deliveredExpiryNotifications = deliveredNotifications
+            .filter { isSubscriptionExpiryNotification($0.request, subscriptionId: subscriptionId) }
+
+        let deliveredExpiryIdentifiersForCurrentBilling = Set(
+            deliveredExpiryNotifications
+                .map(\.request.identifier)
+                .filter { $0.hasSuffix(".\(currentBillingKey)") }
+        )
+
+        let now = Date()
+        let hasDeliveredExpiryNotificationToday = deliveredExpiryNotifications.contains { notification in
+            Calendar.current.isDate(notification.deliveryDate, inSameDayAs: now)
+        }
+        let deliveredIdentifiersToRemove = deliveredExpiryNotifications
+            .filter { notification in
+                guard !notification.request.identifier.hasSuffix(".\(currentBillingKey)") else { return false }
+                return !Calendar.current.isDate(notification.deliveryDate, inSameDayAs: now)
+            }
+            .map(\.request.identifier)
+
+        if !deliveredIdentifiersToRemove.isEmpty {
+            notificationCenter.removeDeliveredNotifications(withIdentifiers: deliveredIdentifiersToRemove)
+        }
 
         let authorizationStatus = await notificationCenter.authorizationStatus()
         let allowedStatuses: Set<UNAuthorizationStatus> = [.authorized, .provisional, .ephemeral]
@@ -89,35 +158,42 @@ class SubscriptionNotificationService: SubscriptionNotificationScheduling {
         }
 
         let remainingDays = subscription.remainingDays
-        let nextBillingDate = subscription.nextBillingDate()
 
         guard remainingDays > 0 else {
             print("Subscription '\(subscription.name)' has already expired or expires today, skipping notification")
             return
         }
 
-        for daysBefore in subscription.reminderIntervals {
+        let uniqueIntervals = Set(subscription.reminderIntervals).filter { $0 > 0 }.sorted()
+
+        for daysBefore in uniqueIntervals {
             guard remainingDays >= daysBefore else {
                 print("Subscription '\(subscription.name)' expires in \(remainingDays) days, skipping \(daysBefore)-day reminder")
                 continue
             }
 
-            let notificationDate = Calendar.current.date(
-                byAdding: .day,
-                value: -daysBefore,
-                to: nextBillingDate
-            ) ?? nextBillingDate
-
-            let identifier = "\(subscription.id.uuidString).expiry.\(daysBefore)days"
+            let notificationDate = reminderDate(for: nextBillingDate, daysBefore: daysBefore)
+            let identifier = notificationIdentifier(for: subscription, daysBefore: daysBefore, billingDate: nextBillingDate)
             let content = createNotificationContent(for: subscription, daysBefore: daysBefore)
 
             let trigger: UNNotificationTrigger
-            if notificationDate <= Date() {
+            if notificationDate <= now {
+                guard !hasDeliveredExpiryNotificationToday else {
+                    print("Subscription '\(subscription.name)' already received an expiry reminder today; skipping fallback scheduling")
+                    continue
+                }
+                guard !deliveredExpiryIdentifiersForCurrentBilling.contains(identifier) else {
+                    print("Reminder '\(identifier)' already delivered, skipping fallback scheduling")
+                    continue
+                }
                 let fallbackInterval: TimeInterval = 5
                 trigger = UNTimeIntervalNotificationTrigger(timeInterval: fallbackInterval, repeats: false)
                 print("Notification date for \(daysBefore)-day reminder already passed, scheduling immediate fallback")
             } else {
-                let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: notificationDate)
+                let components = Calendar.current.dateComponents(
+                    [.year, .month, .day, .hour, .minute, .second],
+                    from: notificationDate
+                )
                 trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
             }
 
@@ -156,6 +232,50 @@ class SubscriptionNotificationService: SubscriptionNotificationScheduling {
         return content
     }
 
+    private func isSubscriptionExpiryNotification(_ request: UNNotificationRequest, subscriptionId: String) -> Bool {
+        guard request.identifier.contains(".expiry.") else { return false }
+
+        if request.identifier.hasPrefix("\(subscriptionId).expiry.") {
+            return true
+        }
+
+        let requestSubscriptionId = request.content.userInfo["subscriptionId"] as? String
+        return requestSubscriptionId == subscriptionId
+    }
+
+    private func reminderDate(for billingDate: Date, daysBefore: Int) -> Date {
+        let calendar = Calendar.current
+        let billingDayStart = calendar.startOfDay(for: billingDate)
+        let reminderDay = calendar.date(byAdding: .day, value: -daysBefore, to: billingDayStart) ?? billingDayStart
+
+        return calendar.date(
+            bySettingHour: Constants.reminderHour,
+            minute: Constants.reminderMinute,
+            second: 0,
+            of: reminderDay
+        ) ?? reminderDay
+    }
+
+    private func notificationIdentifier(for subscription: Subscription, daysBefore: Int, billingDate: Date) -> String {
+        let key = billingDateIdentifierKey(from: billingDate)
+        return "\(subscription.id.uuidString).expiry.\(daysBefore)days.\(key)"
+    }
+
+    private func billingDateIdentifierKey(from billingDate: Date) -> String {
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.year, .month, .day], from: billingDate)
+
+        guard
+            let year = components.year,
+            let month = components.month,
+            let day = components.day
+        else {
+            return String(Int(billingDate.timeIntervalSince1970))
+        }
+
+        return String(format: "%04d%02d%02d", year, month, day)
+    }
+
     // MARK: - Notification Management
 
     /// Cancel all scheduled subscription notifications
@@ -164,17 +284,39 @@ class SubscriptionNotificationService: SubscriptionNotificationScheduling {
         let subscriptionIdentifiers = pendingRequests.filter { $0.identifier.contains(".expiry.") }.map(\.identifier)
 
         notificationCenter.removePendingNotificationRequests(withIdentifiers: subscriptionIdentifiers)
+
+        let deliveredNotifications = await notificationCenter.deliveredNotifications()
+        let deliveredIdentifiers = deliveredNotifications.map(\.request.identifier).filter { $0.contains(".expiry.") }
+        notificationCenter.removeDeliveredNotifications(withIdentifiers: deliveredIdentifiers)
+
         guard !subscriptionIdentifiers.isEmpty else { return }
         print("Cancelled \(subscriptionIdentifiers.count) scheduled subscription notifications")
     }
 
     /// Cancel notifications for a specific subscription
     func cancelNotifications(for subscription: Subscription) async {
-        let pendingRequests = await notificationCenter.pendingNotificationRequests()
-        let subscriptionIdentifiers = pendingRequests.filter { $0.identifier.hasPrefix("\(subscription.id.uuidString).expiry.") }.map(\.identifier)
+        let subscriptionId = subscription.id.uuidString
 
-        notificationCenter.removePendingNotificationRequests(withIdentifiers: subscriptionIdentifiers)
-        guard !subscriptionIdentifiers.isEmpty else { return }
-        print("Cancelled \(subscriptionIdentifiers.count) notifications for '\(subscription.name)'")
+        async let pendingRequestsTask = notificationCenter.pendingNotificationRequests()
+        async let deliveredNotificationsTask = notificationCenter.deliveredNotifications()
+
+        let pendingRequests = await pendingRequestsTask
+        let deliveredNotifications = await deliveredNotificationsTask
+
+        let pendingIdentifiers = pendingRequests
+            .filter { isSubscriptionExpiryNotification($0, subscriptionId: subscriptionId) }
+            .map(\.identifier)
+
+        notificationCenter.removePendingNotificationRequests(withIdentifiers: pendingIdentifiers)
+
+        let deliveredIdentifiers = deliveredNotifications
+            .filter { isSubscriptionExpiryNotification($0.request, subscriptionId: subscriptionId) }
+            .map(\.request.identifier)
+
+        notificationCenter.removeDeliveredNotifications(withIdentifiers: deliveredIdentifiers)
+
+        let removedCount = pendingIdentifiers.count + deliveredIdentifiers.count
+        guard removedCount > 0 else { return }
+        print("Cancelled \(removedCount) notifications for '\(subscription.name)'")
     }
 }
