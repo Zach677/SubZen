@@ -41,6 +41,8 @@ SubZen is a privacy-first subscription manager for iOS and macOS Catalyst built 
 - Route async work (`Task`, `async/await`) through services instead of running it in view layers.
 - Fence Catalyst-only tweaks behind platform checks or dedicated extensions.
 - **No Excessive Backward Compatibility**: This is a solo developer project with a small user base. Avoid writing complex migration shims or maintaining multiple data format versions. When data models change, prefer clean breaks over compatibility layers—old data can be discarded or users can re-enter it. Keep Codable implementations simple without legacy format fallbacks.
+- **No Legacy Code/Data Retention**: Don’t keep commented-out code, unused code paths, or compatibility shims “just in case.” When a refactor needs a clean break, delete the old implementation and reset persisted on-device data rather than carrying legacy forward.
+- **Avoid Defensive Programming**: Don’t add guards for impossible states or redundant nil/error checks “just in case.” Prefer asserting invariants (`assert`/`precondition`) for programmer errors; only validate truly external inputs (user input, disk, notifications, system APIs).
 
 ## Development Commands
 
