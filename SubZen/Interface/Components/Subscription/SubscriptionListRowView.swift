@@ -83,6 +83,7 @@ class SubscriptionListRowView: UIView {
         daysLabel.text = String(localized: "\(remainingDays) days left")
         if remainingDays == 0 {
             daysLabel.text = String(localized: "Today!")
+						daysLabel.textColor = .systemRed.withAlphaComponent(0.8)
         }
 
         // Update expiration progress gradient with animation
