@@ -100,6 +100,16 @@
         }
       }
     },
+    "%lld %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld %2$@"
+          }
+        }
+      }
+    },
     "%lld days before" : {
       "localizations" : {
         "zh-Hans" : {
@@ -140,12 +150,32 @@
         }
       }
     },
+    "7 days" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "7 天"
+          }
+        }
+      }
+    },
     "7 days before" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "提前 7 天"
+          }
+        }
+      }
+    },
+    "14 days" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "14 天"
           }
         }
       }
@@ -368,6 +398,26 @@
     "Failed to write export file: %@" : {
 
     },
+    "For" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "为期"
+          }
+        }
+      }
+    },
+    "Free Trial" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "免费试用"
+          }
+        }
+      }
+    },
     "Import Failed" : {
       "localizations" : {
         "zh-Hans" : {
@@ -522,6 +572,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "文件中没有订阅数据"
+          }
+        }
+      }
+    },
+    "None" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无"
           }
         }
       }
@@ -847,6 +907,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "今天！"
+          }
+        }
+      }
+    },
+    "Trial ends on %@" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "试用将在 %@ 结束"
           }
         }
       }

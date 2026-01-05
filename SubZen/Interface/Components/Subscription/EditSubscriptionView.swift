@@ -85,6 +85,21 @@ final class EditSubscriptionView: UIView {
         items: BillingCycle.presetCases.map(\.shortLocalizedName) + [String(localized: "Custom")]
     )
 
+    let trialLabel = UILabel().with {
+        $0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        $0.textColor = .label
+        $0.text = String(localized: "Free Trial")
+    }
+
+    let trialSegmentedControl = UISegmentedControl(
+        items: [
+            String(localized: "None"),
+            String(localized: "7 days"),
+            String(localized: "14 days"),
+            String(localized: "Custom"),
+        ]
+    )
+
     let dateLabel = UILabel().with {
         $0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         $0.textColor = .label
@@ -123,6 +138,13 @@ final class EditSubscriptionView: UIView {
         $0.numberOfLines = 0
     }
 
+    let trialHintLabel = UILabel().with {
+        $0.font = UIFont.systemFont(ofSize: 13, weight: .regular)
+        $0.textColor = .secondaryLabel
+        $0.numberOfLines = 0
+        $0.isHidden = true
+    }
+
     private let scrollView = UIScrollView().with {
         $0.alwaysBounceVertical = true
         $0.keyboardDismissMode = .onDrag
@@ -142,6 +164,7 @@ final class EditSubscriptionView: UIView {
     )
 
     let customCyclePickerView = CustomCyclePickerView()
+    let customTrialPickerView = CustomTrialPickerView()
 
     private let bottomSpacer = UIView().with {
         $0.isUserInteractionEnabled = false
@@ -174,6 +197,15 @@ final class EditSubscriptionView: UIView {
         $0.addArrangedSubview(customCyclePickerView)
     }
 
+    private lazy var trialContentStack = UIStackView().with {
+        $0.axis = .vertical
+        $0.spacing = Layout.groupSpacing
+        $0.alignment = .fill
+        $0.addArrangedSubview(trialSegmentedControl)
+        $0.addArrangedSubview(customTrialPickerView)
+        $0.addArrangedSubview(trialHintLabel)
+    }
+
     private lazy var dateContentStack = UIStackView().with {
         $0.axis = .vertical
         $0.spacing = 8
@@ -185,6 +217,7 @@ final class EditSubscriptionView: UIView {
     private lazy var nameSectionView = makeVerticalFormSection(label: nameLabel, content: nameTextField)
     private lazy var priceSectionView = makeVerticalFormSection(label: priceLabel, content: priceInputStackView)
     private lazy var cycleSectionView = makeVerticalFormSection(label: cycleLabel, content: cycleContentStack)
+    private lazy var trialSectionView = makeVerticalFormSection(label: trialLabel, content: trialContentStack)
     private lazy var dateSectionView = makeVerticalFormSection(label: dateLabel, content: dateContentStack)
     private lazy var reminderSectionView = makeVerticalFormSection(label: reminderLabel, content: reminderContentStack)
 
@@ -196,6 +229,7 @@ final class EditSubscriptionView: UIView {
         $0.addArrangedSubview(nameSectionView)
         $0.addArrangedSubview(priceSectionView)
         $0.addArrangedSubview(cycleSectionView)
+        $0.addArrangedSubview(trialSectionView)
         $0.addArrangedSubview(dateSectionView)
         $0.addArrangedSubview(reminderSectionView)
         $0.addArrangedSubview(bottomSpacer)
@@ -209,6 +243,8 @@ final class EditSubscriptionView: UIView {
     var onReminderBannerTapped: (() -> Void)?
     var onCycleSegmentChanged: ((Int) -> Void)?
     var onCustomCycleChanged: ((Int, CycleUnit) -> Void)?
+    var onTrialSegmentChanged: ((Int) -> Void)?
+    var onCustomTrialChanged: ((Int, CycleUnit) -> Void)?
     var onDateTapped: (() -> Void)?
 
     init() {
@@ -229,7 +265,11 @@ final class EditSubscriptionView: UIView {
         customCyclePickerView.onSelectionChanged = { [weak self] value, unit in
             self?.onCustomCycleChanged?(value, unit)
         }
+        customTrialPickerView.onSelectionChanged = { [weak self] value, unit in
+            self?.onCustomTrialChanged?(value, unit)
+        }
         customCyclePickerView.isHidden = true
+        customTrialPickerView.isHidden = true
         updateMaterialAppearance()
     }
 
@@ -242,6 +282,10 @@ final class EditSubscriptionView: UIView {
         [nameTextField, priceTextField].forEach { applyRoundedInputStyle(to: $0) }
         EditSubscriptionSelectionStyler.configureSegmentedControl(
             cycleSegmentedControl,
+            cornerRadius: Layout.segmentedCornerRadius
+        )
+        EditSubscriptionSelectionStyler.configureSegmentedControl(
+            trialSegmentedControl,
             cornerRadius: Layout.segmentedCornerRadius
         )
     }
@@ -289,6 +333,11 @@ final class EditSubscriptionView: UIView {
         cycleSegmentedControl.addTarget(
             self,
             action: #selector(cycleSegmentChanged(_:)),
+            for: UIControl.Event.valueChanged
+        )
+        trialSegmentedControl.addTarget(
+            self,
+            action: #selector(trialSegmentChanged(_:)),
             for: UIControl.Event.valueChanged
         )
         dateValueButton.addTarget(
@@ -384,9 +433,14 @@ final class EditSubscriptionView: UIView {
             to: cycleSegmentedControl,
             reduceTransparencyActive: reduceTransparency
         )
+        EditSubscriptionSelectionStyler.applySegmentedStyle(
+            to: trialSegmentedControl,
+            reduceTransparencyActive: reduceTransparency
+        )
         reminderPickerView.updateAppearance(reduceTransparencyActive: reduceTransparency)
         reminderBannerView.updateAppearance(reduceTransparencyActive: reduceTransparency)
         customCyclePickerView.updateAppearance(reduceTransparencyActive: reduceTransparency)
+        customTrialPickerView.updateAppearance(reduceTransparencyActive: reduceTransparency)
 
         EditSubscriptionButtonStyler.applyCurrencyButtonStyle(
             to: dateValueButton,
@@ -425,6 +479,10 @@ final class EditSubscriptionView: UIView {
         onCycleSegmentChanged?(sender.selectedSegmentIndex)
     }
 
+    @objc private func trialSegmentChanged(_ sender: UISegmentedControl) {
+        onTrialSegmentChanged?(sender.selectedSegmentIndex)
+    }
+
     @objc private func dateTapped() {
         onDateTapped?()
     }
@@ -440,6 +498,31 @@ final class EditSubscriptionView: UIView {
         let animations = { [weak self] in
             self?.customCyclePickerView.isHidden = !visible
             self?.customCyclePickerView.alpha = visible ? 1 : 0
+            self?.mainStackView.layoutIfNeeded()
+        }
+
+        if animated {
+            UIView.animate(
+                withDuration: 0.4,
+                delay: 0,
+                usingSpringWithDamping: 0.9,
+                initialSpringVelocity: 0.1,
+                options: [.curveEaseInOut, .beginFromCurrentState]
+            ) {
+                animations()
+            }
+        } else {
+            animations()
+        }
+    }
+
+    func setCustomTrialPickerVisible(_ visible: Bool, animated: Bool) {
+        let isCurrentlyHidden = customTrialPickerView.isHidden
+        guard isCurrentlyHidden == visible else { return }
+
+        let animations = { [weak self] in
+            self?.customTrialPickerView.isHidden = !visible
+            self?.customTrialPickerView.alpha = visible ? 1 : 0
             self?.mainStackView.layoutIfNeeded()
         }
 
@@ -506,6 +589,22 @@ final class EditSubscriptionView: UIView {
             attributedString.addAttribute(.font, value: UIFont.systemFont(ofSize: 13, weight: .semibold), range: range)
         }
         nextBillingHintLabel.attributedText = attributedString
+    }
+
+    func updateTrialHint(hint: String?, highlightRange: NSRange?) {
+        guard let hint else {
+            trialHintLabel.isHidden = true
+            trialHintLabel.attributedText = nil
+            return
+        }
+
+        trialHintLabel.isHidden = false
+        let attributedString = NSMutableAttributedString(string: hint)
+        if let range = highlightRange {
+            attributedString.addAttribute(.foregroundColor, value: UIColor.systemBlue, range: range)
+            attributedString.addAttribute(.font, value: UIFont.systemFont(ofSize: 13, weight: .semibold), range: range)
+        }
+        trialHintLabel.attributedText = attributedString
     }
 
     deinit {

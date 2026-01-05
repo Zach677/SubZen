@@ -18,6 +18,7 @@ class SubscriptionEditorController: UIViewController {
     private let defaultCurrencyProvider: DefaultCurrencyProviding
     private var selectedCurrency: Currency
     private var selectedCycle: BillingCycle = .monthly
+    private var selectedTrialPeriod: TrialPeriod?
 
     init(
         subscription: Subscription? = nil,
@@ -57,10 +58,16 @@ class SubscriptionEditorController: UIViewController {
 
             selectedCycle = existingSubscription.cycle
             configureUIForCycle(existingSubscription.cycle, animated: false)
+
+            selectedTrialPeriod = existingSubscription.trialPeriod
+            configureUIForTrial(existingSubscription.trialPeriod, animated: false)
         } else {
             // Default to monthly for new subscription
             selectedCycle = .monthly
             editSubscriptionView.cycleSegmentedControl.selectedSegmentIndex = 1
+
+            selectedTrialPeriod = nil
+            editSubscriptionView.trialSegmentedControl.selectedSegmentIndex = 0
         }
         editSubscriptionView.updateSelectedCurrencyDisplay(with: selectedCurrency)
         editSubscriptionView.onSaveTapped = { [weak self] in
@@ -81,6 +88,12 @@ class SubscriptionEditorController: UIViewController {
         editSubscriptionView.onCustomCycleChanged = { [weak self] value, unit in
             self?.handleCustomCycleChanged(value: value, unit: unit)
         }
+        editSubscriptionView.onTrialSegmentChanged = { [weak self] index in
+            self?.handleTrialSegmentChanged(index)
+        }
+        editSubscriptionView.onCustomTrialChanged = { [weak self] value, unit in
+            self?.handleCustomTrialChanged(value: value, unit: unit)
+        }
         editSubscriptionView.onDateTapped = { [weak self] in
             self?.handleDateTapped()
         }
@@ -89,6 +102,7 @@ class SubscriptionEditorController: UIViewController {
         navigationItem.backButtonTitle = "<"
 
         updateLastBillingDisplay()
+        updateTrialHint()
         updateNextBillingHint()
         updateReminderPermissionBanner()
     }
@@ -127,6 +141,25 @@ class SubscriptionEditorController: UIViewController {
         }
     }
 
+    private func configureUIForTrial(_ trialPeriod: TrialPeriod?, animated: Bool) {
+        let presets = TrialPeriod.presetCases
+
+        guard let trialPeriod else {
+            editSubscriptionView.trialSegmentedControl.selectedSegmentIndex = 0
+            editSubscriptionView.setCustomTrialPickerVisible(false, animated: animated)
+            return
+        }
+
+        if let index = presets.firstIndex(of: trialPeriod) {
+            editSubscriptionView.trialSegmentedControl.selectedSegmentIndex = index + 1
+            editSubscriptionView.setCustomTrialPickerVisible(false, animated: animated)
+        } else {
+            editSubscriptionView.trialSegmentedControl.selectedSegmentIndex = presets.count + 1 // Custom segment
+            editSubscriptionView.customTrialPickerView.configure(value: trialPeriod.value, unit: trialPeriod.unit)
+            editSubscriptionView.setCustomTrialPickerVisible(true, animated: animated)
+        }
+    }
+
     private func handleCycleSegmentChanged(_ index: Int) {
         let presets = BillingCycle.presetCases
         if index < presets.count {
@@ -146,6 +179,32 @@ class SubscriptionEditorController: UIViewController {
         updateNextBillingHint()
     }
 
+    private func handleTrialSegmentChanged(_ index: Int) {
+        let presets = TrialPeriod.presetCases
+
+        if index == 0 {
+            selectedTrialPeriod = nil
+            editSubscriptionView.setCustomTrialPickerVisible(false, animated: true)
+        } else if index <= presets.count {
+            selectedTrialPeriod = presets[index - 1]
+            editSubscriptionView.setCustomTrialPickerVisible(false, animated: true)
+        } else {
+            // Custom selected - use current picker values
+            let (value, unit) = editSubscriptionView.customTrialPickerView.currentSelection()
+            selectedTrialPeriod = TrialPeriod(value: value, unit: unit)
+            editSubscriptionView.setCustomTrialPickerVisible(true, animated: true)
+        }
+
+        updateTrialHint()
+        updateNextBillingHint()
+    }
+
+    private func handleCustomTrialChanged(value: Int, unit: CycleUnit) {
+        selectedTrialPeriod = TrialPeriod(value: value, unit: unit)
+        updateTrialHint()
+        updateNextBillingHint()
+    }
+
     private func handleSave() {
         Task { [weak self] in
             await self?.performSave()
@@ -155,6 +214,7 @@ class SubscriptionEditorController: UIViewController {
     @MainActor
     private func performSave() async {
         let cycle = selectedCycle
+        let trialPeriod = selectedTrialPeriod
         view.endEditing(true)
 
         let name = (editSubscriptionView.nameTextField.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
@@ -187,6 +247,7 @@ class SubscriptionEditorController: UIViewController {
                     editingSubscription.price = price
                     editingSubscription.lastBillingDate = date
                     editingSubscription.cycle = cycle
+                    editingSubscription.trialPeriod = trialPeriod
                     editingSubscription.currencyCode = selectedCurrency.code
                     editingSubscription.reminderIntervals = reminderIntervals
                 }
@@ -196,6 +257,7 @@ class SubscriptionEditorController: UIViewController {
                     price: price,
                     cycle: cycle,
                     lastBillingDate: date,
+                    trialPeriod: trialPeriod,
                     currencyCode: selectedCurrency.code,
                     reminderIntervals: reminderIntervals
                 )
@@ -324,6 +386,7 @@ class SubscriptionEditorController: UIViewController {
 
     @objc private func datePickerChanged() {
         updateLastBillingDisplay()
+        updateTrialHint()
         updateNextBillingHint()
     }
 
@@ -335,16 +398,45 @@ class SubscriptionEditorController: UIViewController {
         editSubscriptionView.updateLastBillingDisplay(dateString: dateString)
     }
 
+    private func updateTrialHint() {
+        guard let trialPeriod = selectedTrialPeriod,
+              let trialEnd = trialPeriod.endDate(from: editSubscriptionView.datePicker.date)
+        else {
+            editSubscriptionView.updateTrialHint(hint: nil, highlightRange: nil)
+            return
+        }
+
+        let formatter = DateFormatter()
+        formatter.dateStyle = .long
+        formatter.timeStyle = .none
+        let dateString = formatter.string(from: trialEnd)
+
+        let fullText = String(localized: "Trial ends on \(dateString)")
+        let range = (fullText as NSString).range(of: dateString)
+
+        editSubscriptionView.updateTrialHint(hint: fullText, highlightRange: range)
+    }
+
     private func updateNextBillingHint() {
         let lastDate = editSubscriptionView.datePicker.date
         let cycle = selectedCycle
 
         // Calculate next billing date
         let calendar = Calendar.current
-        var nextDate = lastDate
+        let now = Date()
+        var nextDate: Date = if let trialPeriod = selectedTrialPeriod,
+                                let trialEnd = trialPeriod.endDate(from: lastDate, calendar: calendar)
+        {
+            trialEnd
+        } else {
+            calendar.date(
+                byAdding: cycle.calendarComponent,
+                value: cycle.calendarValue,
+                to: lastDate
+            ) ?? lastDate
+        }
 
-        // Start from last billing date and find next future billing date
-        while nextDate <= Date() {
+        while !calendar.isDate(nextDate, inSameDayAs: now), nextDate < now {
             guard let next = calendar.date(
                 byAdding: cycle.calendarComponent,
                 value: cycle.calendarValue,

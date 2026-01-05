@@ -115,6 +115,7 @@ final class SubscriptionImportService {
                     price: subscription.price,
                     cycle: subscription.cycle,
                     lastBillingDate: subscription.lastBillingDate,
+                    trialPeriod: subscription.trialPeriod,
                     currencyCode: subscription.currencyCode,
                     reminderIntervals: subscription.reminderIntervals
                 )

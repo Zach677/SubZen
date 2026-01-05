@@ -179,6 +179,32 @@ enum BillingCycle: Codable, Equatable, Hashable {
     }
 }
 
+// MARK: - TrialPeriod
+
+struct TrialPeriod: Codable, Equatable, Hashable {
+    let value: Int
+    let unit: CycleUnit
+
+    static let presetCases: [TrialPeriod] = [
+        TrialPeriod(value: 7, unit: .day),
+        TrialPeriod(value: 14, unit: .day),
+    ]
+
+    var calendarComponent: Calendar.Component { unit.calendarComponent }
+    var calendarValue: Int { value }
+
+    var durationInDays: Int { value * unit.approximateDays }
+
+    var localizedName: String {
+        let unitName = value == 1 ? unit.localizedName : unit.localizedPluralName
+        return String(localized: "\(value) \(unitName)")
+    }
+
+    func endDate(from startDate: Date, calendar: Calendar = .current) -> Date? {
+        calendar.date(byAdding: calendarComponent, value: calendarValue, to: startDate)
+    }
+}
+
 // MARK: - SubscriptionValidationError
 
 enum SubscriptionValidationError: LocalizedError {
@@ -209,6 +235,7 @@ final class Subscription: Codable, Identifiable, Equatable {
     var price: Decimal
     var cycle: BillingCycle
     var lastBillingDate: Date
+    var trialPeriod: TrialPeriod?
     var currencyCode: String
     var reminderIntervals: [Int] // Days before expiration to send reminders (e.g., [1, 7, 14])
 
@@ -217,6 +244,7 @@ final class Subscription: Codable, Identifiable, Equatable {
         price: Decimal = 0.0,
         cycle: BillingCycle = .monthly,
         lastBillingDate: Date = .now,
+        trialPeriod: TrialPeriod? = nil,
         currencyCode: String = "USD",
         reminderIntervals: [Int] = []
     ) throws {
@@ -233,6 +261,7 @@ final class Subscription: Codable, Identifiable, Equatable {
         self.price = price
         self.cycle = cycle
         self.lastBillingDate = lastBillingDate
+        self.trialPeriod = trialPeriod
         self.currencyCode = normalizedCurrencyCode
         self.reminderIntervals = reminderIntervals
     }
@@ -264,7 +293,7 @@ final class Subscription: Codable, Identifiable, Equatable {
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, name, price, cycle, lastBillingDate, currencyCode, reminderIntervals
+        case id, name, price, cycle, lastBillingDate, trialPeriod, currencyCode, reminderIntervals
     }
 
     required init(from decoder: Decoder) throws {
@@ -277,6 +306,7 @@ final class Subscription: Codable, Identifiable, Equatable {
         cycle = try container.decode(BillingCycle.self, forKey: .cycle)
 
         lastBillingDate = try container.decode(Date.self, forKey: .lastBillingDate)
+        trialPeriod = try container.decodeIfPresent(TrialPeriod.self, forKey: .trialPeriod)
         currencyCode = try container.decode(String.self, forKey: .currencyCode).uppercased()
 
         // Handle backward compatibility for reminderIntervals (default to empty array)
@@ -290,6 +320,7 @@ final class Subscription: Codable, Identifiable, Equatable {
         try container.encode(price, forKey: .price)
         try container.encode(cycle, forKey: .cycle)
         try container.encode(lastBillingDate, forKey: .lastBillingDate)
+        try container.encodeIfPresent(trialPeriod, forKey: .trialPeriod)
         try container.encode(currencyCode, forKey: .currencyCode)
         try container.encode(reminderIntervals, forKey: .reminderIntervals)
     }
@@ -299,7 +330,7 @@ final class Subscription: Codable, Identifiable, Equatable {
     static func == (lhs: Subscription, rhs: Subscription) -> Bool {
         lhs.id == rhs.id && lhs.name == rhs.name && lhs.price == rhs.price && lhs.cycle == rhs.cycle
             && lhs.lastBillingDate == rhs.lastBillingDate && lhs.currencyCode == rhs.currencyCode
-            && lhs.reminderIntervals == rhs.reminderIntervals
+            && lhs.trialPeriod == rhs.trialPeriod && lhs.reminderIntervals == rhs.reminderIntervals
     }
 
     // MARK: - priceLabel formatting
@@ -313,12 +344,35 @@ final class Subscription: Codable, Identifiable, Equatable {
 
     // MARK: - Billing Date Calculations
 
+    func trialEndDate(calendar: Calendar = .current) -> Date? {
+        guard let trialPeriod else { return nil }
+        return trialPeriod.endDate(from: lastBillingDate, calendar: calendar)
+    }
+
+    private func billingAnchorDate(calendar: Calendar = .current) -> Date {
+        trialEndDate(calendar: calendar) ?? lastBillingDate
+    }
+
     /// Calculate remaining days until next billing date
     var remainingDays: Int {
         let currentDate = Date()
         let calendar = Calendar.current
 
-        var probe = lastBillingDate
+        if let trialEnd = trialEndDate(calendar: calendar) {
+            if calendar.isDate(trialEnd, inSameDayAs: currentDate) {
+                return 0
+            }
+            if trialEnd > currentDate {
+                let startOfCurrentDay = calendar.startOfDay(for: currentDate)
+                let startOfTrialEndDay = calendar.startOfDay(for: trialEnd)
+                let components = calendar.dateComponents(
+                    [.day], from: startOfCurrentDay, to: startOfTrialEndDay
+                )
+                return max(0, components.day ?? 0)
+            }
+        }
+
+        var probe = billingAnchorDate(calendar: calendar)
         while true {
             guard
                 let next = calendar.date(
@@ -353,8 +407,8 @@ final class Subscription: Codable, Identifiable, Equatable {
         let calendar = Calendar.current
         let currentDate = Date()
 
-        // Start from last billing date and find next future billing date
-        var nextBillingDate = lastBillingDate
+        // Start from billing anchor date and find next future billing date
+        var nextBillingDate = billingAnchorDate(calendar: calendar)
 
         while nextBillingDate <= currentDate {
             nextBillingDate =
@@ -380,9 +434,24 @@ final class Subscription: Codable, Identifiable, Equatable {
         cycle.cycleDurationInDays
     }
 
+    private var currentPeriodDurationInDays: Int {
+        guard let trialPeriod, let trialEnd = trialEndDate() else {
+            return cycleDurationInDays
+        }
+
+        let calendar = Calendar.current
+        let now = Date()
+
+        if calendar.isDate(trialEnd, inSameDayAs: now) || trialEnd > now {
+            return trialPeriod.durationInDays
+        }
+
+        return cycleDurationInDays
+    }
+
     /// Progress toward expiration (0.0 = just renewed, 1.0 = expiring today)
     var expirationProgress: Double {
-        let total = Double(cycleDurationInDays)
+        let total = Double(currentPeriodDurationInDays)
         let remaining = Double(remainingDays)
         return max(0.0, min(1.0, 1.0 - remaining / total))
     }
