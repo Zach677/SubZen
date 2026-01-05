@@ -66,6 +66,67 @@ final class SubscriptionSpendingCalculatorTests: XCTestCase {
         XCTAssertEqual(result.missingCurrencyCodes, ["CHF"])
     }
 
+    func testMonthlyTotalExcludesActiveTrialSubscriptions() throws {
+        let snapshot = CurrencyRateSnapshot(
+            base: "USD",
+            rates: [:],
+            sourceDate: Date(),
+            fetchedAt: Date()
+        )
+
+        let trialStart = Date(timeIntervalSinceNow: -60)
+        let trialPeriod = TrialPeriod(value: 7, unit: .day)
+
+        let subscriptions: [Subscription] = try [
+            Subscription(
+                name: "Active Trial CHF",
+                price: 5,
+                cycle: .monthly,
+                lastBillingDate: trialStart,
+                trialPeriod: trialPeriod,
+                currencyCode: "CHF"
+            ),
+            Subscription(name: "Paid USD", price: 10, cycle: .monthly, lastBillingDate: .now, currencyCode: "USD"),
+        ]
+
+        let result = calculator.monthlyTotal(for: subscriptions, baseCurrencyCode: "USD", ratesSnapshot: snapshot)
+        XCTAssertEqual(result.total, Decimal(10))
+        XCTAssertEqual(result.missingCurrencyCodes, [])
+    }
+
+    func testMonthlyTotalIncludesSubscriptionsAfterTrialEnds() throws {
+        let snapshot = CurrencyRateSnapshot(
+            base: "USD",
+            rates: ["EUR": Decimal(string: "0.5")!],
+            sourceDate: Date(),
+            fetchedAt: Date()
+        )
+
+        let expiredTrialStart = Date(timeIntervalSinceNow: -(60 * 60 * 24 * 10))
+        let trialPeriod = TrialPeriod(value: 7, unit: .day)
+
+        let subscriptions: [Subscription] = try [
+            Subscription(
+                name: "Expired Trial EUR",
+                price: 10,
+                cycle: .monthly,
+                lastBillingDate: expiredTrialStart,
+                trialPeriod: trialPeriod,
+                currencyCode: "EUR"
+            ),
+        ]
+
+        let result = calculator.monthlyTotal(for: subscriptions, baseCurrencyCode: "USD", ratesSnapshot: snapshot)
+
+        let expected = Decimal(10) / Decimal(string: "0.5")!
+        XCTAssertEqual(result.missingCurrencyCodes, [])
+        XCTAssertEqual(
+            (result.total as NSDecimalNumber).doubleValue,
+            (expected as NSDecimalNumber).doubleValue,
+            accuracy: 0.01
+        )
+    }
+
     func testDailyCycleNormalization() throws {
         let snapshot = CurrencyRateSnapshot(
             base: "USD",
@@ -158,6 +219,31 @@ final class SubscriptionSpendingCalculatorTests: XCTestCase {
             // Expected
         } else {
             XCTFail("Expected requiresConversion when currencies differ from base")
+        }
+    }
+
+    func testEvaluateConversionNeedIgnoresActiveTrialSubscriptions() throws {
+        let trialStart = Date(timeIntervalSinceNow: -60)
+        let trialPeriod = TrialPeriod(value: 7, unit: .day)
+
+        let subscriptions: [Subscription] = try [
+            Subscription(
+                name: "Trial EUR",
+                price: 20,
+                cycle: .monthly,
+                lastBillingDate: trialStart,
+                trialPeriod: trialPeriod,
+                currencyCode: "EUR"
+            ),
+            Subscription(name: "Paid USD", price: 10, cycle: .monthly, lastBillingDate: .now, currencyCode: "USD"),
+        ]
+
+        let mode = calculator.evaluateConversionNeed(for: subscriptions, baseCurrencyCode: "USD")
+
+        if case let .noCurrencyConversion(total) = mode {
+            XCTAssertEqual(total, Decimal(10))
+        } else {
+            XCTFail("Expected noCurrencyConversion when only active trial differs from base currency")
         }
     }
 

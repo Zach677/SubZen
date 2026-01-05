@@ -38,10 +38,13 @@ struct SubscriptionSpendingCalculator {
         var total: Decimal = 0
 
         for subscription in subscriptions {
+            let normalizedAmount = monthlyAmount(for: subscription)
+            guard normalizedAmount != .zero else { continue }
+
             if subscription.currencyCode.uppercased() != base {
                 return .requiresConversion
             }
-            total += monthlyAmount(for: subscription)
+            total += normalizedAmount
         }
 
         return .noCurrencyConversion(total: total)
@@ -58,6 +61,7 @@ struct SubscriptionSpendingCalculator {
 
         for subscription in subscriptions {
             let normalizedAmount = monthlyAmount(for: subscription)
+            guard normalizedAmount != .zero else { continue }
             let currencyCode = subscription.currencyCode.uppercased()
 
             if currencyCode == base {
@@ -80,27 +84,29 @@ struct SubscriptionSpendingCalculator {
     }
 
     func monthlyAmount(for subscription: Subscription) -> Decimal {
+        guard !subscription.isInTrial() else { return .zero }
+
         switch subscription.cycle {
         case .monthly:
-            subscription.price
+            return subscription.price
         case .yearly:
-            subscription.price / Decimal(12)
+            return subscription.price / Decimal(12)
         case .weekly:
-            subscription.price * weeksPerYear / Decimal(12)
+            return subscription.price * weeksPerYear / Decimal(12)
         case let .custom(value, unit):
             switch unit {
             case .day:
                 // Every N days: price * (days in month / N)
-                subscription.price * averageDaysInMonth / Decimal(value)
+                return subscription.price * averageDaysInMonth / Decimal(value)
             case .week:
                 // Every N weeks: price * (52 / N) / 12
-                subscription.price * weeksPerYear / Decimal(value) / Decimal(12)
+                return subscription.price * weeksPerYear / Decimal(value) / Decimal(12)
             case .month:
                 // Every N months: price / N
-                subscription.price / Decimal(value)
+                return subscription.price / Decimal(value)
             case .year:
                 // Every N years: price / N / 12
-                subscription.price / Decimal(value) / Decimal(12)
+                return subscription.price / Decimal(value) / Decimal(12)
             }
         }
     }

@@ -349,6 +349,11 @@ final class Subscription: Codable, Identifiable, Equatable {
         return trialPeriod.endDate(from: lastBillingDate, calendar: calendar)
     }
 
+    func isInTrial(on currentDate: Date = .now, calendar: Calendar = .current) -> Bool {
+        guard let trialEnd = trialEndDate(calendar: calendar) else { return false }
+        return calendar.isDate(trialEnd, inSameDayAs: currentDate) || trialEnd > currentDate
+    }
+
     private func billingAnchorDate(calendar: Calendar = .current) -> Date {
         trialEndDate(calendar: calendar) ?? lastBillingDate
     }
