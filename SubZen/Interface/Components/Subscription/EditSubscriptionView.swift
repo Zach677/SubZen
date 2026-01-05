@@ -166,6 +166,20 @@ final class EditSubscriptionView: UIView {
     let customCyclePickerView = CustomCyclePickerView()
     let customTrialPickerView = CustomTrialPickerView()
 
+    private lazy var cyclePickerView = ExpandableSegmentedControlView(
+        segmentedControl: cycleSegmentedControl,
+        customContentView: customCyclePickerView,
+        cornerRadius: Layout.segmentedCornerRadius,
+        spacing: Layout.groupSpacing
+    )
+
+    private lazy var trialPickerView = ExpandableSegmentedControlView(
+        segmentedControl: trialSegmentedControl,
+        customContentView: customTrialPickerView,
+        cornerRadius: Layout.segmentedCornerRadius,
+        spacing: Layout.groupSpacing
+    )
+
     private let bottomSpacer = UIView().with {
         $0.isUserInteractionEnabled = false
     }
@@ -189,20 +203,11 @@ final class EditSubscriptionView: UIView {
         $0.addArrangedSubview(reminderBannerView)
     }
 
-    private lazy var cycleContentStack = UIStackView().with {
-        $0.axis = .vertical
-        $0.spacing = Layout.groupSpacing
-        $0.alignment = .fill
-        $0.addArrangedSubview(cycleSegmentedControl)
-        $0.addArrangedSubview(customCyclePickerView)
-    }
-
     private lazy var trialContentStack = UIStackView().with {
         $0.axis = .vertical
         $0.spacing = Layout.groupSpacing
         $0.alignment = .fill
-        $0.addArrangedSubview(trialSegmentedControl)
-        $0.addArrangedSubview(customTrialPickerView)
+        $0.addArrangedSubview(trialPickerView)
         $0.addArrangedSubview(trialHintLabel)
     }
 
@@ -216,7 +221,7 @@ final class EditSubscriptionView: UIView {
 
     private lazy var nameSectionView = makeVerticalFormSection(label: nameLabel, content: nameTextField)
     private lazy var priceSectionView = makeVerticalFormSection(label: priceLabel, content: priceInputStackView)
-    private lazy var cycleSectionView = makeVerticalFormSection(label: cycleLabel, content: cycleContentStack)
+    private lazy var cycleSectionView = makeVerticalFormSection(label: cycleLabel, content: cyclePickerView)
     private lazy var trialSectionView = makeVerticalFormSection(label: trialLabel, content: trialContentStack)
     private lazy var dateSectionView = makeVerticalFormSection(label: dateLabel, content: dateContentStack)
     private lazy var reminderSectionView = makeVerticalFormSection(label: reminderLabel, content: reminderContentStack)
@@ -268,8 +273,6 @@ final class EditSubscriptionView: UIView {
         customTrialPickerView.onSelectionChanged = { [weak self] value, unit in
             self?.onCustomTrialChanged?(value, unit)
         }
-        customCyclePickerView.isHidden = true
-        customTrialPickerView.isHidden = true
         updateMaterialAppearance()
     }
 
@@ -280,14 +283,6 @@ final class EditSubscriptionView: UIView {
         priceTextField.setContentHuggingPriority(.defaultLow, for: .horizontal)
 
         [nameTextField, priceTextField].forEach { applyRoundedInputStyle(to: $0) }
-        EditSubscriptionSelectionStyler.configureSegmentedControl(
-            cycleSegmentedControl,
-            cornerRadius: Layout.segmentedCornerRadius
-        )
-        EditSubscriptionSelectionStyler.configureSegmentedControl(
-            trialSegmentedControl,
-            cornerRadius: Layout.segmentedCornerRadius
-        )
     }
 
     private func buildHierarchy() {
@@ -429,18 +424,10 @@ final class EditSubscriptionView: UIView {
         if currencyButton.currentTitle?.isEmpty != false {
             currencyButton.setTitle(fallbackCurrencyTitle, for: UIControl.State.normal)
         }
-        EditSubscriptionSelectionStyler.applySegmentedStyle(
-            to: cycleSegmentedControl,
-            reduceTransparencyActive: reduceTransparency
-        )
-        EditSubscriptionSelectionStyler.applySegmentedStyle(
-            to: trialSegmentedControl,
-            reduceTransparencyActive: reduceTransparency
-        )
+        cyclePickerView.updateAppearance(reduceTransparencyActive: reduceTransparency)
+        trialPickerView.updateAppearance(reduceTransparencyActive: reduceTransparency)
         reminderPickerView.updateAppearance(reduceTransparencyActive: reduceTransparency)
         reminderBannerView.updateAppearance(reduceTransparencyActive: reduceTransparency)
-        customCyclePickerView.updateAppearance(reduceTransparencyActive: reduceTransparency)
-        customTrialPickerView.updateAppearance(reduceTransparencyActive: reduceTransparency)
 
         EditSubscriptionButtonStyler.applyCurrencyButtonStyle(
             to: dateValueButton,
@@ -492,53 +479,19 @@ final class EditSubscriptionView: UIView {
     }
 
     func setCustomPickerVisible(_ visible: Bool, animated: Bool) {
-        let isCurrentlyHidden = customCyclePickerView.isHidden
-        guard isCurrentlyHidden == visible else { return }
-
-        let animations = { [weak self] in
-            self?.customCyclePickerView.isHidden = !visible
-            self?.customCyclePickerView.alpha = visible ? 1 : 0
-            self?.mainStackView.layoutIfNeeded()
-        }
-
-        if animated {
-            UIView.animate(
-                withDuration: 0.4,
-                delay: 0,
-                usingSpringWithDamping: 0.9,
-                initialSpringVelocity: 0.1,
-                options: [.curveEaseInOut, .beginFromCurrentState]
-            ) {
-                animations()
-            }
-        } else {
-            animations()
-        }
+        cyclePickerView.setCustomContentVisible(
+            visible,
+            animated: animated,
+            layoutView: mainStackView
+        )
     }
 
     func setCustomTrialPickerVisible(_ visible: Bool, animated: Bool) {
-        let isCurrentlyHidden = customTrialPickerView.isHidden
-        guard isCurrentlyHidden == visible else { return }
-
-        let animations = { [weak self] in
-            self?.customTrialPickerView.isHidden = !visible
-            self?.customTrialPickerView.alpha = visible ? 1 : 0
-            self?.mainStackView.layoutIfNeeded()
-        }
-
-        if animated {
-            UIView.animate(
-                withDuration: 0.4,
-                delay: 0,
-                usingSpringWithDamping: 0.9,
-                initialSpringVelocity: 0.1,
-                options: [.curveEaseInOut, .beginFromCurrentState]
-            ) {
-                animations()
-            }
-        } else {
-            animations()
-        }
+        trialPickerView.setCustomContentVisible(
+            visible,
+            animated: animated,
+            layoutView: mainStackView
+        )
     }
 
     func selectedReminderIntervals() -> [Int] {

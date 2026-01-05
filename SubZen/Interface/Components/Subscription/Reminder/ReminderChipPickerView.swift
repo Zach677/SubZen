@@ -2,12 +2,24 @@ import SnapKit
 import UIKit
 
 final class ReminderChipPickerView: UIView {
+    private enum Layout {
+        static let stackSpacing: CGFloat = 8
+    }
+
     private let segmentedControl = UISegmentedControl()
-    private let cornerRadius: CGFloat
+    private let customPickerView = ValueUnitPickerView(
+        labelText: String(localized: "Custom"),
+        units: [.day],
+        initialValue: 5,
+        initialUnit: .day
+    )
+    private let expandableView: ExpandableSegmentedControlView
 
     private var options: [Int] = []
+    private var customInterval: Int = 5
     private var reduceTransparencyActive = UIAccessibility.isReduceTransparencyEnabled
     private var isProgrammaticSelectionUpdate = false
+    private var isCustomSelected = false
 
     var selectedInterval: Int? {
         didSet { updateSelection() }
@@ -16,7 +28,12 @@ final class ReminderChipPickerView: UIView {
     var onSelectionChanged: ((Int?) -> Void)?
 
     init(cornerRadius: CGFloat) {
-        self.cornerRadius = cornerRadius
+        expandableView = ExpandableSegmentedControlView(
+            segmentedControl: segmentedControl,
+            customContentView: customPickerView,
+            cornerRadius: cornerRadius,
+            spacing: Layout.stackSpacing
+        )
         super.init(frame: .zero)
         configureView()
         buildHierarchy()
@@ -26,18 +43,22 @@ final class ReminderChipPickerView: UIView {
     private func configureView() {
         segmentedControl.selectedSegmentIndex = UISegmentedControl.noSegment
         segmentedControl.addTarget(self, action: #selector(handleValueChanged(_:)), for: .valueChanged)
-        EditSubscriptionSelectionStyler.configureSegmentedControl(
-            segmentedControl,
-            cornerRadius: cornerRadius
-        )
+
+        customPickerView.onSelectionChanged = { [weak self] value, _ in
+            guard let self else { return }
+            isCustomSelected = true
+            customInterval = value
+            selectedInterval = value
+            onSelectionChanged?(selectedInterval)
+        }
     }
 
     private func buildHierarchy() {
-        addSubview(segmentedControl)
+        addSubview(expandableView)
     }
 
     private func setupConstraints() {
-        segmentedControl.snp.makeConstraints { make in
+        expandableView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
     }
@@ -50,25 +71,50 @@ final class ReminderChipPickerView: UIView {
         for (index, option) in options.enumerated() {
             segmentedControl.insertSegment(withTitle: Self.title(for: option), at: index, animated: false)
         }
+        segmentedControl.insertSegment(withTitle: String(localized: "Custom"), at: options.count, animated: false)
 
-        selectedInterval = selectedInterval.flatMap { options.contains($0) ? $0 : nil }
+        if let selectedInterval {
+            if options.contains(selectedInterval) {
+                isCustomSelected = false
+            } else {
+                isCustomSelected = true
+                customInterval = selectedInterval
+            }
+        } else {
+            isCustomSelected = false
+        }
+
+        updateSelection()
         updateAppearance(reduceTransparencyActive: reduceTransparencyActive)
     }
 
     func updateAppearance(reduceTransparencyActive newValue: Bool) {
         reduceTransparencyActive = newValue
-        EditSubscriptionSelectionStyler.applySegmentedStyle(
-            to: segmentedControl,
-            reduceTransparencyActive: newValue
-        )
+        expandableView.updateAppearance(reduceTransparencyActive: newValue)
     }
 
     private func updateSelection() {
         isProgrammaticSelectionUpdate = true
-        if let selected = selectedInterval, let index = options.firstIndex(of: selected) {
-            segmentedControl.selectedSegmentIndex = index
+        if let selectedInterval {
+            if isCustomSelected {
+                segmentedControl.selectedSegmentIndex = options.count
+                customPickerView.configure(value: selectedInterval, unit: .day)
+                customInterval = selectedInterval
+                expandableView.setCustomContentVisible(true, animated: false, layoutView: superview)
+            } else if let index = options.firstIndex(of: selectedInterval) {
+                segmentedControl.selectedSegmentIndex = index
+                expandableView.setCustomContentVisible(false, animated: false, layoutView: superview)
+            } else {
+                isCustomSelected = true
+                segmentedControl.selectedSegmentIndex = options.count
+                customPickerView.configure(value: selectedInterval, unit: .day)
+                customInterval = selectedInterval
+                expandableView.setCustomContentVisible(true, animated: false, layoutView: superview)
+            }
         } else {
             segmentedControl.selectedSegmentIndex = UISegmentedControl.noSegment
+            isCustomSelected = false
+            expandableView.setCustomContentVisible(false, animated: false, layoutView: superview)
         }
         isProgrammaticSelectionUpdate = false
     }
@@ -78,12 +124,33 @@ final class ReminderChipPickerView: UIView {
 
         let selectedIndex = sender.selectedSegmentIndex
         guard selectedIndex != UISegmentedControl.noSegment else {
+            expandableView.setCustomContentVisible(false, animated: true, layoutView: superview)
+            isCustomSelected = false
             selectedInterval = nil
             return
         }
 
+        if selectedIndex == options.count {
+            customPickerView.configure(value: customInterval, unit: .day)
+            expandableView.setCustomContentVisible(true, animated: true, layoutView: superview)
+            isCustomSelected = true
+            selectedInterval = customInterval
+            onSelectionChanged?(selectedInterval)
+            return
+        }
+
         let value = options[selectedIndex]
-        selectedInterval = selectedInterval == value ? nil : value
+        let wasCustomSelected = isCustomSelected
+        if wasCustomSelected {
+            expandableView.setCustomContentVisible(false, animated: true, layoutView: superview)
+        }
+        isCustomSelected = false
+
+        if !wasCustomSelected, selectedInterval == value {
+            selectedInterval = nil
+        } else {
+            selectedInterval = value
+        }
         onSelectionChanged?(selectedInterval)
     }
 

@@ -234,7 +234,14 @@
       }
     },
     "Custom" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自定义"
+          }
+        }
+      }
     },
     "Cycle" : {
       "localizations" : {

@@ -7,15 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		F87CBBC22E93FD9A00AA9452 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = F87CBBC12E93FD9A00AA9452 /* RevenueCat */; };
-		F87CBBC42E93FD9A00AA9452 /* RevenueCatUI in Frameworks */ = {isa = PBXBuildFile; productRef = F87CBBC32E93FD9A00AA9452 /* RevenueCatUI */; };
 		F8A1B00A2F1AABCD00000001 /* SubscriptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1B0062F1AABCD00000001 /* SubscriptionTests.swift */; };
 		F8A1B00B2F1AABCD00000001 /* SubscriptionManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1B0072F1AABCD00000001 /* SubscriptionManagerTests.swift */; };
 		F8A1B00C2F1AABCD00000001 /* UserDefaultsGuard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1B0082F1AABCD00000001 /* UserDefaultsGuard.swift */; };
 		F8A1B00D2F1AABCD00000001 /* NotificationObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1B0092F1AABCD00000001 /* NotificationObserver.swift */; };
 		F8A1B0162F1AABCD00000001 /* SubscriptionExportServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1B0152F1AABCD00000001 /* SubscriptionExportServiceTests.swift */; };
 		F8A1B0182F1AABCD00000001 /* SubscriptionImportServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1B0172F1AABCD00000001 /* SubscriptionImportServiceTests.swift */; };
-		F8C67C382E4235DD00EEC073 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = F8C67C372E4235DD00EEC073 /* SnapKit */; };
+		F8A723A82F0C1CF5006F031B /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = F8A723A72F0C1CF5006F031B /* SnapKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -65,9 +63,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F87CBBC22E93FD9A00AA9452 /* RevenueCat in Frameworks */,
-				F8C67C382E4235DD00EEC073 /* SnapKit in Frameworks */,
-				F87CBBC42E93FD9A00AA9452 /* RevenueCatUI in Frameworks */,
+				F8A723A82F0C1CF5006F031B /* SnapKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -140,9 +136,7 @@
 			);
 			name = SubZen;
 			packageProductDependencies = (
-				F8C67C372E4235DD00EEC073 /* SnapKit */,
-				F87CBBC12E93FD9A00AA9452 /* RevenueCat */,
-				F87CBBC32E93FD9A00AA9452 /* RevenueCatUI */,
+				F8A723A72F0C1CF5006F031B /* SnapKit */,
 			);
 			productName = SubZen;
 			productReference = F882CE902D982DE2000E2FB7 /* SubZen.app */;
@@ -191,8 +185,7 @@
 			mainGroup = F882CE872D982DE2000E2FB7;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				F8C67C362E4235DD00EEC073 /* XCRemoteSwiftPackageReference "SnapKit" */,
-				F87CBBC02E93FD9900AA9452 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */,
+				F8A723A62F0C1CF5006F031B /* XCRemoteSwiftPackageReference "SnapKit" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = F882CE912D982DE2000E2FB7 /* Products */;
@@ -537,15 +530,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		F87CBBC02E93FD9900AA9452 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/RevenueCat/purchases-ios-spm.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.41.0;
-			};
-		};
-		F8C67C362E4235DD00EEC073 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+		F8A723A62F0C1CF5006F031B /* XCRemoteSwiftPackageReference "SnapKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
 			requirement = {
@@ -556,19 +541,9 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		F87CBBC12E93FD9A00AA9452 /* RevenueCat */ = {
+		F8A723A72F0C1CF5006F031B /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = F87CBBC02E93FD9900AA9452 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
-			productName = RevenueCat;
-		};
-		F87CBBC32E93FD9A00AA9452 /* RevenueCatUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F87CBBC02E93FD9900AA9452 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
-			productName = RevenueCatUI;
-		};
-		F8C67C372E4235DD00EEC073 /* SnapKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F8C67C362E4235DD00EEC073 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			package = F8A723A62F0C1CF5006F031B /* XCRemoteSwiftPackageReference "SnapKit" */;
 			productName = SnapKit;
 		};
 /* End XCSwiftPackageProductDependency section */
