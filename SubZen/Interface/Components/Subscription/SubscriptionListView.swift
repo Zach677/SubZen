@@ -22,6 +22,13 @@ protocol TitleBarDelegate: AnyObject {
 }
 
 class SubscriptionListView: UIView {
+    enum LayoutConstants {
+        static let filterHeight: CGFloat = 34
+        static let filterContentInset: CGFloat = 0
+        static let rowCardHorizontalInset: CGFloat = 16
+        static let tableContentInset = UIEdgeInsets(top: 0, left: 0, bottom: 16, right: 0)
+    }
+
     enum Filter: Int {
         case subscription
         case lifetime
@@ -56,7 +63,7 @@ class SubscriptionListView: UIView {
         $0.separatorStyle = .none
         $0.showsVerticalScrollIndicator = false
         $0.backgroundColor = .clear
-        $0.contentInset = UIEdgeInsets(top: 8, left: 0, bottom: 16, right: 0)
+        $0.contentInset = LayoutConstants.tableContentInset
         $0.estimatedRowHeight = 88
         $0.rowHeight = UITableView.automaticDimension
     }
@@ -89,9 +96,10 @@ class SubscriptionListView: UIView {
         )
 
         filterSegmentedControl.snp.makeConstraints { make in
-            make.top.bottom.equalToSuperview().inset(4)
-            make.leading.trailing.equalToSuperview().inset(16)
-            make.height.equalTo(34)
+            make.top.bottom.equalToSuperview().inset(LayoutConstants.filterContentInset)
+            make.leading.equalTo(tableView.layoutMarginsGuide.snp.leading).offset(LayoutConstants.rowCardHorizontalInset)
+            make.trailing.equalTo(tableView.layoutMarginsGuide.snp.trailing).offset(-LayoutConstants.rowCardHorizontalInset)
+            make.height.equalTo(LayoutConstants.filterHeight)
         }
 
         titleBar.snp.makeConstraints { make in

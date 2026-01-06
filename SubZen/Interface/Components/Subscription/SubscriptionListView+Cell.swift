@@ -20,7 +20,7 @@ extension SubscriptionListView {
 
             contentView.addSubview(cardView)
             cardView.snp.makeConstraints { make in
-                make.edges.equalToSuperview().inset(UIEdgeInsets(top: 6, left: 16, bottom: 6, right: 16))
+                make.edges.equalToSuperview().inset(UIEdgeInsets(top: 6, left: LayoutConstants.rowCardHorizontalInset, bottom: 6, right: LayoutConstants.rowCardHorizontalInset))
             }
         }
 
