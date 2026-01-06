@@ -2,7 +2,7 @@ name: Housekeeping
 
 on:
   schedule:
-    - cron: "0 8 * * *" # daily at 8:00 UTC
+    - cron: '0 8 * * *' # daily at 8:00 UTC
   workflow_dispatch:
 
 permissions:
@@ -109,7 +109,7 @@ jobs:
           ALLOW_DIRTY=1 Resources/DevKit/scripts/scan.license.sh
 
           # check if license file changed
-          if git diff --quiet FlowDown/BundledResources/OpenSourceLicenses.md; then
+          if git diff --quiet SubZen/BundledResources/OpenSourceLicenses.md; then
             echo "has_license_updates=false" >> "$GITHUB_OUTPUT"
             echo "[+] licenses unchanged"
           else
@@ -122,8 +122,8 @@ jobs:
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "Housekeeping Updates"
-          title: "Housekeeping Updates"
+          commit-message: 'Housekeeping Updates'
+          title: 'Housekeeping Updates'
           body: |
             ## Housekeeping Updates
 

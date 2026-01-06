@@ -1,63 +1,42 @@
-# copy from https://github.com/Lakr233/FlowDown/blob/200dc937404cefe7bbfb0b21ac45f9ed45b5868f/Resources/DevKit/scripts/check_translations.py
-import json
-import os
+#!/usr/bin/env python3
+"""
+Report translation completeness and optionally prune stale keys.
+"""
+
 import sys
 
-# Default path to the Localizable.xcstrings file
-default_file_path = os.path.join(
-    os.path.dirname(__file__), "..", "Localizable.xcstrings"
+from i18n_tools import (
+    default_file_path,
+    find_incomplete_translations,
+    load_strings,
+    save_strings,
 )
 
-# Allow overriding the file path via command line argument
-file_path = sys.argv[1] if len(sys.argv) > 1 else default_file_path
 
-# Read the file
-try:
-    with open(file_path, "r", encoding="utf-8") as f:
-        data = json.load(f)
-except FileNotFoundError:
-    print(f"File not found: {file_path}")
-    sys.exit(1)
-except json.JSONDecodeError as e:
-    print(f"JSON decode error in {file_path}: {e}")
-    sys.exit(1)
+if __name__ == "__main__":
+    file_path = sys.argv[1] if len(sys.argv) > 1 else default_file_path()
 
-strings = data["strings"]
+    data = load_strings(file_path)
+    languages, incomplete, removed = find_incomplete_translations(data, clean_stale=True)
 
-translatable_strings = {
-    k: v for k, v in strings.items() if v.get("shouldTranslate", True)
-}
-skipped_count = len(strings) - len(translatable_strings)
+    if removed:
+        save_strings(file_path, data)
+        print("Removed stale strings:")
+        for key in removed:
+            print(f"  - {key}")
+    else:
+        print("No stale strings found.")
 
-languages = set()
-for key, value in translatable_strings.items():
-    locs = value.get("localizations", {})
-    languages.update(locs.keys())
+    translatable_count = len(data["strings"])
+    print(f"Found languages: {', '.join(languages)}")
+    print(f"Total strings: {translatable_count}")
+    print()
 
-languages = sorted(list(languages))
-print(f"Found languages: {', '.join(languages)}")
-print(
-    f"Total strings: {len(strings)}, Translatable: {len(translatable_strings)}, Skipped (shouldTranslate=false): {skipped_count}"
-)
-print()
+    if incomplete:
+        print(f"Incomplete translations in {file_path}:")
+        for key, lang, reason in incomplete:
+            print(f"  {key} - {lang}: {reason}")
+        sys.exit(1)
 
-incomplete = []
-
-for key, value in translatable_strings.items():
-    locs = value.get("localizations", {})
-    for lang in languages:
-        if lang not in locs:
-            incomplete.append((key, lang, "missing localization"))
-        elif locs[lang]["stringUnit"]["state"] != "translated":
-            incomplete.append(
-                (key, lang, f"state: {locs[lang]['stringUnit']['state']}")
-            )
-        elif not locs[lang]["stringUnit"].get("value", "").strip():
-            incomplete.append((key, lang, "empty value"))
-
-if incomplete:
-    print(f"Incomplete translations in {file_path}:")
-    for item in incomplete:
-        print(f"  {item[0]} - {item[1]}: {item[2]}")
-else:
     print(f"All translations are complete in {file_path}.")
+    sys.exit(0)

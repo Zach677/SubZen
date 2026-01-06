@@ -2,166 +2,168 @@
 trigger: always_on
 ---
 
-# SubZen Repository Guidelines
+# SubZen Agent Guide
 
-## Project Overview
-SubZen is a privacy-first subscription manager for iOS and macOS Catalyst built entirely with UIKit. The app helps users track subscription renewals, analyze spending, and detect hidden charges while keeping data on-device by default (no sign-up required).
+This file provides guidance to AI coding agents working inside this repository.
 
-## Project Structure & Module Organization
-- **Workspace**: `SubZen.xcworkspace` hosts all app and test targets.
+## Overview
+
+SubZen is a privacy-first subscription manager for iOS built entirely with UIKit. The app helps users track subscription renewals, analyze spending, and while keeping data on-device by default (no sign-up required).
+
+- All code text (UI strings, comments, logs) must remain in English.
+
+## Platform Requirements & Dependencies
+
+- Target platforms reflect framework minimums: iOS 17.0+
+- Toolchain: Swift 6.0 (`swift-tools-version: 6.0`) and the Xcode 26 SDK line are required.
+- Core SwiftPM dependencies include SnapKit, GlyphixTextFx and additional UI/tooling libraries listed in `SubZen.xcodeproj`.
+
+## Project Structure
+
+- `SubZen.xcworkspace`: Entry point with app and frameworks.
 - **Runtime Code** (`SubZen/`):
   - `Application/` – App lifecycle (`AppDelegate`, `SceneDelegate`).
+  - `DerivedSources/` – Auto-generated build metadata (do not edit manually).
   - `Interface/` – UIKit presentation layer.
     - `Components/` – Reusable `UIView` subclasses, table cells, and helper views composed with SnapKit and the `with` convenience helpers.
     - `ViewController/` – Feature coordinators (`MainController`, `SubscriptionController`, `SettingController`, currency flows).
   - `Backend/` – Domain services and data models.
     - `Subscription/` – Subscription model plus CRUD/persistence (`SubscriptionManager`).
-    - `Currency/` – Currency metadata, totals, and exchange rate services.
+    - `Currency/` – Currency metadata, totals, and exchange rate services (`CurrencyRateService`).
     - `Notification/` – Notification permission + scheduling services.
     - `Settings/` – Reset and wipe flows.
   - `Extension/` – UIKit/Swift helpers shared across modules.
-  - `BundledResources/` – Static payloads and assets bundled inside the app.
-- **Shared Resources** (`Resources/`) – Localized strings, assets, and DevKit scripts.
+  - `Resources/` – App assets and localization (`Localizable.xcstrings`, `Assets.xcassets`, `LaunchScreen.storyboard`, Info.plist).
+  - `BundledResources/` – In-app documents (privacy policy, open source licenses).
+  - `Preview Content/` – Preview assets for Xcode.
+- **Shared Resources** (`Resources/`) – DevKit scripts, i18n docs, and privacy-related documents.
 - **Tests** (`SubZenTests/`) – XCTest targets with fixtures under `Support/`.
 
-## Architecture & Key Services
-- **MainController** (Interface/ViewController) – Container that hosts the subscription list and settings drawer.
-- **SubscriptionController** – Coordinates subscription CRUD, table presentation, and detail editing.
-- **SettingController** – Manages settings UI and integrates reset + notification preferences.
-- **SubscriptionManager** – Singleton persistence layer that stores subscription data in `UserDefaults` and emits notifications (`.newSubCreated`, `.subscriptionUpdated`).
-- **NotificationPermissionService** + **SubscriptionNotificationService/Manager** – Request permissions, schedule reminders, and manage lifecycle.
-- **SettingsResetService** – Clears local state and posts `.settingsDidReset`.
+## Build & Run Commands
 
-**Architecture Principles**
-- Keep UIKit-first composition: favor `UIViewController` containment and `UIView` composition instead of SwiftUI.
-- Inject dependencies through controller initializers or dedicated service initializers; avoid introducing new static singletons.
-- Keep domain logic inside service types; keep view controllers focused on presentation and coordination.
-- Use NotificationCenter with existing names for cross-feature communication. Document new notifications before broadcasting them.
-- Prefer value types for models; mark classes `final` unless subclassing is required.
-- Route async work (`Task`, `async/await`) through services instead of running it in view layers.
-- Fence Catalyst-only tweaks behind platform checks or dedicated extensions.
+- Open the workspace: `open SubZen.xcworkspace`.
+- Debug builds:
+  - iOS: `xcodebuild -workspace SubZen.xcworkspace -scheme SubZen -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 17 Pro' | xcbeautify -qq`
+- Release archive (iOS):
+  - `make` to archive (runs `Resources/DevKit/scripts/archive.all.sh`)
+  - `make clean` to reset build artifacts
+- When running CI-style builds, prefer `xcodebuild -workspace SubZen.xcworkspace -scheme SubZen -configuration Debug build`
+- Archive script automatically commits changes and bumps version before building; ensure the working tree is clean beforehand.
+- Run unit tests (`SubZenTests`): `xcodebuild -workspace SubZen.xcworkspace -scheme SubZen -configuration Debug test | xcbeautify -qq`
+- Localization validation helpers:
+  - `python3 Resources/DevKit/scripts/check_translations.py SubZen/Resources/Localizable.xcstrings`
+  - `python3 Resources/DevKit/scripts/check_untranslated.py SubZen/Resources/Localizable.xcstrings`
+  - `python3 Resources/DevKit/scripts/update_missing_i18n.py SubZen/Resources/Localizable.xcstrings` to scaffold missing locales; extend `NEW_STRINGS` in that script when adding new keys.
+
+## Engineering Principles
+
 - **No Excessive Backward Compatibility**: This is a solo developer project with a small user base. Avoid writing complex migration shims or maintaining multiple data format versions. When data models change, prefer clean breaks over compatibility layers—old data can be discarded or users can re-enter it. Keep Codable implementations simple without legacy format fallbacks.
 - **No Legacy Code/Data Retention**: Don’t keep commented-out code, unused code paths, or compatibility shims “just in case.” When a refactor needs a clean break, delete the old implementation and reset persisted on-device data rather than carrying legacy forward.
 - **Avoid Defensive Programming**: Don’t add guards for impossible states or redundant nil/error checks “just in case.” Prefer asserting invariants (`assert`/`precondition`) for programmer errors; only validate truly external inputs (user input, disk, notifications, system APIs).
 
-## Development Commands
+## Shell Script Style
 
-### Essential Commands
-- `open SubZen.xcworkspace` – Launch the Xcode workspace.
-- `xcodebuild -workspace SubZen.xcworkspace -scheme SubZen -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build` – Headless build verification.
-- `xcodebuild -workspace SubZen.xcworkspace -scheme SubZen -destination 'platform=iOS Simulator,name=iPhone 17 Pro' test` – Run the XCTest suite.
-- `make all` – Archive pipeline (requires a clean git tree).
-- `make clean` – Remove generated artifacts.
+### Core Principles
 
-### Code Formatting
-- `swiftformat . --swiftversion 6.0 --indent 4` – Format all Swift files with consistent style.
-- **IMPORTANT**: Run this command after completing any code changes to maintain consistent code style across the codebase.
+- **Simplicity**: Keep scripts minimal and focused
+- **No unnecessary complexity**: Avoid features that aren't needed
+- **Visual clarity**: Use line breaks for readability
+- **Failure handling**: Use `set -euo pipefail`
+- **Use shebang for scripts**: Use `#!/bin/zsh`
 
-### Development Scripts
-- `Resources/DevKit/scripts/scan.license.sh` – Refresh license compliance report.
-- `Resources/DevKit/scripts/bump.version.sh` – Version management.
-- `Resources/DevKit/scripts/archive.all.sh` – Complete build and archive workflow.
+### Output Guidelines
 
-## Coding Standards
+- Use `[+]` for successful operations
+- Use `[-]` for failed operations (when needed)
+- Keep echo messages lowercase
+- Simple status messages: "building...", "completed successfully"
 
-### Swift Code Style Guidelines
+### Code Style
 
-#### Core Style
-- Indent with 4 spaces; keep opening braces on the same line as declarations
-- Insert single spaces around operators and commas for readability
-- Use PascalCase for types and camelCase for properties, methods, and variables
-- Follow Swift API Design Guidelines for naming clarity
+- Minimal comments - focus on self-evident code
+- No unnecessary color output or visual fluff
+- Line breaks for long command chains
+- Assume required tools are available (e.g., xcbeautify)
+- Don't add if checks when pipefail handles failures
 
-#### File Organization
-- Keep files grouped logically within the existing directory structure
-- Name files in PascalCase for types; append `+Feature` when adding extensions
-- Introduce modular extensions rather than growing monolithic types
-- Name test files as `<Feature>NameTests.swift` and mirror production namespaces
-- Reuse fixtures from `SubZenTests/Support/` to avoid duplication
+## Development Guidelines
 
-#### Modern Swift Features
-- Prefer the `@Observable` macro over `ObservableObject`/`@Published`
-- Embrace Swift concurrency (`async/await`, `Task`, `actor`, `@MainActor`) where appropriate
-- Use result builders to express declarative APIs when they improve clarity
-- Break long property wrapper declarations across multiple lines for readability
-- Return `some Protocol` for opaque types when exposing constrained abstractions
-- Route async work through service types to keep view models thin
+### Swift Style
 
-#### Code Structure
-- Favor early returns and `guard` statements to minimize nesting
-- Keep each type or extension focused on a single responsibility
-- Prefer value types; use `final` classes when references are required
-- Organize larger files with `// MARK:` dividers and extract helpers once files exceed ~150 lines
+- 4-space indentation with opening braces on the same line
+- Single spaces around operators and after commas
+- PascalCase types; camelCase properties, methods, and file names
+- Organize extensions into targeted files (`Type+Feature.swift`) and keep each file focused on one responsibility
+- Lean on modern Swift patterns: `@Observable`, structured concurrency (`async`/`await`), result builders, and protocol-oriented design
 
-#### Error Handling
-- Model recoverable failures with typed `Result` values
-- Propagate errors with `throws`/`try` and unwrap optionals with `guard let`/`if let`
-- Define explicit error types for each domain and document invariants with comments when non-obvious
+### Architecture & Key Services
 
-#### Architecture
-- Avoid protocol-oriented patterns unless the additional abstraction delivers value
-- Inject dependencies instead of introducing new singletons
-- Prefer composition over inheritance; use factory or repository patterns for construction and persistence concerns
+- Respect the established managers: `SubscriptionManager`, `SubscriptionNotificationManager`, `NotificationPermissionService`, and `SettingsResetService`. Consult them before adding new singletons.
+- Compose features via dependency injection and protocols instead of inheritance.
+- Backend services are organized by domain: `Subscription`, `Currency`, `Notification`, `Settings`.
+- `SceneDelegate.swift` wires the root UI (`MainController`). Keep this order intact to avoid race conditions.
+- `UserDefaults` powers persisted user settings—keep keys centralized and publish updates via `NotificationCenter` when UI needs to refresh.
 
-#### Third-Party Libraries
-- Use SnapKit for Auto Layout constraints instead of bare `NSLayoutConstraint`
-- Chain view configuration with `then` to improve readability in setup blocks
-- Localize all user-facing strings with `String(localized:)`
-- Run `make` at the project root to verify builds before sharing changes
+## Testing Expectations
 
-#### Debug Assertions
-- Guard developer-only invariants with `assert()` and mark unreachable paths with `assertionFailure()`
-- Use `precondition()` when violating conditions should abort execution even in release builds
+- Add or update unit/UI tests alongside behavioural changes. `SubZenTests` uses XCTest—author tests as `func testFeatureScenario_expectation() throws`.
+- Run app-level tests with `xcodebuild -workspace SubZen.xcworkspace -scheme SubZen -configuration Debug test | xcbeautify -qq`.
+- Document manual verification steps whenever UI or integration flows lack automation.
 
-#### Memory Management
-- Capture references as `weak` to break cycles; upgrade to `unowned` only when lifetime is guaranteed
-- Provide explicit capture lists in closures and release resources in `deinit`
+## Security & Privacy
 
-## Testing & Quality Assurance
+- Never hardcode secrets; rely on user-supplied keys and platform keychains.
+- Validate new managers or services against the sanctioned singleton list above.
+- Use `assert`/`precondition` to capture invariants during development.
+- Audit persistence changes for privacy impacts before shipping.
+- Preserve privacy-first defaults: no telemetry/analytics, keep network usage minimal, and keep subscription data on-device.
 
-### Strategy
-- Unit tests for service logic and data validation.
-- Integration tests for service collaboration (e.g., notification scheduling).
-- UI tests for critical flows (subscription CRUD, settings reset) when feasible.
+## Documentation & Knowledge Sharing
 
-### Execution
-- Use XCTest with the existing schemes.
-- Reset shared state (`UserDefaults`, caches, notification center) between tests.
-- Document expected coverage gaps in PR descriptions.
+- Capture key findings from external research in PR descriptions so future contributors can trace decisions.
+- Reference official docs, WWDC sessions, or sample projects when introducing new APIs.
+- Keep architectural rationale and trade-offs close to the code (doc comments or dedicated markdown) when complexity grows.
+- Call out changes to generated assets or DevKit scripts (`SubZen/DerivedSources`, `Resources/DevKit/scripts/`) in PR summaries so reviewers can trace automation impacts.
 
-## Commit & Pull Request Workflow
-- Commit format: `<type>: <imperative summary>` (e.g., `fix: adjust notification scheduling`).
-- Keep formatting-only changes separate from logic changes.
-- Reference related issues or tickets in PR descriptions.
-- Provide simulator or Catalyst screenshots for UI changes.
-- Include `xcodebuild … test` output and brief manual QA notes when automation is insufficient.
+## Collaboration Workflow
 
-## Security & Configuration
-- Never commit user subscription data or secrets.
-- Store secrets in the keychain or ignored `.xcconfig` files.
-- Regenerate derived data when modifying bundled currency/notification assets.
-- Maintain license compliance via the DevKit scripts.
+- Craft concise, capitalized commit subjects (e.g., `Adjust Compiler Settings`) and use bodies to explain decisions or link issues (`#123`).
+- Group related work per commit and avoid bundling unrelated refactors.
+- Pull requests must include a summary, testing checklist, and before/after visuals for UI changes. Mention localization or asset updates when relevant.
+- Tag reviewers responsible for the affected modules and outline any follow-up tasks or risks.
 
-## Platform Considerations
-- Minimum deployment target: iOS 17.0+ across all new code paths (match Catalyst baselines accordingly).
-- Support both iOS and macOS Catalyst from the same UIKit codebase.
-- Keep components platform-neutral; isolate Catalyst-specific deltas in extensions.
-- Test critical flows on both platforms before release.
+## Localization Guidelines
 
-## Agent Integration Guidelines
-- Follow existing controller/service boundaries; avoid creating new singleton entry points.
-- Reference the established notification names when broadcasting changes.
-- Preserve privacy-first design by keeping all data local and avoiding network calls outside existing services.
-- Coordinate with the `Withable` helpers and SnapKit patterns when generating new components.
-- Prefer incremental refactors with test coverage instead of sweeping rewrites.
-- **CRITICAL**: After completing any code changes, ALWAYS run `swiftformat . --swiftversion 6.0 --indent 4` to format the code before finishing the task.
+- Prefer APIs that accept `String.LocalizationValue`; pass localization values directly for consistency
+- Other UI entry points should continue using `String(localized: ...)` for user-facing strings
+- Source all user-visible strings from localization files instead of hardcoded literals
 
-## MCP
-Always fetch context via Context7 when you need code generation, setup instructions, or framework documentation.
+### Dynamic values (avoid missed translations)
 
-Use these library IDs with Context7:
-- Swift / UIKit / Combine: `/websites/developer_apple`
-- Tuist: `/tuist/tuist`
-- TCA: `/pointfreeco/swift-composable-architecture`
-- Swift Navigation: `/pointfreeco/swift-navigation`
-- Fastlane: `/fastlane/docs`
+When a localized string includes runtime values (counts, sizes, etc.), do NOT build the key as a `String` via interpolation.
+
+- Bad (produces a runtime `String` key like "3 chances" and will NOT match entries like "%lld chances"):
+  - `String(localized: "\(value) chances")`
+- Good (ensures a `String.LocalizationValue` is produced, so it matches the formatted key in `.xcstrings`):
+  - `let key: String.LocalizationValue = "\(value) chances"`
+  - `String(localized: key)`
+
+Prefer `String.LocalizationValue`/`LocalizedStringResource` formatting over `String(format:)` in app code. Use `String(format:)` only when needed for compatibility.
+
+- Main app localization files:
+  - `SubZen/Resources/Localizable.xcstrings`: Main app UI strings
+  - `SubZen/Resources/InfoPlist/Info.plist`: Info.plist localization strings
+- We ship multiple locales (en base plus de, es, fr, ja, ko, zh-Hans); keep all locales populated when adding or updating strings—do not leave only English/Chinese
+- **IMPORTANT**: When adding new strings, you MUST provide translations for ALL supported languages (de, es, fr, ja, ko, zh-Hans) in `NEW_STRINGS`. Never add strings with only partial translations.
+- **IMPORTANT**: When adding new strings, you MUST provide translations for ALL supported languages (de, es, fr, ja, ko, zh-Hans) in `NEW_STRINGS`. Never add strings with only partial translations.
+- Use the provided scripts to manage translations:
+  - `python3 Resources/DevKit/scripts/update_missing_i18n.py SubZen/Resources/Localizable.xcstrings` to scaffold new keys (extend `NEW_STRINGS` dict in the script as required)
+  - `python3 Resources/DevKit/scripts/translate_missing.py SubZen/Resources/Localizable.xcstrings` to apply curated zh-Hans translations
+  - `python3 Resources/DevKit/scripts/check_untranslated.py SubZen/Resources/Localizable.xcstrings` to surface untranslated entries (missing or empty) across ALL languages
+  - `python3 Resources/DevKit/scripts/check_translations.py SubZen/Resources/Localizable.xcstrings` to remove stale keys and verify completeness across all locales
+- Script usage notes:
+  - `update_missing_i18n.py`: Add translations for ALL languages to `NEW_STRINGS` dict before running; the script merges them into xcstrings. Format: `{"Key": {"de": "...", "es": "...", "fr": "...", "ja": "...", "ko": "...", "zh-Hans": "..."}}`
+  - `check_untranslated.py`: Reports strings missing translations in ANY supported language (not just zh-Hans)
+  - `check_translations.py`: Use this to find strings missing translations in any locale (missing, empty, or non-translated state)
+- Localization files such as `Localizable.xcstrings` exceed 10k lines; update the supporting Python scripts to regenerate changes instead of editing the JSON directly.
+- Follow existing localization patterns and maintain consistency with the codebase. Avoid manual edits to `.xcstrings`; let scripts manage JSON structure.

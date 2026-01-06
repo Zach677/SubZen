@@ -65,6 +65,8 @@
 .serverless/
 .swiftpm
 .tern-port
+__pycache__/
+*.pyc
 .vscode-test
 .vuepress/dist
 .yarn-integrity
