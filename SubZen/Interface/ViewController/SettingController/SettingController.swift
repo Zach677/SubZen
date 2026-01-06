@@ -283,10 +283,15 @@ class SettingController: UIViewController {
     }
 
     private func presentImportSuccessAlert(result: ImportResult) {
-        let message = if result.skipped > 0 {
-            String(localized: "Imported \(result.imported), skipped \(result.skipped) duplicates")
+        let imported = Int64(result.imported)
+        let message: String
+        if result.skipped > 0 {
+            let skipped = Int64(result.skipped)
+            let key: String.LocalizationValue = "Imported \(imported), skipped \(skipped) duplicates"
+            message = String(localized: key)
         } else {
-            String(localized: "Imported \(result.imported) subscriptions")
+            let key: String.LocalizationValue = "Imported \(imported) subscriptions"
+            message = String(localized: key)
         }
 
         let alert = UIAlertController(

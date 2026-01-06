@@ -136,7 +136,7 @@ class SubscriptionEditorController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        // 禁用导航栏动画以避免与布局更新冲突
+        // Disable navigation bar animations to avoid layout update conflicts.
         navigationController?.setNavigationBarHidden(false, animated: false)
         notificationPermissionService.checkCurrentPermissionStatus()
 
@@ -456,7 +456,8 @@ class SubscriptionEditorController: UIViewController {
         formatter.timeStyle = .none
         let dateString = formatter.string(from: trialEnd)
 
-        let fullText = String(localized: "Trial ends on \(dateString)")
+        let fullTextKey: String.LocalizationValue = "Trial ends on \(dateString)"
+        let fullText = String(localized: fullTextKey)
         let range = (fullText as NSString).range(of: dateString)
 
         editSubscriptionView.updateTrialHint(hint: fullText, highlightRange: range)
@@ -500,7 +501,8 @@ class SubscriptionEditorController: UIViewController {
         formatter.timeStyle = .none
         let dateString = formatter.string(from: nextDate)
 
-        let fullText = String(localized: "Next billing date will be on \(dateString)")
+        let fullTextKey: String.LocalizationValue = "Next billing date will be on \(dateString)"
+        let fullText = String(localized: fullTextKey)
         let range = (fullText as NSString).range(of: dateString)
 
         editSubscriptionView.updateNextBillingHint(hint: fullText, highlightRange: range)

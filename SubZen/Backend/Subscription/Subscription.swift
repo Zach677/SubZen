@@ -117,7 +117,9 @@ enum BillingCycle: Codable, Equatable, Hashable {
             return String(localized: "Yearly")
         case let .custom(value, unit):
             let unitName = value == 1 ? unit.localizedName : unit.localizedPluralName
-            return String(localized: "Every \(value) \(unitName)")
+            let quantity = Int64(value)
+            let key: String.LocalizationValue = "Every \(quantity) \(unitName)"
+            return String(localized: key)
         }
     }
 
@@ -155,34 +157,59 @@ enum BillingCycle: Codable, Equatable, Hashable {
     }
 
     init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let type = try container.decode(String.self, forKey: .type)
-        switch type {
-        case "lifetime": self = .lifetime
-        case "weekly": self = .weekly
-        case "monthly": self = .monthly
-        case "yearly": self = .yearly
-        case "custom":
-            let value = try container.decode(Int.self, forKey: .value)
-            let unit = try container.decode(CycleUnit.self, forKey: .unit)
-            self = .custom(value: value, unit: unit)
+        if let container = try? decoder.container(keyedBy: CodingKeys.self) {
+            let type = try container.decode(String.self, forKey: .type)
+            switch type.lowercased() {
+            case "lifetime":
+                self = .lifetime
+            case "weekly":
+                self = .weekly
+            case "monthly":
+                self = .monthly
+            case "yearly":
+                self = .yearly
+            case "custom":
+                let value = try container.decode(Int.self, forKey: .value)
+                let unit = try container.decode(CycleUnit.self, forKey: .unit)
+                self = .custom(value: value, unit: unit)
+            default:
+                self = .monthly
+            }
+            return
+        }
+
+        let legacyContainer = try decoder.singleValueContainer()
+        let legacyValue = try legacyContainer.decode(String.self)
+        switch legacyValue.lowercased() {
+        case "lifetime":
+            self = .lifetime
+        case "weekly":
+            self = .weekly
+        case "monthly":
+            self = .monthly
+        case "yearly":
+            self = .yearly
         default:
             self = .monthly
         }
     }
 
     func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
         switch self {
         case .lifetime:
-            try container.encode("lifetime", forKey: .type)
+            var container = encoder.singleValueContainer()
+            try container.encode("Lifetime")
         case .weekly:
-            try container.encode("weekly", forKey: .type)
+            var container = encoder.singleValueContainer()
+            try container.encode("Weekly")
         case .monthly:
-            try container.encode("monthly", forKey: .type)
+            var container = encoder.singleValueContainer()
+            try container.encode("Monthly")
         case .yearly:
-            try container.encode("yearly", forKey: .type)
+            var container = encoder.singleValueContainer()
+            try container.encode("Yearly")
         case let .custom(value, unit):
+            var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encode("custom", forKey: .type)
             try container.encode(value, forKey: .value)
             try container.encode(unit, forKey: .unit)
@@ -208,7 +235,9 @@ struct TrialPeriod: Codable, Equatable, Hashable {
 
     var localizedName: String {
         let unitName = value == 1 ? unit.localizedName : unit.localizedPluralName
-        return String(localized: "\(value) \(unitName)")
+        let quantity = Int64(value)
+        let key: String.LocalizationValue = "\(quantity) \(unitName)"
+        return String(localized: key)
     }
 
     func endDate(from startDate: Date, calendar: Calendar = .current) -> Date? {

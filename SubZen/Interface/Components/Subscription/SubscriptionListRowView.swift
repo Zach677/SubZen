@@ -75,8 +75,17 @@ class SubscriptionListRowView: UIView {
         )
 
         priceLabel.attributedText = attributed
-        let accessibilityCycleDisplay = cycleDisplay.trimmingCharacters(in: .whitespaces).replacingOccurrences(of: "/ ", with: "per ")
-        let accessibilityAmountDescription = String(localized: "\(code) \(symbol) \(amount) \(accessibilityCycleDisplay)")
+        let accessibilityCycleDisplay: String
+        if case let .custom(value, _) = subscription.cycle, value > 1 {
+            let quantity = Int64(value)
+            let key: String.LocalizationValue = "\(quantity) \(cycleDisplayUnit)"
+            accessibilityCycleDisplay = String(localized: key)
+        } else {
+            accessibilityCycleDisplay = cycleDisplayUnit
+        }
+
+        let accessibilityKey: String.LocalizationValue = "\(code) \(symbol) \(amount) per \(accessibilityCycleDisplay)"
+        let accessibilityAmountDescription = String(localized: accessibilityKey)
         priceLabel.accessibilityLabel = accessibilityAmountDescription
 
         if subscription.isLifetime {
@@ -84,7 +93,8 @@ class SubscriptionListRowView: UIView {
             daysLabel.textColor = .secondaryLabel
         } else {
             let remainingDays = subscription.remainingDays
-            daysLabel.text = String(localized: "\(remainingDays) days left")
+            let daysLeftKey: String.LocalizationValue = "\(Int64(remainingDays)) days left"
+            daysLabel.text = String(localized: daysLeftKey)
             if remainingDays == 0 {
                 daysLabel.text = String(localized: "Today!")
                 daysLabel.textColor = .systemRed.withAlphaComponent(0.8)

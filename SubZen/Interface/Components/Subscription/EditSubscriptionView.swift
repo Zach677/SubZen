@@ -549,13 +549,15 @@ final class EditSubscriptionView: UIView {
             symbol
         }
 
-        let title = String(localized: "\(currency.name) \(displaySymbol) \(code)")
+        let titleKey: String.LocalizationValue = "\(currency.name) \(displaySymbol) \(code)"
+        let title = String(localized: titleKey)
         currencyButton.setTitle(title, for: UIControl.State.normal)
         if var configuration = currencyButton.configuration {
             configuration.title = title
             currencyButton.configuration = configuration
         }
-        currencyButton.accessibilityLabel = String(localized: "Selected currency: \(currency.name) \(currency.code)")
+        let accessibilityKey: String.LocalizationValue = "Selected currency: \(currency.name) \(currency.code)"
+        currencyButton.accessibilityLabel = String(localized: accessibilityKey)
     }
 
     func updateReminderPermissionBanner(isVisible: Bool, message: String?) {

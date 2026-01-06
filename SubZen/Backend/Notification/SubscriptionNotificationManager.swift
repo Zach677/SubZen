@@ -36,16 +36,22 @@ class SubscriptionNotificationManager {
 
         do {
             try await notificationService.scheduleNotifications(for: subscription)
-            print("Successfully scheduled notifications for subscription: \(subscription.name)")
+            #if DEBUG
+                print("Successfully scheduled notifications for subscription: \(subscription.name)")
+            #endif
         } catch {
-            print("Failed to schedule notifications for subscription: \(subscription.name), error: \(error)")
+            #if DEBUG
+                print("Failed to schedule notifications for subscription: \(subscription.name), error: \(error)")
+            #endif
         }
     }
 
     /// Cancel all notifications for a subscription
     func cancelNotifications(for subscription: Subscription) async {
         await notificationService.cancelNotifications(for: subscription)
-        print("Cancelled notifications for subscription: \(subscription.name)")
+        #if DEBUG
+            print("Cancelled notifications for subscription: \(subscription.name)")
+        #endif
     }
 
     /// Update notifications for a subscription (cancel old ones and schedule new ones)

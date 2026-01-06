@@ -24,9 +24,10 @@ extension SubscriptionController {
     }
 
     func deleteSubscription(_ subscription: Subscription) {
+        let messageKey: String.LocalizationValue = "Are you sure you want to delete \(subscription.name)?"
         let alert = UIAlertController(
             title: String(localized: "Delete Subscription"),
-            message: String(localized: "Are you sure you want to delete \(subscription.name)?"),
+            message: String(localized: messageKey),
             preferredStyle: .alert
         )
 

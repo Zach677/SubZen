@@ -33,13 +33,17 @@ enum SubscriptionImportError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case let .fileReadFailed(error):
-            String(localized: "Failed to read file: \(error.localizedDescription)")
+            let key: String.LocalizationValue = "Failed to read file: \(error.localizedDescription)"
+            return String(localized: key)
         case let .decodingFailed(error):
-            String(localized: "Failed to parse file: \(error.localizedDescription)")
+            let key: String.LocalizationValue = "Failed to parse file: \(error.localizedDescription)"
+            return String(localized: key)
         case let .unsupportedVersion(version):
-            String(localized: "Unsupported file version: \(version)")
+            let versionValue = Int64(version)
+            let key: String.LocalizationValue = "Unsupported file version: \(versionValue)"
+            return String(localized: key)
         case .noSubscriptionsToImport:
-            String(localized: "No subscriptions found in file")
+            return String(localized: "No subscriptions found in file")
         }
     }
 }

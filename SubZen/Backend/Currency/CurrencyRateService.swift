@@ -210,13 +210,15 @@ enum CurrencyRateServiceError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .unsupportedBase:
-            String(localized: "Unsupported base currency")
+            return String(localized: "Unsupported base currency")
         case .invalidURL:
-            String(localized: "Failed to build rates URL")
+            return String(localized: "Failed to build rates URL")
         case .invalidResponse:
-            String(localized: "Unexpected response when loading rates")
+            return String(localized: "Unexpected response when loading rates")
         case let .httpError(code):
-            String(localized: "Failed to load rates (HTTP \(code))")
+            let statusCode = Int64(code)
+            let key: String.LocalizationValue = "Failed to load rates (HTTP \(statusCode))"
+            return String(localized: key)
         }
     }
 }

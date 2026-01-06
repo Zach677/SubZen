@@ -25,7 +25,9 @@ class SubscriptionManager {
             return
         }
         subscriptions = loadedSubscriptions
-        print("[+] scanned \(subscriptions.count) subscriptions")
+        #if DEBUG
+            print("[+] scanned \(subscriptions.count) subscriptions")
+        #endif
     }
 
     func saveSubscriptions() {
@@ -38,7 +40,9 @@ class SubscriptionManager {
             let data = try JSONEncoder().encode(subscriptions)
             userDefaults.set(data, forKey: subscriptionsKey)
         } catch {
-            print("[*] failed to save subscriptions: \(error)")
+            #if DEBUG
+                print("[*] failed to save subscriptions: \(error)")
+            #endif
         }
     }
 

@@ -25,12 +25,12 @@ class NotificationPermissionService: ObservableObject {
 
     // MARK: - Public Methods
 
-    /// 检查是否需要请求通知权限（首次启动）
+    /// Returns whether we should prompt for notification permission (first launch).
     func shouldRequestPermission() -> Bool {
         !hasRequestedPermission && permissionStatus == .notDetermined
     }
 
-    /// 请求通知权限
+    /// Requests notification permission.
     func requestNotificationPermission() async {
         let shouldRequest = await MainActor.run { () -> Bool in
             guard !self.hasRequestedPermission, !self.isRequestingPermission else { return false }
@@ -57,7 +57,9 @@ class NotificationPermissionService: ObservableObject {
                 self.savePermissionRequestStatus()
             }
 
-            print("Notification permission granted: \(granted)")
+            #if DEBUG
+                print("Notification permission granted: \(granted)")
+            #endif
         } catch {
             await MainActor.run {
                 self.hasRequestedPermission = true
@@ -65,11 +67,13 @@ class NotificationPermissionService: ObservableObject {
                 self.savePermissionRequestStatus()
             }
 
-            print("Error requesting notification permission: \(error)")
+            #if DEBUG
+                print("Error requesting notification permission: \(error)")
+            #endif
         }
     }
 
-    /// 检查当前通知权限状态
+    /// Checks the current notification permission status.
     func checkCurrentPermissionStatus() {
         Task {
             let settings = await UNUserNotificationCenter.current().notificationSettings()

@@ -26,9 +26,11 @@ enum SubscriptionExportError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case let .encodingFailed(error):
-            String(localized: "Failed to encode subscriptions: \(error.localizedDescription)")
+            let key: String.LocalizationValue = "Failed to encode subscriptions: \(error.localizedDescription)"
+            return String(localized: key)
         case let .fileWriteFailed(error):
-            String(localized: "Failed to write export file: \(error.localizedDescription)")
+            let key: String.LocalizationValue = "Failed to write export file: \(error.localizedDescription)"
+            return String(localized: key)
         }
     }
 }
@@ -91,6 +93,6 @@ final class SubscriptionExportService {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
         let dateString = dateFormatter.string(from: Date())
-        return "SubZen-\(dateString).json"
+        return "SubZen-Subscriptions-\(dateString).json"
     }
 }

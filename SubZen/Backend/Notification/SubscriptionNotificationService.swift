@@ -93,7 +93,9 @@ class SubscriptionNotificationService: SubscriptionNotificationScheduling {
         let allowedStatuses: Set<UNAuthorizationStatus> = [.authorized, .provisional, .ephemeral]
 
         guard allowedStatuses.contains(settings.authorizationStatus) else {
-            print("Notification permission not granted (status: \(settings.authorizationStatus)), skipping scheduling for '\(subscription.name)'")
+            #if DEBUG
+                print("Notification permission not granted (status: \(settings.authorizationStatus)), skipping scheduling for '\(subscription.name)'")
+            #endif
             return
         }
 
@@ -103,13 +105,17 @@ class SubscriptionNotificationService: SubscriptionNotificationScheduling {
         var deliveredNotifications: [DeliveredNotificationSnapshot]?
 
         guard remainingDays > 0 else {
-            print("Subscription '\(subscription.name)' has already expired or expires today, skipping notification")
+            #if DEBUG
+                print("Subscription '\(subscription.name)' has already expired or expires today, skipping notification")
+            #endif
             return
         }
 
         for daysBefore in subscription.reminderIntervals {
             guard remainingDays >= daysBefore else {
-                print("Subscription '\(subscription.name)' expires in \(remainingDays) days, skipping \(daysBefore)-day reminder")
+                #if DEBUG
+                    print("Subscription '\(subscription.name)' expires in \(remainingDays) days, skipping \(daysBefore)-day reminder")
+                #endif
                 continue
             }
 
@@ -143,13 +149,17 @@ class SubscriptionNotificationService: SubscriptionNotificationScheduling {
                 )
 
                 guard !alreadyDeliveredForCurrentCycle else {
-                    print("Notification for '\(subscription.name)' \(daysBefore)-day reminder already delivered, skipping fallback")
+                    #if DEBUG
+                        print("Notification for '\(subscription.name)' \(daysBefore)-day reminder already delivered, skipping fallback")
+                    #endif
                     continue
                 }
 
                 let fallbackInterval: TimeInterval = 5
                 trigger = UNTimeIntervalNotificationTrigger(timeInterval: fallbackInterval, repeats: false)
-                print("Notification date for \(daysBefore)-day reminder already passed, scheduling immediate fallback")
+                #if DEBUG
+                    print("Notification date for \(daysBefore)-day reminder already passed, scheduling immediate fallback")
+                #endif
             } else {
                 trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
             }
@@ -157,7 +167,9 @@ class SubscriptionNotificationService: SubscriptionNotificationScheduling {
             let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
 
             try await notificationCenter.add(request)
-            print("Scheduled \(daysBefore)-day reminder for '\(subscription.name)'")
+            #if DEBUG
+                print("Scheduled \(daysBefore)-day reminder for '\(subscription.name)'")
+            #endif
         }
     }
 
@@ -168,19 +180,25 @@ class SubscriptionNotificationService: SubscriptionNotificationScheduling {
         switch daysBefore {
         case 1:
             content.title = String(localized: "Subscription Renews Tomorrow!")
-            content.body = String(localized: "\(subscription.name) will renew tomorrow.")
+            let key: String.LocalizationValue = "\(subscription.name) will renew tomorrow."
+            content.body = String(localized: key)
         case 3:
             content.title = String(localized: "Subscription Renews in 3 Days")
-            content.body = String(localized: "\(subscription.name) will renew in 3 days.")
+            let key: String.LocalizationValue = "\(subscription.name) will renew in 3 days."
+            content.body = String(localized: key)
         case 7:
             content.title = String(localized: "Subscription Renews Next Week")
-            content.body = String(localized: "\(subscription.name) will renew next week.")
+            let key: String.LocalizationValue = "\(subscription.name) will renew next week."
+            content.body = String(localized: key)
         case 14:
             content.title = String(localized: "Subscription Renews in 2 Weeks")
-            content.body = String(localized: "\(subscription.name) will renew in 2 weeks.")
+            let key: String.LocalizationValue = "\(subscription.name) will renew in 2 weeks."
+            content.body = String(localized: key)
         default:
             content.title = String(localized: "Subscription Reminder")
-            content.body = String(localized: "\(subscription.name) will renew in \(daysBefore) days.")
+            let daysValue = Int64(daysBefore)
+            let key: String.LocalizationValue = "\(subscription.name) will renew in \(daysValue) days."
+            content.body = String(localized: key)
         }
 
         content.sound = .default
@@ -198,7 +216,9 @@ class SubscriptionNotificationService: SubscriptionNotificationScheduling {
 
         notificationCenter.removePendingNotificationRequests(withIdentifiers: subscriptionIdentifiers)
         guard !subscriptionIdentifiers.isEmpty else { return }
-        print("Cancelled \(subscriptionIdentifiers.count) scheduled subscription notifications")
+        #if DEBUG
+            print("Cancelled \(subscriptionIdentifiers.count) scheduled subscription notifications")
+        #endif
     }
 
     /// Cancel notifications for a specific subscription
@@ -208,6 +228,8 @@ class SubscriptionNotificationService: SubscriptionNotificationScheduling {
 
         notificationCenter.removePendingNotificationRequests(withIdentifiers: subscriptionIdentifiers)
         guard !subscriptionIdentifiers.isEmpty else { return }
-        print("Cancelled \(subscriptionIdentifiers.count) notifications for '\(subscription.name)'")
+        #if DEBUG
+            print("Cancelled \(subscriptionIdentifiers.count) notifications for '\(subscription.name)'")
+        #endif
     }
 }

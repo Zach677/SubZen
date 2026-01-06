@@ -30,7 +30,9 @@ extension SubscriptionManager {
         subscriptions.append(subscription)
         saveSubscriptions()
 
-        print("[+] created a new subscription with: \(subscription.name)")
+        #if DEBUG
+            print("[+] created a new subscription with: \(subscription.name)")
+        #endif
         NotificationCenter.default.post(name: .newSubCreated, object: subscription.id)
 
         // Schedule notifications if reminder intervals are set
