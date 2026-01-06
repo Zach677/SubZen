@@ -1,5 +1,5 @@
-# # Copy from https://github.com/Lakr233/FlowDown/blob/bc9ba079f9474f315b985255a4e9ed67b72e9fd0/Resources/DevKit/scripts/scan.license.sh, which is licensed under the MIT license.
 #!/bin/zsh
+# Copy from https://github.com/Lakr233/FlowDown/blob/bc9ba079f9474f315b985255a4e9ed67b72e9fd0/Resources/DevKit/scripts/scan.license.sh, which is licensed under the MIT license.
 
 cd "$(dirname "$0")"
 
@@ -31,16 +31,22 @@ function with_retry {
 }
 
 if [[ -n $(git status --porcelain) ]]; then
-    echo "[!] git is not clean"
-    exit 1
+    if [[ "${ALLOW_DIRTY:-0}" == "1" ]]; then
+        echo "[*] git is not clean; continuing because ALLOW_DIRTY=1"
+    else
+        echo "[!] git is not clean"
+        exit 1
+    fi
 fi
 
 echo "[*] cleaning framework dir..."
-if [[ -d Frameworks ]]; then
-    pushd Frameworks >/dev/null
+if [[ -d "$PROJECT_ROOT/Frameworks" ]]; then
+    pushd "$PROJECT_ROOT/Frameworks" >/dev/null
     # spm may have duplicated LICENSE file inside their own .build directory
     git clean -fdx -f
     popd >/dev/null
+else
+    echo "[*] Frameworks directory not found; skipping"
 fi
 
 echo "[*] resolving packages..."
