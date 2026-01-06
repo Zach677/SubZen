@@ -113,3 +113,60 @@ struct SubscriptionSpendingCalculator {
         }
     }
 }
+
+/// Aggregates one-time purchases for subscriptions marked as `.lifetime`.
+struct LifetimeSpendingCalculator {
+    func evaluateConversionNeed(
+        for subscriptions: [Subscription],
+        baseCurrencyCode: String
+    ) -> SpendingCalculationMode {
+        guard !subscriptions.isEmpty else {
+            return .noCurrencyConversion(total: .zero)
+        }
+
+        let base = baseCurrencyCode.uppercased()
+        var total: Decimal = 0
+
+        for subscription in subscriptions {
+            let amount = subscription.price
+            if subscription.currencyCode.uppercased() != base {
+                return .requiresConversion
+            }
+            total += amount
+        }
+
+        return .noCurrencyConversion(total: total)
+    }
+
+    func total(
+        for subscriptions: [Subscription],
+        baseCurrencyCode: String,
+        ratesSnapshot: CurrencyRateSnapshot
+    ) -> SubscriptionSpendingResult {
+        let base = baseCurrencyCode.uppercased()
+        var runningTotal: Decimal = 0
+        var missingCodes = Set<String>()
+
+        for subscription in subscriptions {
+            let amount = subscription.price
+            let currencyCode = subscription.currencyCode.uppercased()
+
+            if currencyCode == base {
+                runningTotal += amount
+                continue
+            }
+
+            guard let converted = ratesSnapshot.convert(amount: amount, from: currencyCode, to: base) else {
+                missingCodes.insert(currencyCode)
+                continue
+            }
+
+            runningTotal += converted
+        }
+
+        return SubscriptionSpendingResult(
+            total: runningTotal,
+            missingCurrencyCodes: Array(missingCodes).sorted()
+        )
+    }
+}

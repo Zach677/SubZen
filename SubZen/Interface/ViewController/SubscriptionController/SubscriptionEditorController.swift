@@ -16,6 +16,7 @@ class SubscriptionEditorController: UIViewController {
     private let notificationPermissionService: NotificationPermissionService
     private let reminderPermissionPresenter: ReminderPermissionPresenter
     private let defaultCurrencyProvider: DefaultCurrencyProviding
+    private let preferLifetimeForNewSubscription: Bool
     private var selectedCurrency: Currency
     private var selectedCycle: BillingCycle = .monthly
     private var selectedTrialPeriod: TrialPeriod?
@@ -23,6 +24,7 @@ class SubscriptionEditorController: UIViewController {
 
     init(
         subscription: Subscription? = nil,
+        preferLifetimeForNewSubscription: Bool = false,
         notificationPermissionService: NotificationPermissionService = .shared,
         reminderPermissionPresenter: ReminderPermissionPresenter? = nil,
         defaultCurrencyProvider: DefaultCurrencyProviding = DefaultCurrencyProvider()
@@ -31,6 +33,7 @@ class SubscriptionEditorController: UIViewController {
         self.reminderPermissionPresenter = reminderPermissionPresenter ?? ReminderPermissionPresenter(notificationPermissionService: notificationPermissionService)
         editSubscription = subscription
         self.defaultCurrencyProvider = defaultCurrencyProvider
+        self.preferLifetimeForNewSubscription = preferLifetimeForNewSubscription
         selectedCurrency = subscription
             .flatMap { CurrencyList.currency(for: $0.currencyCode) }
             ?? defaultCurrencyProvider.loadDefaultCurrency()
@@ -79,9 +82,9 @@ class SubscriptionEditorController: UIViewController {
                 configureUIForTrial(existingSubscription.trialPeriod, animated: false)
             }
         } else {
-            isLifetimeSelected = false
-            editSubscriptionView.billingTypeSegmentedControl.selectedSegmentIndex = 0
-            editSubscriptionView.setLifetimeModeEnabled(false, animated: false)
+            isLifetimeSelected = preferLifetimeForNewSubscription
+            editSubscriptionView.billingTypeSegmentedControl.selectedSegmentIndex = isLifetimeSelected ? 1 : 0
+            editSubscriptionView.setLifetimeModeEnabled(isLifetimeSelected, animated: false)
 
             // Default to monthly for new subscription
             selectedCycle = .monthly

@@ -9,11 +9,17 @@ import UIKit
 
 extension SubscriptionController {
     @objc func addSubscriptionTapped() {
-        presentSubscriptionEditor()
+        presentSubscriptionEditor(preferLifetimeForNewSubscription: currentFilter == .lifetime)
     }
 
-    func presentSubscriptionEditor(for subscription: Subscription? = nil) {
-        let editorController = SubscriptionEditorController(subscription: subscription)
+    func presentSubscriptionEditor(
+        for subscription: Subscription? = nil,
+        preferLifetimeForNewSubscription: Bool = false
+    ) {
+        let editorController = SubscriptionEditorController(
+            subscription: subscription,
+            preferLifetimeForNewSubscription: preferLifetimeForNewSubscription
+        )
         navigationController?.pushViewController(editorController, animated: true)
     }
 

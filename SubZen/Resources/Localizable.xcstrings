@@ -180,6 +180,16 @@
         }
       }
     },
+    "Add your first lifetime subscription to get started" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "添加第一个终身订阅即可开始"
+          }
+        }
+      }
+    },
     "Add your first subscription to get started" : {
       "localizations" : {
         "zh-Hans" : {
@@ -568,6 +578,16 @@
     },
     "Next billing date will be on %@" : {
 
+    },
+    "No Lifetime Subscriptions" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "暂无终身订阅"
+          }
+        }
+      }
     },
     "No Subscriptions" : {
       "localizations" : {

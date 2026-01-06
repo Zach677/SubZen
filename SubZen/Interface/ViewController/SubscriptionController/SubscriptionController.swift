@@ -18,7 +18,10 @@ class SubscriptionController: UIViewController {
     private let currencyRateService = CurrencyRateService()
     private let defaultCurrencyProvider = DefaultCurrencyProvider()
     private let spendingCalculator = SubscriptionSpendingCalculator()
+    private let lifetimeSpendingCalculator = LifetimeSpendingCalculator()
     private var summaryTask: Task<Void, Never>?
+    private(set) var currentFilter: SubscriptionListView.Filter = .subscription
+    private var cachedSubscriptions: [Subscription] = []
     weak var settingsDelegate: SubscriptionControllerSettingsDelegate?
 
     /// Indicates whether any subscription cell is currently showing swipe actions
@@ -71,10 +74,8 @@ class SubscriptionController: UIViewController {
     }
 
     func loadSubscriptions() {
-        let subscriptions = subscriptionManager.allSubscriptions()
-            .sorted { $0.remainingDays < $1.remainingDays }
-        subscriptionListView.updateSubscriptions(subscriptions)
-        refreshSummary(with: subscriptions)
+        cachedSubscriptions = subscriptionManager.allSubscriptions()
+        applyFilterAndRefresh()
     }
 
     @objc private func handleSubscriptionsChanged() {
@@ -85,7 +86,27 @@ class SubscriptionController: UIViewController {
         loadSubscriptions()
     }
 
-    private func refreshSummary(with subscriptions: [Subscription]) {
+    private func applyFilterAndRefresh() {
+        let filteredSubscriptions = subscriptions(for: currentFilter)
+        subscriptionListView.updateFilter(currentFilter)
+        subscriptionListView.updateSubscriptions(filteredSubscriptions)
+        refreshSummary(for: currentFilter, with: filteredSubscriptions)
+    }
+
+    private func subscriptions(for filter: SubscriptionListView.Filter) -> [Subscription] {
+        switch filter {
+        case .subscription:
+            cachedSubscriptions
+                .filter { !$0.isLifetime }
+                .sorted { $0.remainingDays < $1.remainingDays }
+        case .lifetime:
+            cachedSubscriptions
+                .filter(\.isLifetime)
+                .sorted { $0.lastBillingDate > $1.lastBillingDate }
+        }
+    }
+
+    private func refreshSummary(for filter: SubscriptionListView.Filter, with subscriptions: [Subscription]) {
         summaryTask?.cancel()
 
         guard !subscriptions.isEmpty else {
@@ -96,7 +117,14 @@ class SubscriptionController: UIViewController {
         let baseCurrency = defaultCurrencyProvider.loadDefaultCurrency()
 
         // Check if currency conversion is needed
-        switch spendingCalculator.evaluateConversionNeed(for: subscriptions, baseCurrencyCode: baseCurrency.code) {
+        let conversionMode = switch filter {
+        case .subscription:
+            spendingCalculator.evaluateConversionNeed(for: subscriptions, baseCurrencyCode: baseCurrency.code)
+        case .lifetime:
+            lifetimeSpendingCalculator.evaluateConversionNeed(for: subscriptions, baseCurrencyCode: baseCurrency.code)
+        }
+
+        switch conversionMode {
         case let .noCurrencyConversion(total):
             // All subscriptions use the base currency; skip network request
             let model = SubscriptionSummaryViewModel(
@@ -110,15 +138,25 @@ class SubscriptionController: UIViewController {
             break
         }
 
-        summaryTask = Task { [weak self] in
+        summaryTask = Task { [currencyRateService, defaultCurrencyProvider, lifetimeSpendingCalculator, spendingCalculator, weak self] in
             guard let self else { return }
             do {
+                let baseCurrency = defaultCurrencyProvider.loadDefaultCurrency()
                 let snapshot = try await currencyRateService.latestSnapshot(for: baseCurrency.code)
-                let result = spendingCalculator.monthlyTotal(
-                    for: subscriptions,
-                    baseCurrencyCode: baseCurrency.code,
-                    ratesSnapshot: snapshot
-                )
+                let result: SubscriptionSpendingResult = switch filter {
+                case .subscription:
+                    spendingCalculator.monthlyTotal(
+                        for: subscriptions,
+                        baseCurrencyCode: baseCurrency.code,
+                        ratesSnapshot: snapshot
+                    )
+                case .lifetime:
+                    lifetimeSpendingCalculator.total(
+                        for: subscriptions,
+                        baseCurrencyCode: baseCurrency.code,
+                        ratesSnapshot: snapshot
+                    )
+                }
 
                 guard !Task.isCancelled else { return }
 
@@ -132,12 +170,22 @@ class SubscriptionController: UIViewController {
                 }
             } catch {
                 // Show fallback: calculate base currency subscriptions only
+                guard !Task.isCancelled else { return }
                 await MainActor.run { [weak self] in
                     guard let self else { return }
-                    let fallbackTotal = calculateFallbackTotal(
-                        subscriptions: subscriptions,
-                        baseCurrencyCode: baseCurrency.code
-                    )
+                    let baseCurrency = defaultCurrencyProvider.loadDefaultCurrency()
+                    let fallbackTotal = switch filter {
+                    case .subscription:
+                        calculateFallbackTotal(
+                            subscriptions: subscriptions,
+                            baseCurrencyCode: baseCurrency.code
+                        )
+                    case .lifetime:
+                        calculateLifetimeFallbackTotal(
+                            subscriptions: subscriptions,
+                            baseCurrencyCode: baseCurrency.code
+                        )
+                    }
                     let model = SubscriptionSummaryViewModel(
                         currency: baseCurrency,
                         total: fallbackTotal
@@ -164,6 +212,23 @@ class SubscriptionController: UIViewController {
 
         return total
     }
+
+    private func calculateLifetimeFallbackTotal(
+        subscriptions: [Subscription],
+        baseCurrencyCode: String
+    ) -> Decimal {
+        let base = baseCurrencyCode.uppercased()
+        var total: Decimal = 0
+
+        for subscription in subscriptions {
+            let code = subscription.currencyCode.uppercased()
+            if code == base {
+                total += subscription.price
+            }
+        }
+
+        return total
+    }
 }
 
 extension SubscriptionController: SubscriptionListViewDelegate {
@@ -181,5 +246,10 @@ extension SubscriptionController: SubscriptionListViewDelegate {
 
     func subscriptionListViewDidRequestDelete(_ subscription: Subscription) {
         deleteSubscription(subscription)
+    }
+
+    func subscriptionListViewDidChangeFilter(_: SubscriptionListView, filter: SubscriptionListView.Filter) {
+        currentFilter = filter
+        applyFilterAndRefresh()
     }
 }

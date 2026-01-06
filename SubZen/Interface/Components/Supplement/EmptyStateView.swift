@@ -5,9 +5,16 @@
 //  Created by Star on 2025/8/10.
 //
 
+import SnapKit
 import UIKit
 
-class EmptyStateView: UIView {
+final class EmptyStateView: UIView {
+    struct Model {
+        let systemImageName: String
+        let title: String
+        let subtitle: String
+    }
+
     let containerView = UIView()
 
     let iconImageView = UIImageView(image: UIImage(systemName: "creditcard")).with {
@@ -36,8 +43,13 @@ class EmptyStateView: UIView {
         $0.alignment = .center
     }
 
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    init(model: Model) {
+        super.init(frame: .zero)
+
+        iconImageView.image = UIImage(systemName: model.systemImageName)
+        titleLabel.text = model.title
+        subtitleLabel.text = model.subtitle
+
         addSubview(containerView)
         containerView.addSubview(stackView)
         containerView.snp.makeConstraints { make in

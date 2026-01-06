@@ -13,6 +13,7 @@ protocol SubscriptionListViewDelegate: AnyObject {
     func subscriptionListViewDidTapAddButton()
     func subscriptionListViewDidRequestSettings(_ listview: SubscriptionListView)
     func subscriptionListViewDidRequestDelete(_ subscription: Subscription)
+    func subscriptionListViewDidChangeFilter(_ listview: SubscriptionListView, filter: SubscriptionListView.Filter)
 }
 
 protocol TitleBarDelegate: AnyObject {
@@ -21,6 +22,11 @@ protocol TitleBarDelegate: AnyObject {
 }
 
 class SubscriptionListView: UIView {
+    enum Filter: Int {
+        case subscription
+        case lifetime
+    }
+
     weak var delegate: SubscriptionListViewDelegate?
 
     /// Indicates whether any cell is currently showing swipe actions (delete button visible)
@@ -28,6 +34,17 @@ class SubscriptionListView: UIView {
 
     private let titleBar = TitleBar()
     private let summaryView = SubscriptionSummaryView()
+    private let filterContainer = UIView()
+    private lazy var filterSegmentedControl = UISegmentedControl(
+        items: [
+            String(localized: "Subscription"),
+            String(localized: "Lifetime"),
+        ]
+    ).with {
+        $0.selectedSegmentIndex = Filter.subscription.rawValue
+        $0.addTarget(self, action: #selector(handleFilterChanged), for: .valueChanged)
+    }
+
     private let headerStack = UIStackView().with {
         $0.axis = .vertical
         $0.spacing = 6
@@ -45,6 +62,7 @@ class SubscriptionListView: UIView {
     }
 
     private var subscriptions: [Subscription] = []
+    private var selectedFilter: Filter = .subscription
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -61,6 +79,20 @@ class SubscriptionListView: UIView {
 
         headerStack.addArrangedSubview(titleBar)
         headerStack.addArrangedSubview(summaryView)
+        headerStack.addArrangedSubview(filterContainer)
+
+        filterContainer.addSubview(filterSegmentedControl)
+        EditSubscriptionSelectionStyler.configureSegmentedControl(filterSegmentedControl, cornerRadius: 12)
+        EditSubscriptionSelectionStyler.applySegmentedStyle(
+            to: filterSegmentedControl,
+            reduceTransparencyActive: UIAccessibility.isReduceTransparencyEnabled
+        )
+
+        filterSegmentedControl.snp.makeConstraints { make in
+            make.top.bottom.equalToSuperview().inset(4)
+            make.leading.trailing.equalToSuperview().inset(16)
+            make.height.equalTo(34)
+        }
 
         titleBar.snp.makeConstraints { make in
             make.height.equalTo(60)
@@ -91,7 +123,7 @@ class SubscriptionListView: UIView {
 
     func updateEmptyState() {
         if subscriptions.isEmpty {
-            tableView.backgroundView = EmptyStateView()
+            tableView.backgroundView = EmptyStateView(model: emptyStateModel(for: selectedFilter))
         } else {
             tableView.backgroundView = nil
         }
@@ -99,6 +131,41 @@ class SubscriptionListView: UIView {
 
     func updateSummary(_ model: SubscriptionSummaryViewModel?) {
         summaryView.configure(with: model)
+    }
+
+    func updateFilter(_ filter: Filter) {
+        guard filter != selectedFilter else { return }
+        selectedFilter = filter
+        filterSegmentedControl.selectedSegmentIndex = filter.rawValue
+    }
+
+    @objc private func handleFilterChanged(_ sender: UISegmentedControl) {
+        tableView.setEditing(false, animated: true)
+
+        guard let filter = Filter(rawValue: sender.selectedSegmentIndex) else {
+            assertionFailure("Unexpected filter segment index \(sender.selectedSegmentIndex)")
+            return
+        }
+
+        selectedFilter = filter
+        delegate?.subscriptionListViewDidChangeFilter(self, filter: filter)
+    }
+
+    private func emptyStateModel(for filter: Filter) -> EmptyStateView.Model {
+        switch filter {
+        case .subscription:
+            EmptyStateView.Model(
+                systemImageName: "creditcard",
+                title: String(localized: "No Subscriptions"),
+                subtitle: String(localized: "Add your first subscription to get started")
+            )
+        case .lifetime:
+            EmptyStateView.Model(
+                systemImageName: "infinity.circle",
+                title: String(localized: "No Lifetime Subscriptions"),
+                subtitle: String(localized: "Add your first lifetime subscription to get started")
+            )
+        }
     }
 }
 
