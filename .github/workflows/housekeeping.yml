@@ -1,0 +1,144 @@
+name: Housekeeping
+
+on:
+  schedule:
+    - cron: "0 8 * * *" # daily at 8:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  housekeeping:
+    name: Housekeeping
+    runs-on: macos-26
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Select Newest Xcode
+        run: |
+          chmod +x Resources/DevKit/scripts/select_newest_xcode.sh
+          ./Resources/DevKit/scripts/select_newest_xcode.sh
+
+      - name: Install Dependencies
+        run: brew install xcbeautify
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Check for Submodule Updates
+        id: check
+        run: |
+          set -euo pipefail
+
+          echo "[+] checking submodule updates..."
+
+          has_updates=false
+          update_summary=""
+
+          git submodule foreach --quiet '
+            name=$(basename "$sm_path")
+            current=$(git rev-parse HEAD)
+            git fetch origin --quiet
+
+            default_branch=$(git remote show origin | grep "HEAD branch" | sed "s/.*: //")
+            if [ -z "$default_branch" ]; then
+              default_branch="main"
+            fi
+
+            latest=$(git rev-parse "origin/$default_branch")
+
+            if [ "$current" != "$latest" ]; then
+              current_short=$(git rev-parse --short HEAD)
+              latest_short=$(git rev-parse --short "origin/$default_branch")
+              echo "UPDATE:$name:$current_short:$latest_short"
+            fi
+          ' > /tmp/submodule_updates.txt || true
+
+          if [ -s /tmp/submodule_updates.txt ]; then
+            has_updates=true
+            while IFS=: read -r prefix name current latest; do
+              update_summary="${update_summary}- **${name}**: \`${current}\` → \`${latest}\`\n"
+            done < /tmp/submodule_updates.txt
+          fi
+
+          echo "has_updates=$has_updates" >> "$GITHUB_OUTPUT"
+          echo "update_summary<<EOF" >> "$GITHUB_OUTPUT"
+          echo -e "$update_summary" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+          if [ "$has_updates" = "true" ]; then
+            echo "[+] updates found"
+          else
+            echo "[+] all submodules up to date"
+          fi
+
+      - name: Update Submodules
+        if: steps.check.outputs.has_updates == 'true'
+        run: |
+          set -euo pipefail
+
+          echo "[+] updating submodules..."
+
+          git submodule foreach --quiet '
+            git fetch origin --quiet
+            default_branch=$(git remote show origin | grep "HEAD branch" | sed "s/.*: //")
+            if [ -z "$default_branch" ]; then
+              default_branch="main"
+            fi
+            git checkout "origin/$default_branch" --quiet
+          '
+
+          echo "[+] submodules updated"
+
+      - name: Scan Licenses
+        id: licenses
+        run: |
+          set -euo pipefail
+
+          echo "[+] scanning licenses..."
+
+          ALLOW_DIRTY=1 Resources/DevKit/scripts/scan.license.sh
+
+          # check if license file changed
+          if git diff --quiet FlowDown/BundledResources/OpenSourceLicenses.md; then
+            echo "has_license_updates=false" >> "$GITHUB_OUTPUT"
+            echo "[+] licenses unchanged"
+          else
+            echo "has_license_updates=true" >> "$GITHUB_OUTPUT"
+            echo "[+] licenses updated"
+          fi
+
+      - name: Create Pull Request
+        if: steps.check.outputs.has_updates == 'true' || steps.licenses.outputs.has_license_updates == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "Housekeeping Updates"
+          title: "Housekeeping Updates"
+          body: |
+            ## Housekeeping Updates
+
+            ### Submodule Updates
+
+            ${{ steps.check.outputs.update_summary }}
+
+            ### License Updates
+
+            License file regenerated: `${{ steps.licenses.outputs.has_license_updates }}`
+
+            ---
+            *This PR was automatically created by the housekeeping workflow.*
+          branch: housekeeping/updates
+          delete-branch: true
+          labels: |
+            housekeeping
+            dependencies
