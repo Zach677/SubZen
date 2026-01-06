@@ -19,6 +19,7 @@ class SubscriptionEditorController: UIViewController {
     private var selectedCurrency: Currency
     private var selectedCycle: BillingCycle = .monthly
     private var selectedTrialPeriod: TrialPeriod?
+    private var isLifetimeSelected = false
 
     init(
         subscription: Subscription? = nil,
@@ -56,12 +57,32 @@ class SubscriptionEditorController: UIViewController {
             editSubscriptionView.datePicker.date = existingSubscription.lastBillingDate
             editSubscriptionView.setReminderIntervals(existingSubscription.reminderIntervals)
 
-            selectedCycle = existingSubscription.cycle
-            configureUIForCycle(existingSubscription.cycle, animated: false)
+            isLifetimeSelected = existingSubscription.isLifetime
+            editSubscriptionView.billingTypeSegmentedControl.selectedSegmentIndex = isLifetimeSelected ? 1 : 0
+            editSubscriptionView.setLifetimeModeEnabled(isLifetimeSelected, animated: false)
+
+            if isLifetimeSelected {
+                selectedCycle = .monthly
+                editSubscriptionView.cycleSegmentedControl.selectedSegmentIndex = 1
+                editSubscriptionView.setCustomPickerVisible(false, animated: false)
+            } else {
+                selectedCycle = existingSubscription.cycle
+                configureUIForCycle(existingSubscription.cycle, animated: false)
+            }
 
             selectedTrialPeriod = existingSubscription.trialPeriod
-            configureUIForTrial(existingSubscription.trialPeriod, animated: false)
+            if isLifetimeSelected {
+                selectedTrialPeriod = nil
+                editSubscriptionView.trialSegmentedControl.selectedSegmentIndex = 0
+                editSubscriptionView.setCustomTrialPickerVisible(false, animated: false)
+            } else {
+                configureUIForTrial(existingSubscription.trialPeriod, animated: false)
+            }
         } else {
+            isLifetimeSelected = false
+            editSubscriptionView.billingTypeSegmentedControl.selectedSegmentIndex = 0
+            editSubscriptionView.setLifetimeModeEnabled(false, animated: false)
+
             // Default to monthly for new subscription
             selectedCycle = .monthly
             editSubscriptionView.cycleSegmentedControl.selectedSegmentIndex = 1
@@ -81,6 +102,9 @@ class SubscriptionEditorController: UIViewController {
         }
         editSubscriptionView.onReminderBannerTapped = { [weak self] in
             self?.handleReminderBannerTapped()
+        }
+        editSubscriptionView.onBillingTypeSegmentChanged = { [weak self] index in
+            self?.handleBillingTypeSegmentChanged(index)
         }
         editSubscriptionView.onCycleSegmentChanged = { [weak self] index in
             self?.handleCycleSegmentChanged(index)
@@ -205,6 +229,14 @@ class SubscriptionEditorController: UIViewController {
         updateNextBillingHint()
     }
 
+    private func handleBillingTypeSegmentChanged(_ index: Int) {
+        isLifetimeSelected = index == 1
+        editSubscriptionView.setLifetimeModeEnabled(isLifetimeSelected, animated: true)
+        updateTrialHint()
+        updateNextBillingHint()
+        updateReminderPermissionBanner()
+    }
+
     private func handleSave() {
         Task { [weak self] in
             await self?.performSave()
@@ -213,8 +245,8 @@ class SubscriptionEditorController: UIViewController {
 
     @MainActor
     private func performSave() async {
-        let cycle = selectedCycle
-        let trialPeriod = selectedTrialPeriod
+        let cycle: BillingCycle = isLifetimeSelected ? .lifetime : selectedCycle
+        let trialPeriod: TrialPeriod? = isLifetimeSelected ? nil : selectedTrialPeriod
         view.endEditing(true)
 
         let name = (editSubscriptionView.nameTextField.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
@@ -233,7 +265,7 @@ class SubscriptionEditorController: UIViewController {
             return
         }
 
-        let reminderIntervals = editSubscriptionView.selectedReminderIntervals()
+        let reminderIntervals = isLifetimeSelected ? [] : editSubscriptionView.selectedReminderIntervals()
 
         if reminderPermissionPresenter.shouldRequestPermissionOnSelectionChange(hasReminderSelection: !reminderIntervals.isEmpty) {
             await notificationPermissionService.requestNotificationPermission()
@@ -287,6 +319,11 @@ class SubscriptionEditorController: UIViewController {
 
     @MainActor
     private func updateReminderPermissionBanner() {
+        guard !isLifetimeSelected else {
+            editSubscriptionView.updateReminderPermissionBanner(isVisible: false, message: nil)
+            return
+        }
+
         let hasReminderSelection = !editSubscriptionView.selectedReminderIntervals().isEmpty
         let viewState = reminderPermissionPresenter.makeViewState(hasReminderSelection: hasReminderSelection)
         editSubscriptionView.updateReminderPermissionBanner(
@@ -399,6 +436,11 @@ class SubscriptionEditorController: UIViewController {
     }
 
     private func updateTrialHint() {
+        guard !isLifetimeSelected else {
+            editSubscriptionView.updateTrialHint(hint: nil, highlightRange: nil)
+            return
+        }
+
         guard let trialPeriod = selectedTrialPeriod,
               let trialEnd = trialPeriod.endDate(from: editSubscriptionView.datePicker.date)
         else {
@@ -418,6 +460,11 @@ class SubscriptionEditorController: UIViewController {
     }
 
     private func updateNextBillingHint() {
+        guard !isLifetimeSelected else {
+            editSubscriptionView.updateNextBillingHint(hint: "", highlightRange: nil)
+            return
+        }
+
         let lastDate = editSubscriptionView.datePicker.date
         let cycle = selectedCycle
 

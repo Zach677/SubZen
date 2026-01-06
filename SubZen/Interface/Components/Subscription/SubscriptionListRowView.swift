@@ -79,11 +79,18 @@ class SubscriptionListRowView: UIView {
         let accessibilityAmountDescription = String(localized: "\(code) \(symbol) \(amount) \(accessibilityCycleDisplay)")
         priceLabel.accessibilityLabel = accessibilityAmountDescription
 
-        let remainingDays = subscription.remainingDays
-        daysLabel.text = String(localized: "\(remainingDays) days left")
-        if remainingDays == 0 {
-            daysLabel.text = String(localized: "Today!")
-            daysLabel.textColor = .systemRed.withAlphaComponent(0.8)
+        if subscription.isLifetime {
+            daysLabel.text = String(localized: "Lifetime")
+            daysLabel.textColor = .secondaryLabel
+        } else {
+            let remainingDays = subscription.remainingDays
+            daysLabel.text = String(localized: "\(remainingDays) days left")
+            if remainingDays == 0 {
+                daysLabel.text = String(localized: "Today!")
+                daysLabel.textColor = .systemRed.withAlphaComponent(0.8)
+            } else {
+                daysLabel.textColor = .systemBlue.withAlphaComponent(0.7)
+            }
         }
 
         // Update expiration progress gradient with animation

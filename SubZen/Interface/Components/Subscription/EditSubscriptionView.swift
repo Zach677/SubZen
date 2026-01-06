@@ -61,6 +61,19 @@ final class EditSubscriptionView: UIView {
         $0.autocorrectionType = .no
     }
 
+    let billingTypeLabel = UILabel().with {
+        $0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        $0.textColor = .label
+        $0.text = String(localized: "Billing Type")
+    }
+
+    let billingTypeSegmentedControl = UISegmentedControl(
+        items: [
+            String(localized: "Subscription"),
+            String(localized: "Lifetime"),
+        ]
+    )
+
     let currencyButton = UIButton(type: .system).with {
         var configuration = EditSubscriptionButtonStyler.makeCurrencyButtonBaseConfiguration(
             contentInsets: Layout.currencyButtonContentInsets
@@ -221,6 +234,7 @@ final class EditSubscriptionView: UIView {
 
     private lazy var nameSectionView = makeVerticalFormSection(label: nameLabel, content: nameTextField)
     private lazy var priceSectionView = makeVerticalFormSection(label: priceLabel, content: priceInputStackView)
+    private lazy var billingTypeSectionView = makeVerticalFormSection(label: billingTypeLabel, content: billingTypeSegmentedControl)
     private lazy var cycleSectionView = makeVerticalFormSection(label: cycleLabel, content: cyclePickerView)
     private lazy var trialSectionView = makeVerticalFormSection(label: trialLabel, content: trialContentStack)
     private lazy var dateSectionView = makeVerticalFormSection(label: dateLabel, content: dateContentStack)
@@ -233,6 +247,7 @@ final class EditSubscriptionView: UIView {
         $0.distribution = .fill
         $0.addArrangedSubview(nameSectionView)
         $0.addArrangedSubview(priceSectionView)
+        $0.addArrangedSubview(billingTypeSectionView)
         $0.addArrangedSubview(cycleSectionView)
         $0.addArrangedSubview(trialSectionView)
         $0.addArrangedSubview(dateSectionView)
@@ -246,6 +261,7 @@ final class EditSubscriptionView: UIView {
     var onCurrencyTapped: (() -> Void)?
     var onReminderSelectionChanged: ((Int?) -> Void)?
     var onReminderBannerTapped: (() -> Void)?
+    var onBillingTypeSegmentChanged: ((Int) -> Void)?
     var onCycleSegmentChanged: ((Int) -> Void)?
     var onCustomCycleChanged: ((Int, CycleUnit) -> Void)?
     var onTrialSegmentChanged: ((Int) -> Void)?
@@ -283,6 +299,12 @@ final class EditSubscriptionView: UIView {
         priceTextField.setContentHuggingPriority(.defaultLow, for: .horizontal)
 
         [nameTextField, priceTextField].forEach { applyRoundedInputStyle(to: $0) }
+
+        billingTypeSegmentedControl.selectedSegmentIndex = 0
+        EditSubscriptionSelectionStyler.configureSegmentedControl(
+            billingTypeSegmentedControl,
+            cornerRadius: Layout.segmentedCornerRadius
+        )
     }
 
     private func buildHierarchy() {
@@ -324,6 +346,11 @@ final class EditSubscriptionView: UIView {
             self,
             action: #selector(currencyTapped),
             for: UIControl.Event.touchUpInside
+        )
+        billingTypeSegmentedControl.addTarget(
+            self,
+            action: #selector(billingTypeSegmentChanged(_:)),
+            for: UIControl.Event.valueChanged
         )
         cycleSegmentedControl.addTarget(
             self,
@@ -424,6 +451,11 @@ final class EditSubscriptionView: UIView {
         if currencyButton.currentTitle?.isEmpty != false {
             currencyButton.setTitle(fallbackCurrencyTitle, for: UIControl.State.normal)
         }
+
+        EditSubscriptionSelectionStyler.applySegmentedStyle(
+            to: billingTypeSegmentedControl,
+            reduceTransparencyActive: reduceTransparency
+        )
         cyclePickerView.updateAppearance(reduceTransparencyActive: reduceTransparency)
         trialPickerView.updateAppearance(reduceTransparencyActive: reduceTransparency)
         reminderPickerView.updateAppearance(reduceTransparencyActive: reduceTransparency)
@@ -460,6 +492,10 @@ final class EditSubscriptionView: UIView {
 
     @objc private func currencyTapped() {
         onCurrencyTapped?()
+    }
+
+    @objc private func billingTypeSegmentChanged(_ sender: UISegmentedControl) {
+        onBillingTypeSegmentChanged?(sender.selectedSegmentIndex)
     }
 
     @objc private func cycleSegmentChanged(_ sender: UISegmentedControl) {
@@ -558,6 +594,28 @@ final class EditSubscriptionView: UIView {
             attributedString.addAttribute(.font, value: UIFont.systemFont(ofSize: 13, weight: .semibold), range: range)
         }
         trialHintLabel.attributedText = attributedString
+    }
+
+    func setLifetimeModeEnabled(_ enabled: Bool, animated: Bool) {
+        let update = {
+            self.cycleSectionView.isHidden = enabled
+            self.trialSectionView.isHidden = enabled
+            self.reminderSectionView.isHidden = enabled
+            self.nextBillingHintLabel.isHidden = enabled
+            self.dateLabel.text = enabled ? String(localized: "Purchase Date") : String(localized: "Last Billing Date")
+            self.layoutIfNeeded()
+        }
+
+        if animated {
+            UIView.animate(
+                withDuration: 0.25,
+                delay: 0,
+                options: [.curveEaseInOut, .beginFromCurrentState],
+                animations: update
+            )
+        } else {
+            update()
+        }
     }
 
     deinit {

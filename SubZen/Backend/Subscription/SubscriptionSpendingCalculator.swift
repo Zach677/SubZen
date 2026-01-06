@@ -87,6 +87,8 @@ struct SubscriptionSpendingCalculator {
         guard !subscription.isInTrial() else { return .zero }
 
         switch subscription.cycle {
+        case .lifetime:
+            return .zero
         case .monthly:
             return subscription.price
         case .yearly:

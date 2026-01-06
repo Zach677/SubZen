@@ -61,6 +61,7 @@ enum CycleUnit: String, Codable, CaseIterable {
 // MARK: - BillingCycle Enum
 
 enum BillingCycle: Codable, Equatable, Hashable {
+    case lifetime
     case weekly
     case monthly
     case yearly
@@ -74,6 +75,7 @@ enum BillingCycle: Codable, Equatable, Hashable {
     /// Returns the calendar component for date calculations
     var calendarComponent: Calendar.Component {
         switch self {
+        case .lifetime: .year
         case .weekly: .weekOfYear
         case .monthly: .month
         case .yearly: .year
@@ -84,6 +86,7 @@ enum BillingCycle: Codable, Equatable, Hashable {
     /// Returns the value for date calculations
     var calendarValue: Int {
         switch self {
+        case .lifetime: 100
         case .weekly, .monthly, .yearly: 1
         case let .custom(value, _): value
         }
@@ -92,6 +95,7 @@ enum BillingCycle: Codable, Equatable, Hashable {
     /// Returns a short display name for UI labels
     var displayUnit: String {
         switch self {
+        case .lifetime: String(localized: "lifetime")
         case .weekly: String(localized: "week")
         case .monthly: String(localized: "month")
         case .yearly: String(localized: "year")
@@ -103,6 +107,8 @@ enum BillingCycle: Codable, Equatable, Hashable {
     /// Localized display name suitable for segmented controls or pickers
     var localizedName: String {
         switch self {
+        case .lifetime:
+            return String(localized: "Lifetime")
         case .weekly:
             return String(localized: "Weekly")
         case .monthly:
@@ -118,6 +124,7 @@ enum BillingCycle: Codable, Equatable, Hashable {
     /// Short display name for segmented control
     var shortLocalizedName: String {
         switch self {
+        case .lifetime: String(localized: "Lifetime")
         case .weekly: String(localized: "Weekly")
         case .monthly: String(localized: "Monthly")
         case .yearly: String(localized: "Yearly")
@@ -133,6 +140,7 @@ enum BillingCycle: Codable, Equatable, Hashable {
     /// Approximate number of days in this billing cycle
     var cycleDurationInDays: Int {
         switch self {
+        case .lifetime: 1
         case .weekly: 7
         case .monthly: 30
         case .yearly: 365
@@ -150,6 +158,7 @@ enum BillingCycle: Codable, Equatable, Hashable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let type = try container.decode(String.self, forKey: .type)
         switch type {
+        case "lifetime": self = .lifetime
         case "weekly": self = .weekly
         case "monthly": self = .monthly
         case "yearly": self = .yearly
@@ -165,6 +174,8 @@ enum BillingCycle: Codable, Equatable, Hashable {
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         switch self {
+        case .lifetime:
+            try container.encode("lifetime", forKey: .type)
         case .weekly:
             try container.encode("weekly", forKey: .type)
         case .monthly:
@@ -238,6 +249,10 @@ final class Subscription: Codable, Identifiable, Equatable {
     var trialPeriod: TrialPeriod?
     var currencyCode: String
     var reminderIntervals: [Int] // Days before expiration to send reminders (e.g., [1, 7, 14])
+
+    var isLifetime: Bool {
+        cycle == .lifetime
+    }
 
     init(
         name: String = "",
@@ -345,6 +360,7 @@ final class Subscription: Codable, Identifiable, Equatable {
     // MARK: - Billing Date Calculations
 
     func trialEndDate(calendar: Calendar = .current) -> Date? {
+        guard !isLifetime else { return nil }
         guard let trialPeriod else { return nil }
         return trialPeriod.endDate(from: lastBillingDate, calendar: calendar)
     }
@@ -360,6 +376,8 @@ final class Subscription: Codable, Identifiable, Equatable {
 
     /// Calculate remaining days until next billing date
     var remainingDays: Int {
+        guard !isLifetime else { return Int.max }
+
         let currentDate = Date()
         let calendar = Calendar.current
 
@@ -409,6 +427,8 @@ final class Subscription: Codable, Identifiable, Equatable {
 
     /// Calculate next billing date using precise Calendar calculations
     private func calculateNextBillingDate() -> Date {
+        guard !isLifetime else { return .distantFuture }
+
         let calendar = Calendar.current
         let currentDate = Date()
 

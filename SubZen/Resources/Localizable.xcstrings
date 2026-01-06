@@ -200,6 +200,9 @@
         }
       }
     },
+    "Billing Type" : {
+
+    },
     "Cancel" : {
       "localizations" : {
         "zh-Hans" : {
@@ -521,6 +524,12 @@
         }
       }
     },
+    "lifetime" : {
+
+    },
+    "Lifetime" : {
+
+    },
     "Merge" : {
       "localizations" : {
         "zh-Hans" : {
@@ -669,6 +678,9 @@
     "Privacy policy not found. Please check your installation." : {
 
     },
+    "Purchase Date" : {
+
+    },
     "Remind Me" : {
       "localizations" : {
         "zh-Hans" : {
@@ -797,6 +809,9 @@
           }
         }
       }
+    },
+    "Subscription" : {
+
     },
     "Subscription Name" : {
       "localizations" : {

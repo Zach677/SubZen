@@ -25,6 +25,7 @@ class SubscriptionNotificationManager {
 
     /// Schedule notifications for a subscription based on its reminder intervals
     func scheduleNotifications(for subscription: Subscription) async {
+        guard !subscription.isLifetime else { return }
         guard !subscription.reminderIntervals.isEmpty else { return }
 
         let needsPrompt = await MainActor.run { permissionService.shouldRequestPermission() }
