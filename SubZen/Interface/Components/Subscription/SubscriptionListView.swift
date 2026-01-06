@@ -30,7 +30,7 @@ class SubscriptionListView: UIView {
     private let summaryView = SubscriptionSummaryView()
     private let headerStack = UIStackView().with {
         $0.axis = .vertical
-        $0.spacing = 10
+        $0.spacing = 6
         $0.alignment = .fill
         $0.distribution = .fill
     }

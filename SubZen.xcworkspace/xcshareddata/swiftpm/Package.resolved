@@ -1,6 +1,33 @@
 {
-  "originHash" : "dd27728c8848101841bd8d45243ef43144e233aa3767c82656934b73447347b8",
+  "originHash" : "25c77f422c34f73f058c85e47849466f13c875231a71da0268339656f2d16197",
   "pins" : [
+    {
+      "identity" : "choreographer",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/unixzii/Choreographer",
+      "state" : {
+        "revision" : "fa8cf25b0a16c499b299d357c1a64db6760a83ef",
+        "version" : "0.1.0"
+      }
+    },
+    {
+      "identity" : "glyphixtextfx",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ktiays/GlyphixTextFx.git",
+      "state" : {
+        "revision" : "e1d0aa71c1849363a1bbef061d3d92f10481e62c",
+        "version" : "2.3.6"
+      }
+    },
+    {
+      "identity" : "respring",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ktiays/Respring",
+      "state" : {
+        "revision" : "5efa8274a25dc44e418b3695f9fcfea9ef771087",
+        "version" : "1.0.0"
+      }
+    },
     {
       "identity" : "snapkit",
       "kind" : "remoteSourceControl",
@@ -8,6 +35,15 @@
       "state" : {
         "revision" : "2842e6e84e82eb9a8dac0100ca90d9444b0307f4",
         "version" : "5.7.1"
+      }
+    },
+    {
+      "identity" : "with",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ktiays/With",
+      "state" : {
+        "revision" : "d8788e5c3733f5b8f12582487f508e6f9617e7ab",
+        "version" : "2.1.0"
       }
     }
   ],

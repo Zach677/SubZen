@@ -14,6 +14,7 @@
 		F8A1B0162F1AABCD00000001 /* SubscriptionExportServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1B0152F1AABCD00000001 /* SubscriptionExportServiceTests.swift */; };
 		F8A1B0182F1AABCD00000001 /* SubscriptionImportServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1B0172F1AABCD00000001 /* SubscriptionImportServiceTests.swift */; };
 		F8A723A82F0C1CF5006F031B /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = F8A723A72F0C1CF5006F031B /* SnapKit */; };
+		F8A724372F0D00D0006F031B /* GlyphixTextFx in Frameworks */ = {isa = PBXBuildFile; productRef = F8A724362F0D00D0006F031B /* GlyphixTextFx */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,6 +65,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F8A723A82F0C1CF5006F031B /* SnapKit in Frameworks */,
+				F8A724372F0D00D0006F031B /* GlyphixTextFx in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -137,6 +139,7 @@
 			name = SubZen;
 			packageProductDependencies = (
 				F8A723A72F0C1CF5006F031B /* SnapKit */,
+				F8A724362F0D00D0006F031B /* GlyphixTextFx */,
 			);
 			productName = SubZen;
 			productReference = F882CE902D982DE2000E2FB7 /* SubZen.app */;
@@ -186,6 +189,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				F8A723A62F0C1CF5006F031B /* XCRemoteSwiftPackageReference "SnapKit" */,
+				F8A724352F0D00D0006F031B /* XCRemoteSwiftPackageReference "GlyphixTextFx" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = F882CE912D982DE2000E2FB7 /* Products */;
@@ -538,6 +542,14 @@
 				minimumVersion = 5.7.1;
 			};
 		};
+		F8A724352F0D00D0006F031B /* XCRemoteSwiftPackageReference "GlyphixTextFx" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ktiays/GlyphixTextFx.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.3.6;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -545,6 +557,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = F8A723A62F0C1CF5006F031B /* XCRemoteSwiftPackageReference "SnapKit" */;
 			productName = SnapKit;
+		};
+		F8A724362F0D00D0006F031B /* GlyphixTextFx */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F8A724352F0D00D0006F031B /* XCRemoteSwiftPackageReference "GlyphixTextFx" */;
+			productName = GlyphixTextFx;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

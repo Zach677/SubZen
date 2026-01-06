@@ -5,6 +5,7 @@
 //  Created by Star on 2025/10/8.
 //
 
+import GlyphixTextFx
 import SnapKit
 import UIKit
 
@@ -14,46 +15,25 @@ struct SubscriptionSummaryViewModel {
 }
 
 final class SubscriptionSummaryView: UIView {
-    private let container = UIView().with {
-        $0.backgroundColor = .accent.withAlphaComponent(0.12)
-        $0.layer.cornerRadius = 14
-        $0.layer.masksToBounds = true
-    }
-
-    private let titleLabel = UILabel().with {
-        $0.text = String(localized: "Monthly Spend")
-        $0.font = UIFont.systemFont(ofSize: 15, weight: .semibold)
-        $0.textColor = .secondaryLabel
-    }
-
-    private let amountLabel = UILabel().with {
-        $0.font = UIFont.systemFont(ofSize: 28, weight: .bold)
+    private let amountLabel = GlyphixTextLabel().with {
+        $0.font = UIFont.systemFont(ofSize: 30, weight: .bold)
         $0.textColor = .label
-        $0.adjustsFontForContentSizeCategory = true
+        $0.textAlignment = .center
+        $0.isSmoothRenderingEnabled = true
     }
 
-    private lazy var stack = UIStackView(arrangedSubviews: [titleLabel, amountLabel]).with {
-        $0.axis = .vertical
-        $0.spacing = 6
-        $0.alignment = .leading
-    }
+    private var lastTotal: Decimal?
 
     override init(frame: CGRect) {
         super.init(frame: frame)
         backgroundColor = .clear
 
-        addSubview(container)
-        container.addSubview(stack)
-
-        container.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(8)
+        addSubview(amountLabel)
+        amountLabel.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(4)
             make.leading.equalToSuperview().offset(20)
             make.trailing.equalToSuperview().offset(-20)
-            make.bottom.equalToSuperview()
-        }
-
-        stack.snp.makeConstraints { make in
-            make.edges.equalToSuperview().inset(UIEdgeInsets(top: 14, left: 14, bottom: 14, right: 14))
+            make.bottom.equalToSuperview().offset(-4)
         }
     }
 
@@ -65,11 +45,16 @@ final class SubscriptionSummaryView: UIView {
     func configure(with model: SubscriptionSummaryViewModel?) {
         guard let model else {
             isHidden = true
+            lastTotal = nil
             return
         }
 
         isHidden = false
+        if let lastTotal {
+            amountLabel.countsDown = model.total < lastTotal
+        }
         amountLabel.text = formattedAmount(for: model.currency, amount: model.total)
+        lastTotal = model.total
     }
 
     private func formattedAmount(for currency: Currency, amount: Decimal) -> String {
