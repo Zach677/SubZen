@@ -25,7 +25,7 @@ class SubscriptionListView: UIView {
     enum LayoutConstants {
         static let filterHeight: CGFloat = 34
         static let filterContentInset: CGFloat = 0
-        static let rowCardHorizontalInset: CGFloat = 16
+        static let rowCardHorizontalInset: CGFloat = 10
         static let tableContentInset = UIEdgeInsets(top: 0, left: 0, bottom: 16, right: 0)
         static let bottomFadeHeight: CGFloat = 72
         static let titleBarHeight: CGFloat = 64
