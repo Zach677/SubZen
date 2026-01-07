@@ -28,6 +28,7 @@ final class EditSubscriptionView: UIView {
         static let bottomSpacerHeight: CGFloat = 24
         static let additionalBottomInset: CGFloat = 16
         static let segmentedCornerRadius: CGFloat = 14
+        static let iconSize: CGFloat = textFieldHeight
     }
 
     private let reminderOptions = [1, 3, 7]
@@ -36,6 +37,22 @@ final class EditSubscriptionView: UIView {
         $0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         $0.textColor = .label
         $0.text = String(localized: "Subscription Name")
+    }
+
+    private let iconControl = UIControl().with {
+        $0.isAccessibilityElement = true
+        $0.accessibilityTraits = .button
+    }
+
+    private let iconImageView = UIImageView().with {
+        $0.contentMode = .scaleAspectFill
+        $0.image = UIImage.subZenAppIconPlaceholder
+        $0.clipsToBounds = true
+    }
+
+    private let iconActivityIndicator = UIActivityIndicatorView(style: .medium).with {
+        $0.hidesWhenStopped = true
+        $0.stopAnimating()
     }
 
     let nameTextField = UITextField().with {
@@ -232,7 +249,16 @@ final class EditSubscriptionView: UIView {
         $0.addArrangedSubview(nextBillingHintLabel)
     }
 
-    private lazy var nameSectionView = makeVerticalFormSection(label: nameLabel, content: nameTextField)
+    private lazy var nameContentStack = UIStackView().with {
+        $0.axis = .horizontal
+        $0.spacing = Layout.groupSpacing
+        $0.alignment = .fill
+        $0.distribution = .fill
+        $0.addArrangedSubview(iconControl)
+        $0.addArrangedSubview(nameTextField)
+    }
+
+    private lazy var nameSectionView = makeVerticalFormSection(label: nameLabel, content: nameContentStack)
     private lazy var priceSectionView = makeVerticalFormSection(label: priceLabel, content: priceInputStackView)
     private lazy var billingTypeSectionView = makeVerticalFormSection(label: billingTypeLabel, content: billingTypeSegmentedControl)
     private lazy var cycleSectionView = makeVerticalFormSection(label: cycleLabel, content: cyclePickerView)
@@ -258,6 +284,7 @@ final class EditSubscriptionView: UIView {
     private var traitChangeRegistrations: [any UITraitChangeRegistration] = []
 
     var onSaveTapped: (() -> Void)?
+    var onIconTapped: (() -> Void)?
     var onCurrencyTapped: (() -> Void)?
     var onReminderSelectionChanged: ((Int?) -> Void)?
     var onReminderBannerTapped: (() -> Void)?
@@ -276,6 +303,22 @@ final class EditSubscriptionView: UIView {
         setupConstraints()
         setupInteractions()
         registerObservers()
+
+        iconControl.addSubview(iconImageView)
+        iconControl.addSubview(iconActivityIndicator)
+
+        iconControl.snp.makeConstraints { make in
+            make.size.equalTo(Layout.iconSize)
+        }
+
+        iconImageView.snp.makeConstraints { make in
+            make.edges.equalToSuperview().inset(6)
+        }
+
+        iconActivityIndicator.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+        }
+
         reminderPickerView.configure(options: reminderOptions)
         reminderPickerView.onSelectionChanged = { [weak self] selected in
             self?.onReminderSelectionChanged?(selected)
@@ -299,6 +342,9 @@ final class EditSubscriptionView: UIView {
         priceTextField.setContentHuggingPriority(.defaultLow, for: .horizontal)
 
         [nameTextField, priceTextField].forEach { applyRoundedInputStyle(to: $0) }
+        applyRoundedIconStyle(to: iconControl)
+
+        updateIconPreview(image: nil)
 
         billingTypeSegmentedControl.selectedSegmentIndex = 0
         EditSubscriptionSelectionStyler.configureSegmentedControl(
@@ -340,6 +386,11 @@ final class EditSubscriptionView: UIView {
         floatingSaveBar.saveButton.addTarget(
             self,
             action: #selector(saveTapped),
+            for: UIControl.Event.touchUpInside
+        )
+        iconControl.addTarget(
+            self,
+            action: #selector(iconTapped),
             for: UIControl.Event.touchUpInside
         )
         currencyButton.addTarget(
@@ -425,6 +476,15 @@ final class EditSubscriptionView: UIView {
         }
     }
 
+    private func applyRoundedIconStyle(to view: UIView) {
+        view.backgroundColor = UIColor.secondarySystemBackground.withAlphaComponent(0.96)
+        view.layer.cornerRadius = Layout.textFieldCornerRadius
+        view.layer.cornerCurve = .continuous
+        view.layer.masksToBounds = true
+        view.layer.borderWidth = 1
+        view.layer.borderColor = UIColor.separator.withAlphaComponent(0.18).cgColor
+    }
+
     private func updateMaterialAppearance() {
         let reduceTransparency = UIAccessibility.isReduceTransparencyEnabled
         let saveTitle = String(localized: "Save")
@@ -488,6 +548,10 @@ final class EditSubscriptionView: UIView {
 
     @objc private func saveTapped() {
         onSaveTapped?()
+    }
+
+    @objc private func iconTapped() {
+        onIconTapped?()
     }
 
     @objc private func currencyTapped() {
@@ -563,6 +627,25 @@ final class EditSubscriptionView: UIView {
     func updateReminderPermissionBanner(isVisible: Bool, message: String?) {
         reminderBannerView.update(message: message)
         reminderBannerView.isHidden = !isVisible
+    }
+
+    func updateIconPreview(image: UIImage?) {
+        if let image {
+            iconImageView.image = image
+            iconControl.accessibilityLabel = String(localized: "Subscription icon")
+        } else {
+            iconImageView.image = UIImage.subZenAppIconPlaceholder
+            iconControl.accessibilityLabel = String(localized: "No subscription icon")
+        }
+    }
+
+    func setIconLoading(_ isLoading: Bool) {
+        if isLoading {
+            iconActivityIndicator.startAnimating()
+        } else {
+            iconActivityIndicator.stopAnimating()
+        }
+        iconControl.isEnabled = !isLoading
     }
 
     func updateLastBillingDisplay(dateString: String) {
