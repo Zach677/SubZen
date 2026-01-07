@@ -13,7 +13,40 @@ class SubscriptionListRowView: UIView {
 
     private let progressGradientLayer = CAGradientLayer()
     private var currentProgress: Double = 0
-    func configure(with subscription: Subscription) {
+
+    private let iconImageView = UIImageView().with {
+        $0.contentMode = .scaleAspectFill
+        $0.image = UIImage.subZenAppIconPlaceholder
+        $0.backgroundColor = UIColor.secondarySystemBackground.withAlphaComponent(0.7)
+        $0.layer.cornerRadius = 12
+        $0.layer.cornerCurve = .continuous
+        $0.layer.masksToBounds = true
+    }
+
+    private var iconTask: Task<Void, Never>?
+    private var currentSubscriptionID: UUID?
+
+    func configure(with subscription: Subscription, iconStore: SubscriptionIconStore?) {
+        currentSubscriptionID = subscription.id
+        iconTask?.cancel()
+        iconImageView.image = UIImage.subZenAppIconPlaceholder
+        iconImageView.contentMode = .scaleAspectFill
+
+        if let iconStore {
+            let subscriptionID = subscription.id
+            iconTask = Task { [weak self] in
+                let image = await iconStore.icon(for: subscriptionID)
+                guard !Task.isCancelled else { return }
+                await MainActor.run { [weak self] in
+                    guard let self else { return }
+                    guard self.currentSubscriptionID == subscriptionID else { return }
+                    guard let image else { return }
+                    self.iconImageView.image = image
+                    self.iconImageView.contentMode = .scaleAspectFill
+                }
+            }
+        }
+
         titleLabel.text = subscription.name
         let code = subscription.currencyCode.uppercased()
         let currency = CurrencyList.currency(for: code)
@@ -167,12 +200,19 @@ class SubscriptionListRowView: UIView {
         layer.insertSublayer(progressGradientLayer, at: 0)
         updateGradientLocations(progress: 0)
 
+        addSubview(iconImageView)
         addSubview(titleLabel)
         addSubview(rightStackView)
 
+        iconImageView.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(16)
+            make.centerY.equalToSuperview()
+            make.size.equalTo(44)
+        }
+
         titleLabel.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
-            make.leading.equalToSuperview().offset(16)
+            make.leading.equalTo(iconImageView.snp.trailing).offset(12)
             make.trailing.lessThanOrEqualTo(rightStackView.snp.leading).offset(-8)
         }
 

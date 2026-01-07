@@ -78,6 +78,8 @@ class SubscriptionListView: UIView {
     private var subscriptions: [Subscription] = []
     private var selectedFilter: Filter = .subscription
 
+    var iconStore: SubscriptionIconStore?
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         backgroundColor = .background
@@ -223,7 +225,7 @@ extension SubscriptionListView: UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: SubscriptionListView.SubscriptionTableViewCell.reuseIdentifier, for: indexPath) as! SubscriptionListView.SubscriptionTableViewCell
-        cell.configure(with: subscriptions[indexPath.row])
+        cell.configure(with: subscriptions[indexPath.row], iconStore: iconStore)
         return cell
     }
 }

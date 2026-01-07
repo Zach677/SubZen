@@ -15,6 +15,7 @@ protocol SubscriptionControllerSettingsDelegate: AnyObject {
 class SubscriptionController: UIViewController {
     private let subscriptionListView = SubscriptionListView()
     let subscriptionManager = SubscriptionManager.shared
+    let iconStore = SubscriptionIconStore()
     private let currencyRateService = CurrencyRateService()
     private let defaultCurrencyProvider = DefaultCurrencyProvider()
     private let spendingCalculator = SubscriptionSpendingCalculator()
@@ -39,6 +40,7 @@ class SubscriptionController: UIViewController {
         view.backgroundColor = .background
 
         subscriptionListView.delegate = self
+        subscriptionListView.iconStore = iconStore
 
         view.addSubview(subscriptionListView)
 
