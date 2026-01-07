@@ -121,3 +121,4 @@ yarn-error.log*
 buildServer.json
 SubZen/DerivedSources/*
 .github/copilot-instructions.md
+.derivedData

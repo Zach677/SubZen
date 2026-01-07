@@ -27,6 +27,7 @@ class SubscriptionListView: UIView {
         static let filterContentInset: CGFloat = 0
         static let rowCardHorizontalInset: CGFloat = 16
         static let tableContentInset = UIEdgeInsets(top: 0, left: 0, bottom: 16, right: 0)
+        static let bottomFadeHeight: CGFloat = 72
     }
 
     enum Filter: Int {
@@ -68,6 +69,10 @@ class SubscriptionListView: UIView {
         $0.rowHeight = UITableView.automaticDimension
     }
 
+    private let bottomFadeView = BottomFadeView().with {
+        $0.isHidden = true
+    }
+
     private var subscriptions: [Subscription] = []
     private var selectedFilter: Filter = .subscription
 
@@ -83,6 +88,7 @@ class SubscriptionListView: UIView {
 
         addSubview(headerStack)
         addSubview(tableView)
+        addSubview(bottomFadeView)
 
         headerStack.addArrangedSubview(titleBar)
         headerStack.addArrangedSubview(summaryView)
@@ -116,6 +122,11 @@ class SubscriptionListView: UIView {
             make.top.equalTo(headerStack.snp.bottom)
             make.leading.trailing.bottom.equalToSuperview()
         }
+
+        bottomFadeView.snp.makeConstraints { make in
+            make.leading.trailing.bottom.equalToSuperview()
+            make.height.equalTo(LayoutConstants.bottomFadeHeight)
+        }
     }
 
     @available(*, unavailable)
@@ -135,6 +146,8 @@ class SubscriptionListView: UIView {
         } else {
             tableView.backgroundView = nil
         }
+
+        updateBottomFade()
     }
 
     func updateSummary(_ model: SubscriptionSummaryViewModel?) {
@@ -174,6 +187,30 @@ class SubscriptionListView: UIView {
                 subtitle: String(localized: "Add your first lifetime subscription to get started")
             )
         }
+    }
+
+    private func updateBottomFade() {
+        let enabled = !subscriptions.isEmpty && !UIAccessibility.isReduceTransparencyEnabled
+        bottomFadeView.isHidden = !enabled
+
+        tableView.contentInset = LayoutConstants.tableContentInset
+
+        if enabled {
+            bottomFadeView.updateColors(baseColor: .background)
+        }
+    }
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+
+        guard previousTraitCollection == nil
+            || traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection)
+        else {
+            return
+        }
+
+        guard !bottomFadeView.isHidden else { return }
+        bottomFadeView.updateColors(baseColor: .background)
     }
 }
 
@@ -285,5 +322,36 @@ extension SubscriptionListView {
 extension SubscriptionListView.TitleBar: NewSubButtonDelegate {
     func newSubButtonTapped() {
         delegate?.titleBarDidTapAddButton()
+    }
+}
+
+extension SubscriptionListView {
+    final class BottomFadeView: UIView {
+        override class var layerClass: AnyClass { CAGradientLayer.self }
+
+        private var gradientLayer: CAGradientLayer { layer as! CAGradientLayer }
+
+        override init(frame: CGRect) {
+            super.init(frame: frame)
+            isUserInteractionEnabled = false
+            backgroundColor = .clear
+
+            gradientLayer.startPoint = CGPoint(x: 0.5, y: 0.0)
+            gradientLayer.endPoint = CGPoint(x: 0.5, y: 1.0)
+            gradientLayer.locations = [0, 1]
+        }
+
+        @available(*, unavailable)
+        required init?(coder _: NSCoder) {
+            fatalError()
+        }
+
+        func updateColors(baseColor: UIColor) {
+            let resolved = baseColor.resolvedColor(with: traitCollection)
+            gradientLayer.colors = [
+                resolved.withAlphaComponent(0.0).cgColor,
+                resolved.withAlphaComponent(1.0).cgColor,
+            ]
+        }
     }
 }
