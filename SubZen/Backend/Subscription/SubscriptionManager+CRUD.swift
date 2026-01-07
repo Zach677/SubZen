@@ -60,6 +60,8 @@ extension SubscriptionManager {
             await SubscriptionNotificationManager.shared.handleSubscriptionDeleted(subscription)
         }
 
+        try? SubscriptionIconFileStore().removeIcon(for: identifier)
+
         subscriptions.removeAll { $0.id == identifier }
         saveSubscriptions()
     }
@@ -69,6 +71,8 @@ extension SubscriptionManager {
         Task {
             await SubscriptionNotificationManager.shared.cancelAllNotifications()
         }
+
+        try? SubscriptionIconFileStore().removeAllIcons()
 
         subscriptions.removeAll()
         saveSubscriptions()
