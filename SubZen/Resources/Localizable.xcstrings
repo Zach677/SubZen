@@ -3,19 +3,13 @@
   "strings" : {
     "%@ %@ %@" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ %2$@ %3$@"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ %2$@ %3$@"
-          }
-        },
         "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ %2$@ %3$@"
+          }
+        },
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@ %2$@ %3$@"
@@ -40,6 +34,12 @@
           }
         },
         "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ %2$@ %3$@"
+          }
+        },
+        "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@ %2$@ %3$@"
@@ -47,70 +47,64 @@
         }
       }
     },
-    "%@ %@ %@ %@" : {
+    "%@ %@ %@ per %@" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@ %2$@ %3$@ %4$@"
+            "value" : "%1$@ %2$@ %3$@ per %4$@"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@ %2$@ %3$@ %4$@"
+            "value" : "%1$@ %2$@ %3$@ pro %4$@"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@ %2$@ %3$@ %4$@"
+            "value" : "%1$@ %2$@ %3$@ por %4$@"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@ %2$@ %3$@ %4$@"
+            "value" : "%1$@ %2$@ %3$@ par %4$@"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@ %2$@ %3$@ %4$@"
+            "value" : "%1$@ %2$@ %3$@ %4$@あたり"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@ %2$@ %3$@ %4$@"
+            "value" : "%1$@ %2$@ %3$@ %4$@당"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@ %2$@ %3$@ %4$@"
+            "value" : "%1$@ %2$@ %3$@ 每%4$@"
           }
         }
       }
     },
     "%@ will renew in %lld days." : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ will renew in %2$lld days."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ 将在 %2$lld 天后续订。"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@ wird in %2$lld Tagen verlängert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ will renew in %2$lld days."
           }
         },
         "es" : {
@@ -136,27 +130,27 @@
             "state" : "translated",
             "value" : "%1$@이(가) %2$lld일 후에 갱신됩니다."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ 将在 %2$lld 天后续订。"
+          }
         }
       }
     },
     "%@ will renew in 2 weeks." : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ 将在 2 周后续订。"
+            "value" : "%@ wird in 2 Wochen verlängert."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ will renew in 2 weeks."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ wird in 2 Wochen verlängert."
           }
         },
         "es" : {
@@ -182,27 +176,27 @@
             "state" : "translated",
             "value" : "%@이(가) 2주 후에 갱신됩니다."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 将在 2 周后续订。"
+          }
         }
       }
     },
     "%@ will renew in 3 days." : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ 将在 3 天后续订。"
+            "value" : "%@ wird in 3 Tagen verlängert."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ will renew in 3 days."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ wird in 3 Tagen verlängert."
           }
         },
         "es" : {
@@ -228,27 +222,27 @@
             "state" : "translated",
             "value" : "%@이(가) 3일 후에 갱신됩니다."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 将在 3 天后续订。"
+          }
         }
       }
     },
     "%@ will renew next week." : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ 将在下周续订。"
+            "value" : "%@ wird nächste Woche verlängert."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ will renew next week."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ wird nächste Woche verlängert."
           }
         },
         "es" : {
@@ -274,27 +268,27 @@
             "state" : "translated",
             "value" : "%@이(가) 다음 주에 갱신됩니다."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 将在下周续订。"
+          }
         }
       }
     },
     "%@ will renew tomorrow." : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ 将在明天续订。"
+            "value" : "%@ wird morgen verlängert."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ will renew tomorrow."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ wird morgen verlängert."
           }
         },
         "es" : {
@@ -320,18 +314,24 @@
             "state" : "translated",
             "value" : "%@이(가) 내일 갱신됩니다."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 将在明天续订。"
+          }
         }
       }
     },
     "%lld %@" : {
       "localizations" : {
-        "en" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$lld %2$@"
           }
         },
-        "de" : {
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$lld %2$@"
@@ -371,22 +371,16 @@
     },
     "%lld days before" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "提前 %1$lld 天"
+            "value" : "%1$lld Tage vorher"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld days before"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld Tage vorher"
           }
         },
         "es" : {
@@ -412,27 +406,27 @@
             "state" : "translated",
             "value" : "%1$lld일 전"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "提前 %1$lld 天"
+          }
         }
       }
     },
     "%lld days left" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "剩余 %1$lld 天"
+            "value" : "Noch %1$lld Tage"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld days left"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Noch %1$lld Tage"
           }
         },
         "es" : {
@@ -458,27 +452,27 @@
             "state" : "translated",
             "value" : "%1$lld일 남음"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "剩余 %1$lld 天"
+          }
         }
       }
     },
     "1 day before" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "提前 1 天"
+            "value" : "1 Tag vorher"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "1 day before"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "1 Tag vorher"
           }
         },
         "es" : {
@@ -504,27 +498,27 @@
             "state" : "translated",
             "value" : "1일 전"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "提前 1 天"
+          }
         }
       }
     },
     "3 days before" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "提前 3 天"
+            "value" : "3 Tage vorher"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "3 days before"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "3 Tage vorher"
           }
         },
         "es" : {
@@ -550,27 +544,27 @@
             "state" : "translated",
             "value" : "3일 전"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "提前 3 天"
+          }
         }
       }
     },
     "7 days" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "7 天"
+            "value" : "7 Tage"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "7 days"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "7 Tage"
           }
         },
         "es" : {
@@ -596,27 +590,27 @@
             "state" : "translated",
             "value" : "7일"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "7 天"
+          }
         }
       }
     },
     "7 days before" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "提前 7 天"
+            "value" : "7 Tage vorher"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "7 days before"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "7 Tage vorher"
           }
         },
         "es" : {
@@ -642,27 +636,27 @@
             "state" : "translated",
             "value" : "7일 전"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "提前 7 天"
+          }
         }
       }
     },
     "14 days" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "14 天"
+            "value" : "14 Tage"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "14 days"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "14 Tage"
           }
         },
         "es" : {
@@ -688,27 +682,27 @@
             "state" : "translated",
             "value" : "14일"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "14 天"
+          }
         }
       }
     },
     "Add your first lifetime subscription to get started" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "添加第一个终身订阅即可开始"
+            "value" : "Fügen Sie Ihr erstes lebenslanges Abonnement hinzu, um loszulegen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Add your first lifetime subscription to get started"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fügen Sie Ihr erstes lebenslanges Abonnement hinzu, um loszulegen"
           }
         },
         "es" : {
@@ -734,27 +728,27 @@
             "state" : "translated",
             "value" : "시작하려면 첫 평생 구독을 추가하세요"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "添加第一个终身订阅即可开始"
+          }
         }
       }
     },
     "Add your first subscription to get started" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "添加第一个订阅即可开始"
+            "value" : "Fügen Sie Ihr erstes Abonnement hinzu, um loszulegen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Add your first subscription to get started"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fügen Sie Ihr erstes Abonnement hinzu, um loszulegen"
           }
         },
         "es" : {
@@ -780,27 +774,27 @@
             "state" : "translated",
             "value" : "시작하려면 첫 구독을 추가하세요"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "添加第一个订阅即可开始"
+          }
         }
       }
     },
     "Are you sure you want to delete %@?" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "确定要删除 %@ 吗？"
+            "value" : "Möchten Sie %@ wirklich löschen?"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Are you sure you want to delete %@?"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Möchten Sie %@ wirklich löschen?"
           }
         },
         "es" : {
@@ -826,21 +820,27 @@
             "state" : "translated",
             "value" : "%@을(를) 삭제하시겠습니까?"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "确定要删除 %@ 吗？"
+          }
         }
       }
     },
     "Billing Type" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Billing Type"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Abrechnungsart"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Billing Type"
           }
         },
         "es" : {
@@ -877,22 +877,16 @@
     },
     "Cancel" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "取消"
+            "value" : "Abbrechen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cancel"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abbrechen"
           }
         },
         "es" : {
@@ -918,21 +912,27 @@
             "state" : "translated",
             "value" : "취소"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "取消"
+          }
         }
       }
     },
     "Cannot access the selected file" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cannot access the selected file"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Auf die ausgewählte Datei kann nicht zugegriffen werden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cannot access the selected file"
           }
         },
         "es" : {
@@ -969,22 +969,16 @@
     },
     "Confirm Reset" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "确认重置"
+            "value" : "Zurücksetzen bestätigen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Confirm Reset"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zurücksetzen bestätigen"
           }
         },
         "es" : {
@@ -1010,27 +1004,27 @@
             "state" : "translated",
             "value" : "재설정 확인"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "确认重置"
+          }
         }
       }
     },
     "Currency" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "货币"
+            "value" : "Währung"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Currency"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Währung"
           }
         },
         "es" : {
@@ -1056,27 +1050,27 @@
             "state" : "translated",
             "value" : "통화"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "货币"
+          }
         }
       }
     },
     "Custom" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "自定义"
+            "value" : "Benutzerdefiniert"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Custom"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Benutzerdefiniert"
           }
         },
         "es" : {
@@ -1102,27 +1096,27 @@
             "state" : "translated",
             "value" : "사용자 지정"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自定义"
+          }
         }
       }
     },
     "Cycle" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "周期"
+            "value" : "Zyklus"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cycle"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zyklus"
           }
         },
         "es" : {
@@ -1148,27 +1142,27 @@
             "state" : "translated",
             "value" : "주기"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "周期"
+          }
         }
       }
     },
     "day" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "天"
+            "value" : "Tag"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "day"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tag"
           }
         },
         "es" : {
@@ -1194,21 +1188,27 @@
             "state" : "translated",
             "value" : "일"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "天"
+          }
         }
       }
     },
     "days" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "days"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tage"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "days"
           }
         },
         "es" : {
@@ -1245,22 +1245,16 @@
     },
     "Delete" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "删除"
+            "value" : "Löschen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Delete"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Löschen"
           }
         },
         "es" : {
@@ -1286,27 +1280,27 @@
             "state" : "translated",
             "value" : "삭제"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "删除"
+          }
         }
       }
     },
     "Delete Subscription" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "删除订阅"
+            "value" : "Abonnement löschen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Delete Subscription"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abonnement löschen"
           }
         },
         "es" : {
@@ -1332,21 +1326,27 @@
             "state" : "translated",
             "value" : "구독 삭제"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "删除订阅"
+          }
         }
       }
     },
     "Edit Subscription" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Edit Subscription"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Abonnement bearbeiten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Subscription"
           }
         },
         "es" : {
@@ -1383,22 +1383,16 @@
     },
     "Enable notifications to receive reminders. Tap to open notification settings." : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : " 启通知权限才能收到提醒。轻点即可前往通知设置。"
+            "value" : "Aktivieren Sie Benachrichtigungen, um Erinnerungen zu erhalten. Tippen Sie, um die Benachrichtigungseinstellungen zu öffnen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enable notifications to receive reminders. Tap to open notification settings."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aktivieren Sie Benachrichtigungen, um Erinnerungen zu erhalten. Tippen Sie, um die Benachrichtigungseinstellungen zu öffnen."
           }
         },
         "es" : {
@@ -1424,27 +1418,27 @@
             "state" : "translated",
             "value" : "리마인더를 받으려면 알림을 활성화하세요. 탭하여 알림 설정을 엽니다."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " 启通知权限才能收到提醒。轻点即可前往通知设置。"
+          }
         }
       }
     },
     "Enter price" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "输入价格"
+            "value" : "Preis eingeben"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enter price"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Preis eingeben"
           }
         },
         "es" : {
@@ -1470,27 +1464,27 @@
             "state" : "translated",
             "value" : "가격 입력"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "输入价格"
+          }
         }
       }
     },
     "Enter subscription name" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "输入订阅名称"
+            "value" : "Abonnementnamen eingeben"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enter subscription name"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abonnementnamen eingeben"
           }
         },
         "es" : {
@@ -1516,27 +1510,27 @@
             "state" : "translated",
             "value" : "구독 이름 입력"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "输入订阅名称"
+          }
         }
       }
     },
     "Error" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "错误"
+            "value" : "Fehler"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Error"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fehler"
           }
         },
         "es" : {
@@ -1562,21 +1556,27 @@
             "state" : "translated",
             "value" : "오류"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "错误"
+          }
         }
       }
     },
     "Every" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Every"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Alle"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every"
           }
         },
         "es" : {
@@ -1613,16 +1613,16 @@
     },
     "Every %lld %@" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Every %1$lld %2$@"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Alle %1$lld %2$@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every %1$lld %2$@"
           }
         },
         "es" : {
@@ -1659,22 +1659,16 @@
     },
     "Export Failed" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "导出失败"
+            "value" : "Export fehlgeschlagen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Export Failed"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Export fehlgeschlagen"
           }
         },
         "es" : {
@@ -1700,27 +1694,27 @@
             "state" : "translated",
             "value" : "내보내기 실패"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "导出失败"
+          }
         }
       }
     },
     "Export Subscriptions" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "导出订阅"
+            "value" : "Abonnements exportieren"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Export Subscriptions"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abonnements exportieren"
           }
         },
         "es" : {
@@ -1746,21 +1740,27 @@
             "state" : "translated",
             "value" : "구독 내보내기"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "导出订阅"
+          }
         }
       }
     },
     "Failed to build rates URL" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Failed to build rates URL"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "URL für Wechselkurse konnte nicht erstellt werden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to build rates URL"
           }
         },
         "es" : {
@@ -1797,16 +1797,16 @@
     },
     "Failed to encode subscriptions: %@" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Failed to encode subscriptions: %@"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Abonnements konnten nicht kodiert werden: %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to encode subscriptions: %@"
           }
         },
         "es" : {
@@ -1843,16 +1843,16 @@
     },
     "Failed to load rates (HTTP %lld)" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Failed to load rates (HTTP %lld)"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wechselkurse konnten nicht geladen werden (HTTP %lld)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to load rates (HTTP %lld)"
           }
         },
         "es" : {
@@ -1889,22 +1889,16 @@
     },
     "Failed to parse file: %@" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "解析文件失败：%@"
+            "value" : "Datei konnte nicht geparst werden: %@"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Failed to parse file: %@"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Datei konnte nicht geparst werden: %@"
           }
         },
         "es" : {
@@ -1930,27 +1924,27 @@
             "state" : "translated",
             "value" : "파일을 파싱하지 못했습니다: %@"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "解析文件失败：%@"
+          }
         }
       }
     },
     "Failed to read file: %@" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "读取文件失败：%@"
+            "value" : "Datei konnte nicht gelesen werden: %@"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Failed to read file: %@"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Datei konnte nicht gelesen werden: %@"
           }
         },
         "es" : {
@@ -1976,21 +1970,27 @@
             "state" : "translated",
             "value" : "파일을 읽지 못했습니다: %@"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "读取文件失败：%@"
+          }
         }
       }
     },
     "Failed to write export file: %@" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Failed to write export file: %@"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Exportdatei konnte nicht geschrieben werden: %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to write export file: %@"
           }
         },
         "es" : {
@@ -2027,22 +2027,16 @@
     },
     "For" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "为期"
+            "value" : "Für"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "For"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Für"
           }
         },
         "es" : {
@@ -2068,27 +2062,27 @@
             "state" : "translated",
             "value" : "기간"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "为期"
+          }
         }
       }
     },
     "Free Trial" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "免费试用"
+            "value" : "Kostenlose Testphase"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Free Trial"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kostenlose Testphase"
           }
         },
         "es" : {
@@ -2114,27 +2108,27 @@
             "state" : "translated",
             "value" : "무료 체험"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "免费试用"
+          }
         }
       }
     },
     "Import Failed" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "导入失败"
+            "value" : "Import fehlgeschlagen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Import Failed"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Import fehlgeschlagen"
           }
         },
         "es" : {
@@ -2160,27 +2154,27 @@
             "state" : "translated",
             "value" : "가져오기 실패"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "导入失败"
+          }
         }
       }
     },
     "Import Mode" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "导入模式"
+            "value" : "Importmodus"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Import Mode"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Importmodus"
           }
         },
         "es" : {
@@ -2206,27 +2200,27 @@
             "state" : "translated",
             "value" : "가져오기 모드"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "导入模式"
+          }
         }
       }
     },
     "Import Subscriptions" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "导入订阅"
+            "value" : "Abonnements importieren"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Import Subscriptions"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abonnements importieren"
           }
         },
         "es" : {
@@ -2252,27 +2246,27 @@
             "state" : "translated",
             "value" : "구독 가져오기"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "导入订阅"
+          }
         }
       }
     },
     "Import Successful" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "导入成功"
+            "value" : "Import erfolgreich"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Import Successful"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Import erfolgreich"
           }
         },
         "es" : {
@@ -2298,27 +2292,27 @@
             "state" : "translated",
             "value" : "가져오기 완료"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "导入成功"
+          }
         }
       }
     },
     "Imported %lld subscriptions" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "已导入 %lld 个订阅"
+            "value" : "%lld Abonnements importiert"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Imported %lld subscriptions"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld Abonnements importiert"
           }
         },
         "es" : {
@@ -2344,27 +2338,27 @@
             "state" : "translated",
             "value" : "구독 %lld개를 가져왔습니다"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已导入 %lld 个订阅"
+          }
         }
       }
     },
     "Imported %lld, skipped %lld duplicates" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Imported %1$lld, skipped %2$lld duplicates"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "已导入 %1$lld 个，跳过 %2$lld 个重复"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$lld importiert, %2$lld Duplikate übersprungen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imported %1$lld, skipped %2$lld duplicates"
           }
         },
         "es" : {
@@ -2390,27 +2384,27 @@
             "state" : "translated",
             "value" : "%1$lld개를 가져오고 중복 %2$lld개를 건너뛰었습니다"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已导入 %1$lld 个，跳过 %2$lld 个重复"
+          }
         }
       }
     },
     "Invalid currency code" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "无效的货币代码"
+            "value" : "Ungültiger Währungscode"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Invalid currency code"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ungültiger Währungscode"
           }
         },
         "es" : {
@@ -2436,27 +2430,27 @@
             "state" : "translated",
             "value" : "잘못된 통화 코드"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无效的货币代码"
+          }
         }
       }
     },
     "Last Billing Date" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "上次计费日期"
+            "value" : "Letztes Abrechnungsdatum"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Last Billing Date"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Letztes Abrechnungsdatum"
           }
         },
         "es" : {
@@ -2482,27 +2476,27 @@
             "state" : "translated",
             "value" : "마지막 청구일"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "上次计费日期"
+          }
         }
       }
     },
     "Last billing date cannot be in the future" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "上次计费日期不能晚于今天"
+            "value" : "Das letzte Abrechnungsdatum darf nicht in der Zukunft liegen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Last billing date cannot be in the future"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Das letzte Abrechnungsdatum darf nicht in der Zukunft liegen"
           }
         },
         "es" : {
@@ -2528,21 +2522,27 @@
             "state" : "translated",
             "value" : "마지막 청구일은 미래일 수 없습니다"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "上次计费日期不能晚于今天"
+          }
         }
       }
     },
     "lifetime" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "lifetime"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "lebenslang"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "lifetime"
           }
         },
         "es" : {
@@ -2579,16 +2579,16 @@
     },
     "Lifetime" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lifetime"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lebenslang"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lifetime"
           }
         },
         "es" : {
@@ -2625,22 +2625,16 @@
     },
     "Merge" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "合并"
+            "value" : "Zusammenführen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Merge"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zusammenführen"
           }
         },
         "es" : {
@@ -2666,27 +2660,27 @@
             "state" : "translated",
             "value" : "병합"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "合并"
+          }
         }
       }
     },
     "month" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "月"
+            "value" : "Monat"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "month"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Monat"
           }
         },
         "es" : {
@@ -2712,27 +2706,27 @@
             "state" : "translated",
             "value" : "개월"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "月"
+          }
         }
       }
     },
     "Monthly" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "每月"
+            "value" : "Monatlich"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Monthly"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Monatlich"
           }
         },
         "es" : {
@@ -2758,21 +2752,27 @@
             "state" : "translated",
             "value" : "매월"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每月"
+          }
         }
       }
     },
     "months" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "months"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Monate"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "months"
           }
         },
         "es" : {
@@ -2809,16 +2809,16 @@
     },
     "New Subscription" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "New Subscription"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Neues Abonnement"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Subscription"
           }
         },
         "es" : {
@@ -2855,16 +2855,16 @@
     },
     "Next billing date will be on %@" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Next billing date will be on %@"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Das nächste Abrechnungsdatum ist %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next billing date will be on %@"
           }
         },
         "es" : {
@@ -2901,22 +2901,16 @@
     },
     "No Lifetime Subscriptions" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "暂无终身订阅"
+            "value" : "Keine lebenslangen Abonnements"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "No Lifetime Subscriptions"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keine lebenslangen Abonnements"
           }
         },
         "es" : {
@@ -2942,27 +2936,27 @@
             "state" : "translated",
             "value" : "평생 구독이 없습니다"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "暂无终身订阅"
+          }
         }
       }
     },
     "No Subscriptions" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "暂无订阅"
+            "value" : "Keine Abonnements"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "No Subscriptions"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keine Abonnements"
           }
         },
         "es" : {
@@ -2988,27 +2982,27 @@
             "state" : "translated",
             "value" : "구독이 없습니다"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "暂无订阅"
+          }
         }
       }
     },
     "No subscriptions found in file" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "文件中没有订阅数据"
+            "value" : "Keine Abonnements in der Datei gefunden"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "No subscriptions found in file"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keine Abonnements in der Datei gefunden"
           }
         },
         "es" : {
@@ -3034,27 +3028,27 @@
             "state" : "translated",
             "value" : "파일에서 구독을 찾을 수 없습니다"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "文件中没有订阅数据"
+          }
         }
       }
     },
     "None" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "无"
+            "value" : "Keine"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "None"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keine"
           }
         },
         "es" : {
@@ -3080,27 +3074,27 @@
             "state" : "translated",
             "value" : "없음"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无"
+          }
         }
       }
     },
     "Notifications are turned off. Tap to open notification settings." : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "通知权限已关闭。轻点即可前往通知设置。"
+            "value" : "Benachrichtigungen sind deaktiviert. Tippen Sie, um die Benachrichtigungseinstellungen zu öffnen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Notifications are turned off. Tap to open notification settings."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Benachrichtigungen sind deaktiviert. Tippen Sie, um die Benachrichtigungseinstellungen zu öffnen."
           }
         },
         "es" : {
@@ -3126,24 +3120,24 @@
             "state" : "translated",
             "value" : "알림이 꺼져 있습니다. 탭하여 알림 설정을 엽니다."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通知权限已关闭。轻点即可前往通知设置。"
+          }
         }
       }
     },
     "OK" : {
       "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "好"
-          }
-        },
-        "en" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "OK"
           }
         },
-        "de" : {
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "OK"
@@ -3172,27 +3166,27 @@
             "state" : "translated",
             "value" : "확인"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "好"
+          }
         }
       }
     },
     "Open Settings manually to enable notifications for SubZen." : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "请手动前往“设置”开启 SubZen 的通知权限。"
+            "value" : "Öffnen Sie die Einstellungen manuell, um Benachrichtigungen für SubZen zu aktivieren."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Open Settings manually to enable notifications for SubZen."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Öffnen Sie die Einstellungen manuell, um Benachrichtigungen für SubZen zu aktivieren."
           }
         },
         "es" : {
@@ -3218,27 +3212,27 @@
             "state" : "translated",
             "value" : "SubZen 알림을 활성화하려면 설정을 수동으로 열어주세요."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请手动前往“设置”开启 SubZen 的通知权限。"
+          }
         }
       }
     },
     "Opens notification settings." : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "打开通知设置。"
+            "value" : "Öffnet die Benachrichtigungseinstellungen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Opens notification settings."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Öffnet die Benachrichtigungseinstellungen."
           }
         },
         "es" : {
@@ -3264,27 +3258,27 @@
             "state" : "translated",
             "value" : "알림 설정을 엽니다."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开通知设置。"
+          }
         }
       }
     },
     "Please enter a valid name." : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "请输入有效名称。"
+            "value" : "Bitte geben Sie einen gültigen Namen ein."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Please enter a valid name."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bitte geben Sie einen gültigen Namen ein."
           }
         },
         "es" : {
@@ -3310,27 +3304,27 @@
             "state" : "translated",
             "value" : "유효한 이름을 입력하세요."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请输入有效名称。"
+          }
         }
       }
     },
     "Please enter a valid price." : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "请输入有效价格。"
+            "value" : "Bitte geben Sie einen gültigen Preis ein."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Please enter a valid price."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bitte geben Sie einen gültigen Preis ein."
           }
         },
         "es" : {
@@ -3356,27 +3350,27 @@
             "state" : "translated",
             "value" : "유효한 가격을 입력하세요."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请输入有效价格。"
+          }
         }
       }
     },
     "Price" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "价格"
+            "value" : "Preis"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Price"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Preis"
           }
         },
         "es" : {
@@ -3402,21 +3396,27 @@
             "state" : "translated",
             "value" : "가격"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "价格"
+          }
         }
       }
     },
     "Privacy Policy" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Privacy Policy"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Datenschutzerklärung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Policy"
           }
         },
         "es" : {
@@ -3453,16 +3453,16 @@
     },
     "Privacy policy not found. Please check your installation." : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Privacy policy not found. Please check your installation."
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Datenschutzerklärung nicht gefunden. Bitte überprüfen Sie Ihre Installation."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy policy not found. Please check your installation."
           }
         },
         "es" : {
@@ -3499,16 +3499,16 @@
     },
     "Purchase Date" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Purchase Date"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kaufdatum"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Purchase Date"
           }
         },
         "es" : {
@@ -3545,22 +3545,16 @@
     },
     "Remind Me" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "提醒我"
+            "value" : "Erinnerung"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Remind Me"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Erinnerung"
           }
         },
         "es" : {
@@ -3586,27 +3580,27 @@
             "state" : "translated",
             "value" : "알림"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "提醒我"
+          }
         }
       }
     },
     "Replace" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "替换"
+            "value" : "Ersetzen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Replace"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ersetzen"
           }
         },
         "es" : {
@@ -3632,27 +3626,27 @@
             "state" : "translated",
             "value" : "교체"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "替换"
+          }
         }
       }
     },
     "Reset" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "重置"
+            "value" : "Zurücksetzen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Reset"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zurücksetzen"
           }
         },
         "es" : {
@@ -3678,27 +3672,27 @@
             "state" : "translated",
             "value" : "재설정"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重置"
+          }
         }
       }
     },
     "Reset All Data" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "清除所有数据"
+            "value" : "Alle Daten zurücksetzen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Reset All Data"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alle Daten zurücksetzen"
           }
         },
         "es" : {
@@ -3724,27 +3718,27 @@
             "state" : "translated",
             "value" : "모든 데이터 재설정"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "清除所有数据"
+          }
         }
       }
     },
     "Reset Failed" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "重置失败"
+            "value" : "Zurücksetzen fehlgeschlagen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Reset Failed"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zurücksetzen fehlgeschlagen"
           }
         },
         "es" : {
@@ -3770,27 +3764,27 @@
             "state" : "translated",
             "value" : "재설정 실패"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重置失败"
+          }
         }
       }
     },
     "Save" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "保存"
+            "value" : "Speichern"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Save"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Speichern"
           }
         },
         "es" : {
@@ -3816,27 +3810,27 @@
             "state" : "translated",
             "value" : "저장"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存"
+          }
         }
       }
     },
     "Search code or name" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "搜索代码或名称"
+            "value" : "Code oder Name suchen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Search code or name"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Code oder Name suchen"
           }
         },
         "es" : {
@@ -3862,27 +3856,27 @@
             "state" : "translated",
             "value" : "코드 또는 이름 검색"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "搜索代码或名称"
+          }
         }
       }
     },
     "Select" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "选择"
+            "value" : "Auswählen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Select"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Auswählen"
           }
         },
         "es" : {
@@ -3908,27 +3902,27 @@
             "state" : "translated",
             "value" : "선택"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择"
+          }
         }
       }
     },
     "Select Currency" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "选择货币"
+            "value" : "Währung auswählen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Select Currency"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Währung auswählen"
           }
         },
         "es" : {
@@ -3954,27 +3948,27 @@
             "state" : "translated",
             "value" : "통화 선택"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择货币"
+          }
         }
       }
     },
     "Selected currency: %@ %@" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Selected currency: %1$@ %2$@"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "已选择货币：%1$@ %2$@"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ausgewählte Währung: %1$@ %2$@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selected currency: %1$@ %2$@"
           }
         },
         "es" : {
@@ -4000,21 +3994,27 @@
             "state" : "translated",
             "value" : "선택한 통화: %1$@ %2$@"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已选择货币：%1$@ %2$@"
+          }
         }
       }
     },
     "Send Debug Renewal Notifications" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Send Debug Renewal Notifications"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Debug-Erneuerungsbenachrichtigungen senden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send Debug Renewal Notifications"
           }
         },
         "es" : {
@@ -4051,22 +4051,16 @@
     },
     "Setting" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "设置"
+            "value" : "Einstellungen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Setting"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Einstellungen"
           }
         },
         "es" : {
@@ -4092,27 +4086,27 @@
             "state" : "translated",
             "value" : "설정"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设置"
+          }
         }
       }
     },
     "Settings Unavailable" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "设置不可用"
+            "value" : "Einstellungen nicht verfügbar"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Settings Unavailable"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Einstellungen nicht verfügbar"
           }
         },
         "es" : {
@@ -4138,21 +4132,27 @@
             "state" : "translated",
             "value" : "설정을 사용할 수 없습니다"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设置不可用"
+          }
         }
       }
     },
     "Subscription" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Subscription"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Abonnement"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subscription"
           }
         },
         "es" : {
@@ -4189,22 +4189,16 @@
     },
     "Subscription Name" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "订阅名称"
+            "value" : "Abonnementname"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Subscription Name"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abonnementname"
           }
         },
         "es" : {
@@ -4230,27 +4224,27 @@
             "state" : "translated",
             "value" : "구독 이름"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "订阅名称"
+          }
         }
       }
     },
     "Subscription name cannot be empty" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "订阅名称不能为空"
+            "value" : "Der Abonnementname darf nicht leer sein"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Subscription name cannot be empty"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Abonnementname darf nicht leer sein"
           }
         },
         "es" : {
@@ -4276,27 +4270,27 @@
             "state" : "translated",
             "value" : "구독 이름은 비워둘 수 없습니다"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "订阅名称不能为空"
+          }
         }
       }
     },
     "Subscription price must be greater than 0" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "订阅价格必须大于 0"
+            "value" : "Der Abonnementpreis muss größer als 0 sein"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Subscription price must be greater than 0"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Abonnementpreis muss größer als 0 sein"
           }
         },
         "es" : {
@@ -4322,27 +4316,27 @@
             "state" : "translated",
             "value" : "구독 가격은 0보다 커야 합니다"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "订阅价格必须大于 0"
+          }
         }
       }
     },
     "Subscription Reminder" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "订阅提醒"
+            "value" : "Abonnement-Erinnerung"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Subscription Reminder"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abonnement-Erinnerung"
           }
         },
         "es" : {
@@ -4368,27 +4362,27 @@
             "state" : "translated",
             "value" : "구독 알림"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "订阅提醒"
+          }
         }
       }
     },
     "Subscription Renews in 2 Weeks" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "订阅将在 2 周后续订"
+            "value" : "Abonnement wird in 2 Wochen verlängert"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Subscription Renews in 2 Weeks"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abonnement wird in 2 Wochen verlängert"
           }
         },
         "es" : {
@@ -4414,27 +4408,27 @@
             "state" : "translated",
             "value" : "구독이 2주 후 갱신됨"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "订阅将在 2 周后续订"
+          }
         }
       }
     },
     "Subscription Renews in 3 Days" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "订阅将在 3 天后续订"
+            "value" : "Abonnement wird in 3 Tagen verlängert"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Subscription Renews in 3 Days"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abonnement wird in 3 Tagen verlängert"
           }
         },
         "es" : {
@@ -4460,27 +4454,27 @@
             "state" : "translated",
             "value" : "구독이 3일 후 갱신됨"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "订阅将在 3 天后续订"
+          }
         }
       }
     },
     "Subscription Renews Next Week" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "订阅将在下周续订"
+            "value" : "Abonnement wird nächste Woche verlängert"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Subscription Renews Next Week"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abonnement wird nächste Woche verlängert"
           }
         },
         "es" : {
@@ -4506,27 +4500,27 @@
             "state" : "translated",
             "value" : "구독이 다음 주에 갱신됨"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "订阅将在下周续订"
+          }
         }
       }
     },
     "Subscription Renews Tomorrow!" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "订阅将在明天续订！"
+            "value" : "Abonnement wird morgen verlängert!"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Subscription Renews Tomorrow!"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abonnement wird morgen verlängert!"
           }
         },
         "es" : {
@@ -4552,24 +4546,24 @@
             "state" : "translated",
             "value" : "구독이 내일 갱신됩니다!"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "订阅将在明天续订！"
+          }
         }
       }
     },
     "SubZen" : {
       "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "素臻"
-          }
-        },
-        "en" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "SubZen"
           }
         },
-        "de" : {
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "SubZen"
@@ -4598,27 +4592,27 @@
             "state" : "translated",
             "value" : "SubZen"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "素臻"
+          }
         }
       }
     },
     "Tap Reset to erase all data and restart the app." : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "点击“重置”以清除所有数据并重新启动应用。"
+            "value" : "Tippen Sie auf „Zurücksetzen“, um alle Daten zu löschen und die App neu zu starten."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tap Reset to erase all data and restart the app."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tippen Sie auf „Zurücksetzen“, um alle Daten zu löschen und die App neu zu starten."
           }
         },
         "es" : {
@@ -4644,27 +4638,27 @@
             "state" : "translated",
             "value" : "재설정을 탭하면 모든 데이터가 삭제되고 앱이 다시 시작됩니다."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "点击“重置”以清除所有数据并重新启动应用。"
+          }
         }
       }
     },
     "This action cannot be undone." : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "该操作无法撤销。"
+            "value" : "Diese Aktion kann nicht rückgängig gemacht werden."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "This action cannot be undone."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Diese Aktion kann nicht rückgängig gemacht werden."
           }
         },
         "es" : {
@@ -4690,27 +4684,27 @@
             "state" : "translated",
             "value" : "이 작업은 되돌릴 수 없습니다."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "该操作无法撤销。"
+          }
         }
       }
     },
     "Today!" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "今天！"
+            "value" : "Heute!"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Today!"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Heute!"
           }
         },
         "es" : {
@@ -4736,27 +4730,27 @@
             "state" : "translated",
             "value" : "오늘!"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今天！"
+          }
         }
       }
     },
     "Trial ends on %@" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "试用将在 %@ 结束"
+            "value" : "Testphase endet am %@"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Trial ends on %@"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Testphase endet am %@"
           }
         },
         "es" : {
@@ -4782,21 +4776,27 @@
             "state" : "translated",
             "value" : "체험은 %@에 종료됩니다"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "试用将在 %@ 结束"
+          }
         }
       }
     },
     "Unexpected response when loading rates" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Unexpected response when loading rates"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Unerwartete Antwort beim Laden der Wechselkurse"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unexpected response when loading rates"
           }
         },
         "es" : {
@@ -4833,16 +4833,16 @@
     },
     "Unsupported base currency" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Unsupported base currency"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nicht unterstützte Basiswährung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unsupported base currency"
           }
         },
         "es" : {
@@ -4879,22 +4879,16 @@
     },
     "Unsupported file version: %lld" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "不支持的文件版本：%lld"
+            "value" : "Nicht unterstützte Dateiversion: %lld"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Unsupported file version: %lld"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nicht unterstützte Dateiversion: %lld"
           }
         },
         "es" : {
@@ -4920,18 +4914,24 @@
             "state" : "translated",
             "value" : "지원되지 않는 파일 버전: %lld"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "不支持的文件版本：%lld"
+          }
         }
       }
     },
     "Version %@ (%d)" : {
       "localizations" : {
-        "en" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Version %1$@ (%2$d)"
           }
         },
-        "de" : {
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Version %1$@ (%2$d)"
@@ -4971,22 +4971,16 @@
     },
     "week" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "周"
+            "value" : "Woche"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "week"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Woche"
           }
         },
         "es" : {
@@ -5012,27 +5006,27 @@
             "state" : "translated",
             "value" : "주"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "周"
+          }
         }
       }
     },
     "Weekly" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "每周"
+            "value" : "Wöchentlich"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Weekly"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wöchentlich"
           }
         },
         "es" : {
@@ -5058,21 +5052,27 @@
             "state" : "translated",
             "value" : "매주"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每周"
+          }
         }
       }
     },
     "weeks" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "weeks"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wochen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "weeks"
           }
         },
         "es" : {
@@ -5109,22 +5109,16 @@
     },
     "year" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "年"
+            "value" : "Jahr"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "year"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Jahr"
           }
         },
         "es" : {
@@ -5150,27 +5144,27 @@
             "state" : "translated",
             "value" : "년"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "年"
+          }
         }
       }
     },
     "Yearly" : {
       "localizations" : {
-        "zh-Hans" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "每年"
+            "value" : "Jährlich"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Yearly"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Jährlich"
           }
         },
         "es" : {
@@ -5196,21 +5190,27 @@
             "state" : "translated",
             "value" : "매년"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每年"
+          }
         }
       }
     },
     "years" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "years"
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Jahre"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "years"
           }
         },
         "es" : {
@@ -5241,6 +5241,52 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "年"
+          }
+        }
+      }
+    },
+    "%@ %@ %@ %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ %@ %@ %@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ %2$@ %3$@ %4$@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ %2$@ %3$@ %4$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ %2$@ %3$@ %4$@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ %2$@ %3$@ %4$@"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ %2$@ %3$@ %4$@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ %2$@ %3$@ %4$@"
           }
         }
       }

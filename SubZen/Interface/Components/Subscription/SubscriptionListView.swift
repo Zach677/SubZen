@@ -28,6 +28,8 @@ class SubscriptionListView: UIView {
         static let rowCardHorizontalInset: CGFloat = 16
         static let tableContentInset = UIEdgeInsets(top: 0, left: 0, bottom: 16, right: 0)
         static let bottomFadeHeight: CGFloat = 72
+        static let titleBarHeight: CGFloat = 64
+        static let titleBarButtonSize: CGFloat = 56
     }
 
     enum Filter: Int {
@@ -109,7 +111,7 @@ class SubscriptionListView: UIView {
         }
 
         titleBar.snp.makeConstraints { make in
-            make.height.equalTo(60)
+            make.height.equalTo(LayoutConstants.titleBarHeight)
         }
 
         summaryView.isHidden = true
@@ -271,44 +273,36 @@ extension SubscriptionListView {
     final class TitleBar: UIView {
         weak var delegate: TitleBarDelegate?
 
-        private let titleLabel = UILabel().with {
-            $0.text = String(localized: "SubZen")
-            $0.font = UIFont.systemFont(ofSize: 25, weight: .bold)
-            $0.textColor = .label
-        }
-
+        private let settingsButton = NewSubButton(
+            systemImageName: "gearshape",
+            accessibilityLabel: String(localized: "Setting")
+        )
         private let addButton = NewSubButton()
 
         init() {
             super.init(frame: .zero)
             backgroundColor = .background
 
+            settingsButton.delegate = self
             addButton.delegate = self
 
-            addSubview(titleLabel)
+            addSubview(settingsButton)
             addSubview(addButton)
 
-            titleLabel.snp.makeConstraints { make in
-                make.leading.equalToSuperview().offset(40)
+            settingsButton.snp.makeConstraints { make in
+                make.leading.equalToSuperview().offset(20)
                 make.centerY.equalToSuperview()
+                make.width.height.equalTo(LayoutConstants.titleBarButtonSize)
             }
 
             addButton.snp.makeConstraints { make in
                 make.trailing.equalToSuperview().offset(-20)
                 make.centerY.equalToSuperview()
-                make.width.height.equalTo(50)
+                make.width.height.equalTo(LayoutConstants.titleBarButtonSize)
             }
-
-            installTitleGestures()
         }
 
-        private func installTitleGestures() {
-            titleLabel.isUserInteractionEnabled = true
-            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTitleTap))
-            titleLabel.addGestureRecognizer(tapGesture)
-        }
-
-        @objc private func handleTitleTap() {
+        private func requestSettings() {
             delegate?.titleBarDidRequestSettings(self)
         }
 
@@ -320,8 +314,12 @@ extension SubscriptionListView {
 }
 
 extension SubscriptionListView.TitleBar: NewSubButtonDelegate {
-    func newSubButtonTapped() {
-        delegate?.titleBarDidTapAddButton()
+    func newSubButtonTapped(_ button: NewSubButton) {
+        if button === addButton {
+            delegate?.titleBarDidTapAddButton()
+        } else if button === settingsButton {
+            requestSettings()
+        }
     }
 }
 

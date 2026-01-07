@@ -30,7 +30,7 @@ class SettingView: UIView {
     }
 
     private let titleLabel = UILabel().with {
-        $0.text = String(localized: "Setting")
+        $0.text = String(localized: "SubZen")
         $0.font = UIFont.systemFont(ofSize: 24, weight: .bold)
         $0.textColor = .label
         $0.numberOfLines = 0

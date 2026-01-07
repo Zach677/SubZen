@@ -33,6 +33,14 @@ NEW_STRINGS: dict[str, dict[str, str]] = {
         "ko": "%1$@ %2$@ %3$@ %4$@",
         "zh-Hans": "%1$@ %2$@ %3$@ %4$@",
     },
+    "%@ %@ %@ per %@": {
+        "de": "%1$@ %2$@ %3$@ pro %4$@",
+        "es": "%1$@ %2$@ %3$@ por %4$@",
+        "fr": "%1$@ %2$@ %3$@ par %4$@",
+        "ja": "%1$@ %2$@ %3$@ %4$@あたり",
+        "ko": "%1$@ %2$@ %3$@ %4$@당",
+        "zh-Hans": "%1$@ %2$@ %3$@ 每%4$@",
+    },
     "%@ will renew in %lld days.": {
         "de": "%1$@ wird in %2$lld Tagen verlängert.",
         "es": "%1$@ se renovará en %2$lld días.",
