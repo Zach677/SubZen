@@ -18,7 +18,8 @@ extension SubscriptionController {
     ) {
         let editorController = SubscriptionEditorController(
             subscription: subscription,
-            preferLifetimeForNewSubscription: preferLifetimeForNewSubscription
+            preferLifetimeForNewSubscription: preferLifetimeForNewSubscription,
+            iconStore: iconStore
         )
         navigationController?.pushViewController(editorController, animated: true)
     }
@@ -50,6 +51,7 @@ extension SubscriptionController {
     }
 
     private func performDeleteSubscription(_ subscription: Subscription) {
+        try? iconStore.removeIcon(for: subscription.id)
         subscriptionManager.deleteSubscription(identifier: subscription.id)
         loadSubscriptions()
     }

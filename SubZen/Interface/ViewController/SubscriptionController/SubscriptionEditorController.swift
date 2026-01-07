@@ -13,6 +13,8 @@ class SubscriptionEditorController: UIViewController {
     private let editSubscriptionView = EditSubscriptionView()
     private let subscriptionManager = SubscriptionManager.shared
     private let editSubscription: Subscription?
+    private let iconStore: SubscriptionIconStore
+    private let iconRemoteService: SubscriptionIconRemoteService
     private let notificationPermissionService: NotificationPermissionService
     private let reminderPermissionPresenter: ReminderPermissionPresenter
     private let defaultCurrencyProvider: DefaultCurrencyProviding
@@ -21,14 +23,19 @@ class SubscriptionEditorController: UIViewController {
     private var selectedCycle: BillingCycle = .monthly
     private var selectedTrialPeriod: TrialPeriod?
     private var isLifetimeSelected = false
+    private var pendingIconImage: UIImage?
 
     init(
         subscription: Subscription? = nil,
         preferLifetimeForNewSubscription: Bool = false,
+        iconStore: SubscriptionIconStore = SubscriptionIconStore(),
+        iconRemoteService: SubscriptionIconRemoteService = SubscriptionIconRemoteService(),
         notificationPermissionService: NotificationPermissionService = .shared,
         reminderPermissionPresenter: ReminderPermissionPresenter? = nil,
         defaultCurrencyProvider: DefaultCurrencyProviding = DefaultCurrencyProvider()
     ) {
+        self.iconStore = iconStore
+        self.iconRemoteService = iconRemoteService
         self.notificationPermissionService = notificationPermissionService
         self.reminderPermissionPresenter = reminderPermissionPresenter ?? ReminderPermissionPresenter(notificationPermissionService: notificationPermissionService)
         editSubscription = subscription
@@ -97,6 +104,9 @@ class SubscriptionEditorController: UIViewController {
         editSubscriptionView.onSaveTapped = { [weak self] in
             self?.handleSave()
         }
+        editSubscriptionView.onIconTapped = { [weak self] in
+            self?.presentIconActions()
+        }
         editSubscriptionView.onCurrencyTapped = { [weak self] in
             self?.presentCurrencyPicker()
         }
@@ -128,6 +138,7 @@ class SubscriptionEditorController: UIViewController {
         title = editSubscription == nil ? String(localized: "New Subscription") : String(localized: "Edit Subscription")
         navigationItem.backButtonTitle = "<"
 
+        loadExistingIconIfNeeded()
         updateLastBillingDisplay()
         updateTrialHint()
         updateNextBillingHint()
@@ -287,7 +298,7 @@ class SubscriptionEditorController: UIViewController {
                     editingSubscription.reminderIntervals = reminderIntervals
                 }
             } else {
-                _ = try subscriptionManager.createSubscription(
+                let created = try subscriptionManager.createSubscription(
                     name: name,
                     price: price,
                     cycle: cycle,
@@ -296,6 +307,10 @@ class SubscriptionEditorController: UIViewController {
                     currencyCode: selectedCurrency.code,
                     reminderIntervals: reminderIntervals
                 )
+
+                if let pendingIconImage {
+                    try? await iconStore.saveIcon(pendingIconImage, for: created.id)
+                }
             }
             navigationController?.popViewController(animated: true)
         } catch {
@@ -537,5 +552,244 @@ class SubscriptionEditorController: UIViewController {
     @objc private func inlineDatePickerChanged(_ sender: UIDatePicker) {
         editSubscriptionView.datePicker.date = sender.date
         datePickerChanged()
+    }
+}
+
+// MARK: - Icon Actions
+
+extension SubscriptionEditorController {
+    @MainActor
+    private func loadExistingIconIfNeeded() {
+        guard let editSubscription else {
+            editSubscriptionView.updateIconPreview(image: pendingIconImage)
+            return
+        }
+
+        Task { [weak self] in
+            guard let self else { return }
+            let image = await iconStore.icon(for: editSubscription.id)
+            await MainActor.run { [weak self] in
+                self?.editSubscriptionView.updateIconPreview(image: image)
+            }
+        }
+    }
+
+    @MainActor
+    private func presentIconActions() {
+        let sheet = UIAlertController(
+            title: String(localized: "App Icon"),
+            message: String(localized: "Choose how to set the icon."),
+            preferredStyle: .actionSheet
+        )
+
+        sheet.addAction(
+            UIAlertAction(
+                title: String(localized: "Fetch App Store Icon"),
+                style: .default
+            ) { [weak self] _ in
+                self?.presentAppStoreIconPrompt()
+            }
+        )
+
+        sheet.addAction(
+            UIAlertAction(
+                title: String(localized: "Get Icon from URL"),
+                style: .default
+            ) { [weak self] _ in
+                self?.presentIconURLPrompt()
+            }
+        )
+
+        if hasIconForCurrentContext() {
+            sheet.addAction(
+                UIAlertAction(
+                    title: String(localized: "Remove Icon"),
+                    style: .destructive
+                ) { [weak self] _ in
+                    self?.removeCurrentIcon()
+                }
+            )
+        }
+
+        sheet.addAction(
+            UIAlertAction(
+                title: String(localized: "Cancel"),
+                style: .cancel
+            )
+        )
+
+        if let popover = sheet.popoverPresentationController {
+            popover.sourceView = view
+            popover.sourceRect = CGRect(x: view.bounds.midX, y: view.bounds.midY, width: 0, height: 0)
+            popover.permittedArrowDirections = []
+        }
+
+        present(sheet, animated: true)
+    }
+
+    @MainActor
+    private func presentIconURLPrompt() {
+        let alert = UIAlertController(
+            title: String(localized: "Get Icon from URL"),
+            message: String(localized: "Paste an https image URL."),
+            preferredStyle: .alert
+        )
+
+        alert.addTextField { textField in
+            textField.placeholder = String(localized: "https://example.com/icon.png")
+            textField.keyboardType = .URL
+            textField.textContentType = .URL
+            textField.autocapitalizationType = .none
+            textField.autocorrectionType = .no
+        }
+
+        alert.addAction(
+            UIAlertAction(
+                title: String(localized: "Cancel"),
+                style: .cancel
+            )
+        )
+        alert.addAction(
+            UIAlertAction(
+                title: String(localized: "Fetch"),
+                style: .default
+            ) { [weak self, weak alert] _ in
+                guard let self else { return }
+                let text = alert?.textFields?.first?.text ?? ""
+                Task { [weak self] in
+                    await self?.fetchIcon(fromURLString: text)
+                }
+            }
+        )
+
+        present(alert, animated: true)
+    }
+
+    @MainActor
+    private func presentAppStoreIconPrompt() {
+        let alert = UIAlertController(
+            title: String(localized: "Fetch App Store Icon"),
+            message: String(localized: "Paste an App Store link or enter an app id."),
+            preferredStyle: .alert
+        )
+
+        alert.addTextField { textField in
+            textField.placeholder = String(localized: "https://apps.apple.com/... or 123456789")
+            textField.keyboardType = .default
+            textField.textContentType = .URL
+            textField.autocapitalizationType = .none
+            textField.autocorrectionType = .no
+        }
+
+        alert.addAction(
+            UIAlertAction(
+                title: String(localized: "Cancel"),
+                style: .cancel
+            )
+        )
+        alert.addAction(
+            UIAlertAction(
+                title: String(localized: "Fetch"),
+                style: .default
+            ) { [weak self, weak alert] _ in
+                guard let self else { return }
+                let input = alert?.textFields?.first?.text ?? ""
+                Task { [weak self] in
+                    await self?.fetchAppStoreIcon(fromInput: input)
+                }
+            }
+        )
+
+        present(alert, animated: true)
+    }
+
+    @MainActor
+    private func hasIconForCurrentContext() -> Bool {
+        if let editSubscription {
+            return iconStore.iconExists(for: editSubscription.id)
+        }
+        return pendingIconImage != nil
+    }
+
+    @MainActor
+    private func removeCurrentIcon() {
+        if let editSubscription {
+            do {
+                try iconStore.removeIcon(for: editSubscription.id)
+                editSubscriptionView.updateIconPreview(image: nil)
+            } catch {
+                showAlert(error.localizedDescription)
+            }
+            return
+        }
+
+        pendingIconImage = nil
+        editSubscriptionView.updateIconPreview(image: nil)
+    }
+
+    @MainActor
+    private func fetchIcon(fromURLString input: String) async {
+        let trimmed = input.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let url = URL(string: trimmed) else {
+            showAlert(SubscriptionIconRemoteServiceError.invalidURL.localizedDescription)
+            return
+        }
+
+        editSubscriptionView.setIconLoading(true)
+        defer { editSubscriptionView.setIconLoading(false) }
+
+        do {
+            let data = try await iconRemoteService.fetchImageData(from: url)
+            try await applyIconData(data)
+        } catch {
+            showAlert(error.localizedDescription)
+        }
+    }
+
+    @MainActor
+    private func fetchAppStoreIcon(fromInput input: String) async {
+        let trimmed = input.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let appID = AppStoreAppIDParser.parseAppID(from: trimmed) else {
+            showAlert(String(localized: "Please enter a valid App Store link or app id."))
+            return
+        }
+
+        editSubscriptionView.setIconLoading(true)
+        defer { editSubscriptionView.setIconLoading(false) }
+
+        do {
+            let artworkURL = try await iconRemoteService.fetchAppStoreArtworkURL(appID: appID)
+            let data = try await iconRemoteService.fetchImageData(from: artworkURL)
+            try await applyIconData(data)
+        } catch {
+            showAlert(error.localizedDescription)
+        }
+    }
+
+    @MainActor
+    private func applyIconData(_ data: Data) async throws {
+        guard let image = UIImage(data: data) else {
+            throw SubscriptionIconApplyError.invalidImageData
+        }
+
+        if let editSubscription {
+            try await iconStore.saveIcon(image, for: editSubscription.id)
+            let saved = await iconStore.icon(for: editSubscription.id)
+            editSubscriptionView.updateIconPreview(image: saved)
+        } else {
+            pendingIconImage = image
+            editSubscriptionView.updateIconPreview(image: image)
+        }
+    }
+}
+
+private enum SubscriptionIconApplyError: LocalizedError {
+    case invalidImageData
+
+    var errorDescription: String? {
+        switch self {
+        case .invalidImageData:
+            String(localized: "The downloaded data is not a valid image.")
+        }
     }
 }
