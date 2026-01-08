@@ -65,7 +65,7 @@ final class SubscriptionIconStore {
     func saveIcon(_ image: UIImage, for subscriptionID: UUID) async throws {
         let key = subscriptionID.uuidString as NSString
         let savedImage = try await Task.detached(priority: .utility) { [fileStore] in
-            let normalized = normalizedSquareIcon(from: image, size: Constants.targetIconSize)
+            let normalized = image.normalizedSquareIcon(size: Constants.targetIconSize)
             guard let data = normalized.pngData() else {
                 throw SubscriptionIconStoreError.iconEncodingFailed
             }
@@ -83,22 +83,24 @@ final class SubscriptionIconStore {
     }
 }
 
-private func normalizedSquareIcon(from image: UIImage, size: CGFloat) -> UIImage {
-    let targetSize = CGSize(width: size, height: size)
-    let format = UIGraphicsImageRendererFormat().with {
-        $0.scale = 1
-        $0.opaque = false
-    }
-    let renderer = UIGraphicsImageRenderer(size: targetSize, format: format)
+extension UIImage {
+    func normalizedSquareIcon(size: CGFloat) -> UIImage {
+        let targetSize = CGSize(width: size, height: size)
+        let format = UIGraphicsImageRendererFormat().with {
+            $0.scale = 1
+            $0.opaque = false
+        }
+        let renderer = UIGraphicsImageRenderer(size: targetSize, format: format)
 
-    return renderer.image { _ in
-        let imageSize = image.size
-        let scale = max(targetSize.width / imageSize.width, targetSize.height / imageSize.height)
-        let scaledSize = CGSize(width: imageSize.width * scale, height: imageSize.height * scale)
-        let origin = CGPoint(
-            x: (targetSize.width - scaledSize.width) / 2,
-            y: (targetSize.height - scaledSize.height) / 2
-        )
-        image.draw(in: CGRect(origin: origin, size: scaledSize))
+        return renderer.image { _ in
+            let imageSize = self.size
+            let scale = max(targetSize.width / imageSize.width, targetSize.height / imageSize.height)
+            let scaledSize = CGSize(width: imageSize.width * scale, height: imageSize.height * scale)
+            let origin = CGPoint(
+                x: (targetSize.width - scaledSize.width) / 2,
+                y: (targetSize.height - scaledSize.height) / 2
+            )
+            self.draw(in: CGRect(origin: origin, size: scaledSize))
+        }
     }
 }

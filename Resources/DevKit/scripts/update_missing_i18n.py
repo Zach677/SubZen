@@ -26,6 +26,22 @@ NEW_STRINGS: dict[str, dict[str, str]] = {
         "ko": "앱 아이콘",
         "zh-Hans": "App 图标",
     },
+    "Choose from Files": {
+        "de": "Aus Dateien auswählen",
+        "es": "Elegir de Archivos",
+        "fr": "Choisir dans Fichiers",
+        "ja": "ファイルから選択",
+        "ko": "파일에서 선택",
+        "zh-Hans": "从文件中选择",
+    },
+    "Choose from Photos": {
+        "de": "Aus Fotos auswählen",
+        "es": "Elegir de Fotos",
+        "fr": "Choisir dans Photos",
+        "ja": "写真から選択",
+        "ko": "사진에서 선택",
+        "zh-Hans": "从照片中选择",
+    },
     "Choose how to set the icon.": {
         "de": "Wähle, wie das Icon gesetzt werden soll.",
         "es": "Elige cómo establecer el icono.",
@@ -49,6 +65,14 @@ NEW_STRINGS: dict[str, dict[str, str]] = {
         "ja": "アイコン画像のエンコードに失敗しました。",
         "ko": "아이콘 이미지를 인코딩하지 못했습니다.",
         "zh-Hans": "无法编码图标图片。",
+    },
+    "Failed to load the selected image.": {
+        "de": "Das ausgewählte Bild konnte nicht geladen werden.",
+        "es": "No se pudo cargar la imagen seleccionada.",
+        "fr": "Impossible de charger l’image sélectionnée.",
+        "ja": "選択した画像を読み込めませんでした。",
+        "ko": "선택한 이미지를 불러오지 못했습니다.",
+        "zh-Hans": "无法加载所选图片。",
     },
     "Fetch": {
         "de": "Abrufen",
@@ -121,6 +145,14 @@ NEW_STRINGS: dict[str, dict[str, str]] = {
         "ja": "https の画像URLを貼り付けてください。",
         "ko": "https 이미지 URL을 붙여넣으세요.",
         "zh-Hans": "粘贴 https 图片 URL。",
+    },
+    "Paste a website URL or an https image URL.": {
+        "de": "Füge eine Website-URL oder eine https-Bild-URL ein.",
+        "es": "Pega una URL de sitio web o una URL de imagen https.",
+        "fr": "Collez une URL de site web ou une URL d’image https.",
+        "ja": "WebサイトのURLまたは https の画像URLを貼り付けてください。",
+        "ko": "웹사이트 URL 또는 https 이미지 URL을 붙여넣으세요.",
+        "zh-Hans": "粘贴网站 URL 或 https 图片 URL。",
     },
     "Please enter a valid App Store link or app id.": {
         "de": "Bitte gib einen gültigen App Store-Link oder eine App-ID ein.",
