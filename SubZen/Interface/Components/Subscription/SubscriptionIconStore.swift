@@ -86,8 +86,7 @@ final class SubscriptionIconStore {
 extension UIImage {
     func normalizedSquareIcon(size: CGFloat) -> UIImage {
         let targetSize = CGSize(width: size, height: size)
-        let format = UIGraphicsImageRendererFormat().with {
-            $0.scale = 1
+        let format = UIGraphicsImageRendererFormat.default().with {
             $0.opaque = false
         }
         let renderer = UIGraphicsImageRenderer(size: targetSize, format: format)

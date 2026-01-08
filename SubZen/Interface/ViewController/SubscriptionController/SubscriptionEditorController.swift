@@ -812,27 +812,37 @@ extension SubscriptionEditorController {
 
     @MainActor
     private func applyIconData(_ data: Data) async throws {
-        guard let image = UIImage(data: data) else {
-            throw SubscriptionIconApplyError.invalidImageData
-        }
+        let previewImage = try await Task.detached(priority: .userInitiated) {
+            guard let image = UIImage(data: data) else {
+                throw SubscriptionIconApplyError.invalidImageData
+            }
+            return image.normalizedSquareIcon(size: IconPickerConstants.previewSize)
+        }.value
 
-        try await applyIconImage(image)
+        try await applyIconPreviewImage(previewImage)
     }
 
     @MainActor
     private func applyIconImage(_ image: UIImage) async throws {
-        let previewImage = image.normalizedSquareIcon(size: IconPickerConstants.previewSize)
+        let previewImage = await Task.detached(priority: .userInitiated) {
+            image.normalizedSquareIcon(size: IconPickerConstants.previewSize)
+        }.value
 
+        try await applyIconPreviewImage(previewImage)
+    }
+
+    @MainActor
+    private func applyIconPreviewImage(_ previewImage: UIImage) async throws {
         if let editSubscription {
             try await iconStore.saveIcon(previewImage, for: editSubscription.id)
             let saved = await iconStore.icon(for: editSubscription.id)
             editSubscriptionView.updateIconPreview(image: saved)
-            updateIconMenu()
         } else {
             pendingIconImage = previewImage
             editSubscriptionView.updateIconPreview(image: previewImage)
-            updateIconMenu()
         }
+
+        updateIconMenu()
     }
 
     @MainActor

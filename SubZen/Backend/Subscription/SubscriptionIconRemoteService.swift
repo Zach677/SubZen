@@ -220,6 +220,12 @@ final class SubscriptionIconRemoteService {
         guard let http = response as? HTTPURLResponse else {
             throw SubscriptionIconRemoteServiceError.invalidResponse
         }
+        guard let finalURL = http.url else {
+            throw SubscriptionIconRemoteServiceError.invalidResponse
+        }
+        guard finalURL.scheme?.lowercased() == "https" else {
+            throw SubscriptionIconRemoteServiceError.unsupportedScheme
+        }
         guard (200...299).contains(http.statusCode) else {
             throw SubscriptionIconRemoteServiceError.requestFailed(statusCode: http.statusCode)
         }
