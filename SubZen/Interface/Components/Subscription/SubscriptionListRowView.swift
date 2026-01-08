@@ -13,7 +13,40 @@ class SubscriptionListRowView: UIView {
 
     private let progressGradientLayer = CAGradientLayer()
     private var currentProgress: Double = 0
-    func configure(with subscription: Subscription) {
+
+    private let iconImageView = UIImageView().with {
+        $0.contentMode = .scaleAspectFill
+        $0.image = UIImage.subZenAppIconPlaceholder
+        $0.backgroundColor = UIColor.secondarySystemBackground.withAlphaComponent(0.7)
+        $0.layer.cornerRadius = 10
+        $0.layer.cornerCurve = .continuous
+        $0.layer.masksToBounds = true
+    }
+
+    private var iconTask: Task<Void, Never>?
+    private var currentSubscriptionID: UUID?
+
+    func configure(with subscription: Subscription, iconStore: SubscriptionIconStore?) {
+        currentSubscriptionID = subscription.id
+        iconTask?.cancel()
+        iconImageView.image = UIImage.subZenAppIconPlaceholder
+        iconImageView.contentMode = .scaleAspectFill
+
+        if let iconStore {
+            let subscriptionID = subscription.id
+            iconTask = Task { [weak self] in
+                let image = await iconStore.icon(for: subscriptionID)
+                guard !Task.isCancelled else { return }
+                await MainActor.run { [weak self] in
+                    guard let self else { return }
+                    guard self.currentSubscriptionID == subscriptionID else { return }
+                    guard let image else { return }
+                    self.iconImageView.image = image
+                    self.iconImageView.contentMode = .scaleAspectFill
+                }
+            }
+        }
+
         titleLabel.text = subscription.name
         let code = subscription.currencyCode.uppercased()
         let currency = CurrencyList.currency(for: code)
@@ -32,8 +65,8 @@ class SubscriptionListRowView: UIView {
             .string(from: subscription.price as NSDecimalNumber) ?? "\(subscription.price)"
 
         let color = priceLabel.textColor ?? .secondaryLabel
-        let priceFont = UIFont.systemFont(ofSize: 16, weight: .semibold)
-        let metaFont = UIFont.systemFont(ofSize: 12, weight: .regular)
+        let priceFont = UIFont.systemFont(ofSize: 15, weight: .semibold)
+        let metaFont = UIFont.systemFont(ofSize: 11, weight: .regular)
         let prefixAttributes: [NSAttributedString.Key: Any] = [
             .font: metaFont,
             .foregroundColor: color.withAlphaComponent(0.7),
@@ -124,14 +157,24 @@ class SubscriptionListRowView: UIView {
     }
 
     let titleLabel = UILabel().with {
-        $0.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
+        $0.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
         $0.textColor = .label
+        $0.numberOfLines = 2
+        $0.lineBreakMode = .byTruncatingTail
+        $0.allowsDefaultTighteningForTruncation = true
+        $0.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        $0.setContentHuggingPriority(.defaultLow, for: .horizontal)
     }
 
     let priceLabel = UILabel().with {
         $0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         $0.textColor = .secondaryLabel
         $0.textAlignment = .right
+        $0.numberOfLines = 1
+        $0.lineBreakMode = .byTruncatingHead
+        $0.allowsDefaultTighteningForTruncation = true
+        $0.setContentCompressionResistancePriority(.required, for: .horizontal)
+        $0.setContentHuggingPriority(.required, for: .horizontal)
     }
 
     let daysLabel = UILabel().with {
@@ -147,6 +190,8 @@ class SubscriptionListRowView: UIView {
         $0.distribution = .fill
         $0.addArrangedSubview(priceLabel)
         $0.addArrangedSubview(daysLabel)
+        $0.setContentCompressionResistancePriority(.required, for: .horizontal)
+        $0.setContentHuggingPriority(.required, for: .horizontal)
     }
 
     init() {
@@ -167,21 +212,29 @@ class SubscriptionListRowView: UIView {
         layer.insertSublayer(progressGradientLayer, at: 0)
         updateGradientLocations(progress: 0)
 
+        addSubview(iconImageView)
         addSubview(titleLabel)
         addSubview(rightStackView)
 
+        iconImageView.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(12)
+            make.top.equalToSuperview().offset(14)
+            make.size.equalTo(38)
+            make.bottom.lessThanOrEqualToSuperview().offset(-14)
+        }
+
         titleLabel.snp.makeConstraints { make in
-            make.centerY.equalToSuperview()
-            make.leading.equalToSuperview().offset(16)
-            make.trailing.lessThanOrEqualTo(rightStackView.snp.leading).offset(-8)
+            make.top.equalToSuperview().offset(14)
+            make.leading.equalTo(iconImageView.snp.trailing).offset(8)
+            make.trailing.lessThanOrEqualTo(rightStackView.snp.leading).offset(-6)
+            make.bottom.lessThanOrEqualToSuperview().offset(-14)
         }
 
         rightStackView.snp.makeConstraints { make in
-            make.top.greaterThanOrEqualToSuperview().offset(12)
-            make.bottom.lessThanOrEqualToSuperview().offset(-12)
-            make.centerY.equalToSuperview()
-            make.trailing.equalToSuperview().offset(-16)
-            make.leading.greaterThanOrEqualTo(titleLabel.snp.trailing).offset(8)
+            make.top.equalToSuperview().offset(14)
+            make.trailing.equalToSuperview().offset(-12)
+            make.leading.greaterThanOrEqualTo(titleLabel.snp.trailing).offset(6)
+            make.bottom.lessThanOrEqualToSuperview().offset(-14)
         }
     }
 

@@ -30,7 +30,11 @@ extension SubscriptionListView {
         }
 
         func configure(with subscription: Subscription) {
-            cardView.configure(with: subscription)
+            cardView.configure(with: subscription, iconStore: nil)
+        }
+
+        func configure(with subscription: Subscription, iconStore: SubscriptionIconStore?) {
+            cardView.configure(with: subscription, iconStore: iconStore)
         }
     }
 }

@@ -11,7 +11,6 @@ import UserNotifications
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     func application(_: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         UNUserNotificationCenter.current().delegate = self
-        UITableView.appearance().backgroundColor = .clear
         UIButton.appearance().tintColor = .accent
         UITextView.appearance().tintColor = .accent
         UINavigationBar.appearance().tintColor = .accent

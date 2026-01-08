@@ -13,6 +13,7 @@
 		F8A1B00D2F1AABCD00000001 /* NotificationObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1B0092F1AABCD00000001 /* NotificationObserver.swift */; };
 		F8A1B0162F1AABCD00000001 /* SubscriptionExportServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1B0152F1AABCD00000001 /* SubscriptionExportServiceTests.swift */; };
 		F8A1B0182F1AABCD00000001 /* SubscriptionImportServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1B0172F1AABCD00000001 /* SubscriptionImportServiceTests.swift */; };
+		F8A1B01A2F1AABCD00000001 /* SubscriptionIconRemoteServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1B0192F1AABCD00000001 /* SubscriptionIconRemoteServiceTests.swift */; };
 		F8A723A82F0C1CF5006F031B /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = F8A723A72F0C1CF5006F031B /* SnapKit */; };
 		F8A724372F0D00D0006F031B /* GlyphixTextFx in Frameworks */ = {isa = PBXBuildFile; productRef = F8A724362F0D00D0006F031B /* GlyphixTextFx */; };
 /* End PBXBuildFile section */
@@ -36,6 +37,7 @@
 		F8A1B0092F1AABCD00000001 /* NotificationObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationObserver.swift; sourceTree = "<group>"; };
 		F8A1B0152F1AABCD00000001 /* SubscriptionExportServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionExportServiceTests.swift; sourceTree = "<group>"; };
 		F8A1B0172F1AABCD00000001 /* SubscriptionImportServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionImportServiceTests.swift; sourceTree = "<group>"; };
+		F8A1B0192F1AABCD00000001 /* SubscriptionIconRemoteServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionIconRemoteServiceTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -103,6 +105,7 @@
 				F8A1B0052F1AABCD00000001 /* Support */,
 				F8A1B0152F1AABCD00000001 /* SubscriptionExportServiceTests.swift */,
 				F8A1B0172F1AABCD00000001 /* SubscriptionImportServiceTests.swift */,
+				F8A1B0192F1AABCD00000001 /* SubscriptionIconRemoteServiceTests.swift */,
 				F8A1B0062F1AABCD00000001 /* SubscriptionTests.swift */,
 				F8A1B0072F1AABCD00000001 /* SubscriptionManagerTests.swift */,
 			);
@@ -230,6 +233,7 @@
 				F8A1B00D2F1AABCD00000001 /* NotificationObserver.swift in Sources */,
 				F8A1B0162F1AABCD00000001 /* SubscriptionExportServiceTests.swift in Sources */,
 				F8A1B0182F1AABCD00000001 /* SubscriptionImportServiceTests.swift in Sources */,
+				F8A1B01A2F1AABCD00000001 /* SubscriptionIconRemoteServiceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

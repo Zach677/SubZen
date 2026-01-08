@@ -25,7 +25,7 @@ class SubscriptionListView: UIView {
     enum LayoutConstants {
         static let filterHeight: CGFloat = 34
         static let filterContentInset: CGFloat = 0
-        static let rowCardHorizontalInset: CGFloat = 16
+        static let rowCardHorizontalInset: CGFloat = 10
         static let tableContentInset = UIEdgeInsets(top: 0, left: 0, bottom: 16, right: 0)
         static let bottomFadeHeight: CGFloat = 72
         static let titleBarHeight: CGFloat = 64
@@ -77,6 +77,8 @@ class SubscriptionListView: UIView {
 
     private var subscriptions: [Subscription] = []
     private var selectedFilter: Filter = .subscription
+
+    var iconStore: SubscriptionIconStore?
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -223,7 +225,7 @@ extension SubscriptionListView: UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: SubscriptionListView.SubscriptionTableViewCell.reuseIdentifier, for: indexPath) as! SubscriptionListView.SubscriptionTableViewCell
-        cell.configure(with: subscriptions[indexPath.row])
+        cell.configure(with: subscriptions[indexPath.row], iconStore: iconStore)
         return cell
     }
 }
