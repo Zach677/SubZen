@@ -19,6 +19,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         // Create local window variable to avoid repeated optional unwrapping for cleaner code
         let window = UIWindow(windowScene: windowScene)
+        window.backgroundColor = .background
         window.rootViewController = mainController
         // Assign configured window to instance property for retention
         self.window = window

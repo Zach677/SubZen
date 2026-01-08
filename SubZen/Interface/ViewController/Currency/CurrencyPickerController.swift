@@ -50,6 +50,7 @@ final class CurrencyPickerController: UITableViewController {
         definesPresentationContext = true
 
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: Constants.reuseIdentifier)
+        tableView.backgroundColor = .background
         tableView.keyboardDismissMode = .onDrag
     }
 
