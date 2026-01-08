@@ -16,6 +16,7 @@ final class AppStoreIconSearchController: UITableViewController {
 
     private let iconRemoteService: SubscriptionIconRemoteService
     private var results: [AppStoreSearchResult] = []
+    private var shouldFocusSearchOnAppear = true
 
     private var activeSearchToken = UUID()
     private var queryTask: Task<Void, Never>?
@@ -64,6 +65,19 @@ final class AppStoreIconSearchController: UITableViewController {
 
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: Constants.reuseIdentifier)
         tableView.keyboardDismissMode = .onDrag
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+
+        guard shouldFocusSearchOnAppear else { return }
+        shouldFocusSearchOnAppear = false
+
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            self.searchController.isActive = true
+            self.searchController.searchBar.searchTextField.becomeFirstResponder()
+        }
     }
 
     override func tableView(_: UITableView, numberOfRowsInSection _: Int) -> Int {
