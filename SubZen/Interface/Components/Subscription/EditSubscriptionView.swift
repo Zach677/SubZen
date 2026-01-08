@@ -39,9 +39,11 @@ final class EditSubscriptionView: UIView {
         $0.text = String(localized: "Subscription Name")
     }
 
-    private let iconControl = UIControl().with {
+    private let iconControl = UIButton(type: .system).with {
         $0.isAccessibilityElement = true
         $0.accessibilityTraits = .button
+        $0.contentHorizontalAlignment = .fill
+        $0.contentVerticalAlignment = .fill
     }
 
     private let iconImageView = UIImageView().with {
@@ -284,7 +286,6 @@ final class EditSubscriptionView: UIView {
     private var traitChangeRegistrations: [any UITraitChangeRegistration] = []
 
     var onSaveTapped: (() -> Void)?
-    var onIconTapped: (() -> Void)?
     var onCurrencyTapped: (() -> Void)?
     var onReminderSelectionChanged: ((Int?) -> Void)?
     var onReminderBannerTapped: (() -> Void)?
@@ -386,11 +387,6 @@ final class EditSubscriptionView: UIView {
         floatingSaveBar.saveButton.addTarget(
             self,
             action: #selector(saveTapped),
-            for: UIControl.Event.touchUpInside
-        )
-        iconControl.addTarget(
-            self,
-            action: #selector(iconTapped),
             for: UIControl.Event.touchUpInside
         )
         currencyButton.addTarget(
@@ -550,10 +546,6 @@ final class EditSubscriptionView: UIView {
         onSaveTapped?()
     }
 
-    @objc private func iconTapped() {
-        onIconTapped?()
-    }
-
     @objc private func currencyTapped() {
         onCurrencyTapped?()
     }
@@ -637,6 +629,11 @@ final class EditSubscriptionView: UIView {
             iconImageView.image = UIImage.subZenAppIconPlaceholder
             iconControl.accessibilityLabel = String(localized: "No subscription icon")
         }
+    }
+
+    func setIconMenu(_ menu: UIMenu?) {
+        iconControl.menu = menu
+        iconControl.showsMenuAsPrimaryAction = menu != nil
     }
 
     func setIconLoading(_ isLoading: Bool) {

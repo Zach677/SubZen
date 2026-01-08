@@ -41,6 +41,7 @@ enum SubscriptionIconRemoteServiceError: LocalizedError {
 final class SubscriptionIconRemoteService {
     private enum Constants {
         static let defaultMaxBytes = 10 * 1024 * 1024
+        static let defaultAppStoreSearchLimit = 25
     }
 
     private let urlSession: URLSession
@@ -123,6 +124,54 @@ final class SubscriptionIconRemoteService {
 
         throw SubscriptionIconRemoteServiceError.appStoreArtworkMissing
     }
+
+    func searchAppStoreApps(
+        term: String,
+        limit: Int = Constants.defaultAppStoreSearchLimit
+    ) async throws -> [AppStoreSearchResult] {
+        let trimmed = term.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return [] }
+
+        guard var components = URLComponents(string: "https://itunes.apple.com/search") else {
+            throw SubscriptionIconRemoteServiceError.invalidURL
+        }
+
+        let countryCode = Locale.current.region?.identifier.lowercased()
+        var queryItems = [
+            URLQueryItem(name: "term", value: trimmed),
+            URLQueryItem(name: "entity", value: "software"),
+            URLQueryItem(name: "limit", value: String(limit)),
+        ]
+        if let countryCode {
+            queryItems.append(URLQueryItem(name: "country", value: countryCode))
+        }
+        components.queryItems = queryItems
+
+        guard let url = components.url else {
+            throw SubscriptionIconRemoteServiceError.invalidURL
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.timeoutInterval = 30
+        request.cachePolicy = .reloadIgnoringLocalCacheData
+
+        let (data, response) = try await urlSession.data(for: request)
+        guard let http = response as? HTTPURLResponse else {
+            throw SubscriptionIconRemoteServiceError.invalidResponse
+        }
+        guard (200...299).contains(http.statusCode) else {
+            throw SubscriptionIconRemoteServiceError.requestFailed(statusCode: http.statusCode)
+        }
+
+        let search: AppStoreSearchResponse
+        do {
+            search = try JSONDecoder().decode(AppStoreSearchResponse.self, from: data)
+        } catch {
+            throw SubscriptionIconRemoteServiceError.invalidResponse
+        }
+        return search.results
+    }
 }
 
 private struct AppStoreLookupResponse: Decodable {
@@ -133,4 +182,34 @@ private struct AppStoreLookupResult: Decodable {
     let artworkUrl60: URL?
     let artworkUrl100: URL?
     let artworkUrl512: URL?
+}
+
+struct AppStoreSearchResult: Decodable, Hashable {
+    let appID: Int
+    let name: String
+    let sellerName: String?
+    let artworkURL60: URL?
+    let artworkURL100: URL?
+    let artworkURL512: URL?
+
+    var preferredArtworkURL: URL? {
+        artworkURL512 ?? artworkURL100 ?? artworkURL60
+    }
+
+    var listArtworkURL: URL? {
+        artworkURL100 ?? artworkURL60 ?? artworkURL512
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case appID = "trackId"
+        case name = "trackName"
+        case sellerName
+        case artworkURL60 = "artworkUrl60"
+        case artworkURL100 = "artworkUrl100"
+        case artworkURL512 = "artworkUrl512"
+    }
+}
+
+private struct AppStoreSearchResponse: Decodable {
+    let results: [AppStoreSearchResult]
 }
