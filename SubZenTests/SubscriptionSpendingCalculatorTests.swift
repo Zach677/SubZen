@@ -136,7 +136,7 @@ final class SubscriptionSpendingCalculatorTests: XCTestCase {
         )
 
         let subscriptions: [Subscription] = try [
-            Subscription(name: "Daily Sub", price: 1, cycle: .daily, lastBillingDate: .now, currencyCode: "USD"),
+            Subscription(name: "Daily Sub", price: 1, cycle: .custom(value: 1, unit: .day), lastBillingDate: .now, currencyCode: "USD"),
         ]
 
         let result = calculator.monthlyTotal(for: subscriptions, baseCurrencyCode: "USD", ratesSnapshot: snapshot)

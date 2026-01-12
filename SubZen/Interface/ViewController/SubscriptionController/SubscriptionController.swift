@@ -100,7 +100,16 @@ class SubscriptionController: UIViewController {
         case .subscription:
             cachedSubscriptions
                 .filter { !$0.isLifetime }
-                .sorted { $0.remainingDays < $1.remainingDays }
+                .sorted { lhs, rhs in
+                    let lhsEnded = lhs.isEnded()
+                    let rhsEnded = rhs.isEnded()
+
+                    if lhsEnded != rhsEnded {
+                        return !lhsEnded
+                    }
+
+                    return lhs.remainingDays < rhs.remainingDays
+                }
         case .lifetime:
             cachedSubscriptions
                 .filter(\.isLifetime)

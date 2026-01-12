@@ -13,6 +13,7 @@ extension SubscriptionManager {
         price: Decimal,
         cycle: BillingCycle,
         lastBillingDate: Date,
+        endDate: Date? = nil,
         trialPeriod: TrialPeriod? = nil,
         currencyCode: String,
         reminderIntervals: [Int] = []
@@ -22,6 +23,7 @@ extension SubscriptionManager {
             price: price,
             cycle: cycle,
             lastBillingDate: lastBillingDate,
+            endDate: endDate,
             trialPeriod: trialPeriod,
             currencyCode: currencyCode,
             reminderIntervals: reminderIntervals

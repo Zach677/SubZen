@@ -59,6 +59,7 @@ class SubscriptionManager {
         let previousPrice = subscription.price
         let previousCycle = subscription.cycle
         let previousBillingDate = subscription.lastBillingDate
+        let previousEndDate = subscription.endDate
         let previousTrialPeriod = subscription.trialPeriod
         let previousCurrencyCode = subscription.currencyCode
 
@@ -71,6 +72,7 @@ class SubscriptionManager {
             previousPrice != updatedSubscription.price ||
             previousCycle != updatedSubscription.cycle ||
             previousBillingDate != updatedSubscription.lastBillingDate ||
+            previousEndDate != updatedSubscription.endDate ||
             previousTrialPeriod != updatedSubscription.trialPeriod ||
             previousCurrencyCode != updatedSubscription.currencyCode
 

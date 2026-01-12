@@ -138,6 +138,16 @@ final class EditSubscriptionView: UIView {
         $0.text = String(localized: "Last Billing Date")
     }
 
+    let endDateLabel = UILabel().with {
+        $0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        $0.textColor = .label
+        $0.text = String(localized: "End Date")
+    }
+
+    let endDateSwitch = UISwitch().with {
+        $0.isOn = false
+    }
+
     let reminderLabel = UILabel().with {
         $0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         $0.textColor = .label
@@ -156,6 +166,20 @@ final class EditSubscriptionView: UIView {
             contentInsets: Layout.currencyButtonContentInsets
         )
         configuration.image = UIImage(systemName: "calendar")
+        $0.configuration = configuration
+        $0.tintColor = .systemBlue
+        $0.layer.cornerRadius = Layout.currencyButtonCornerRadius
+        $0.layer.cornerCurve = .continuous
+        $0.backgroundColor = UIColor.secondarySystemBackground.withAlphaComponent(0.6)
+        $0.contentHorizontalAlignment = .fill
+    }
+
+    let endDateValueButton = UIButton(type: .system).with {
+        var configuration = EditSubscriptionButtonStyler.makeCurrencyButtonBaseConfiguration(
+            contentInsets: Layout.currencyButtonContentInsets
+        )
+        configuration.image = UIImage(systemName: "calendar.badge.minus")
+        configuration.title = String(localized: "Not set")
         $0.configuration = configuration
         $0.tintColor = .systemBlue
         $0.layer.cornerRadius = Layout.currencyButtonCornerRadius
@@ -251,6 +275,23 @@ final class EditSubscriptionView: UIView {
         $0.addArrangedSubview(nextBillingHintLabel)
     }
 
+    private lazy var endDateContentStack = UIStackView().with {
+        $0.axis = .vertical
+        $0.spacing = Layout.groupSpacing
+        $0.alignment = .fill
+        $0.addArrangedSubview(endDateValueButton)
+    }
+
+    private lazy var endDateHeaderStack = UIStackView().with {
+        let spacer = UIView()
+        $0.axis = .horizontal
+        $0.spacing = Layout.groupSpacing
+        $0.alignment = .center
+        $0.addArrangedSubview(endDateLabel)
+        $0.addArrangedSubview(spacer)
+        $0.addArrangedSubview(endDateSwitch)
+    }
+
     private lazy var nameContentStack = UIStackView().with {
         $0.axis = .horizontal
         $0.spacing = Layout.groupSpacing
@@ -266,6 +307,13 @@ final class EditSubscriptionView: UIView {
     private lazy var cycleSectionView = makeVerticalFormSection(label: cycleLabel, content: cyclePickerView)
     private lazy var trialSectionView = makeVerticalFormSection(label: trialLabel, content: trialContentStack)
     private lazy var dateSectionView = makeVerticalFormSection(label: dateLabel, content: dateContentStack)
+    private lazy var endDateSectionView = UIStackView().with {
+        $0.axis = .vertical
+        $0.spacing = Layout.groupSpacing
+        $0.alignment = .fill
+        $0.addArrangedSubview(endDateHeaderStack)
+        $0.addArrangedSubview(endDateContentStack)
+    }
     private lazy var reminderSectionView = makeVerticalFormSection(label: reminderLabel, content: reminderContentStack)
 
     private lazy var mainStackView = UIStackView().with {
@@ -279,6 +327,7 @@ final class EditSubscriptionView: UIView {
         $0.addArrangedSubview(cycleSectionView)
         $0.addArrangedSubview(trialSectionView)
         $0.addArrangedSubview(dateSectionView)
+        $0.addArrangedSubview(endDateSectionView)
         $0.addArrangedSubview(reminderSectionView)
         $0.addArrangedSubview(bottomSpacer)
     }
@@ -295,6 +344,8 @@ final class EditSubscriptionView: UIView {
     var onTrialSegmentChanged: ((Int) -> Void)?
     var onCustomTrialChanged: ((Int, CycleUnit) -> Void)?
     var onDateTapped: (() -> Void)?
+    var onEndDateTapped: (() -> Void)?
+    var onEndDateSwitchChanged: ((Bool) -> Void)?
 
     init() {
         super.init(frame: .zero)
@@ -304,6 +355,8 @@ final class EditSubscriptionView: UIView {
         setupConstraints()
         setupInteractions()
         registerObservers()
+
+        endDateContentStack.isHidden = true
 
         iconControl.addSubview(iconImageView)
         iconControl.addSubview(iconActivityIndicator)
@@ -413,6 +466,16 @@ final class EditSubscriptionView: UIView {
             self,
             action: #selector(dateTapped),
             for: UIControl.Event.touchUpInside
+        )
+        endDateValueButton.addTarget(
+            self,
+            action: #selector(endDateTapped),
+            for: UIControl.Event.touchUpInside
+        )
+        endDateSwitch.addTarget(
+            self,
+            action: #selector(endDateSwitchChanged(_:)),
+            for: UIControl.Event.valueChanged
         )
 
         if #available(iOS 26.0, *) {
@@ -524,6 +587,14 @@ final class EditSubscriptionView: UIView {
         )
         dateValueButton.configuration?.image = UIImage(systemName: "calendar")
         dateValueButton.tintColor = .systemBlue
+
+        EditSubscriptionButtonStyler.applyCurrencyButtonStyle(
+            to: endDateValueButton,
+            reduceTransparencyActive: reduceTransparency,
+            contentInsets: Layout.currencyButtonContentInsets
+        )
+        endDateValueButton.configuration?.image = UIImage(systemName: "calendar.badge.minus")
+        endDateValueButton.tintColor = .systemBlue
     }
 
     override func layoutSubviews() {
@@ -564,6 +635,14 @@ final class EditSubscriptionView: UIView {
 
     @objc private func dateTapped() {
         onDateTapped?()
+    }
+
+    @objc private func endDateTapped() {
+        onEndDateTapped?()
+    }
+
+    @objc private func endDateSwitchChanged(_ sender: UISwitch) {
+        onEndDateSwitchChanged?(sender.isOn)
     }
 
     func setReminderIntervals(_ intervals: [Int]) {
@@ -653,6 +732,33 @@ final class EditSubscriptionView: UIView {
         }
     }
 
+    func updateEndDateDisplay(dateString: String?) {
+        let title = dateString ?? String(localized: "Not set")
+        endDateValueButton.setTitle(title, for: .normal)
+        if var configuration = endDateValueButton.configuration {
+            configuration.title = title
+            endDateValueButton.configuration = configuration
+        }
+    }
+
+    func setEndDateSelectionVisible(_ visible: Bool, animated: Bool) {
+        let update = {
+            self.endDateContentStack.isHidden = !visible
+            self.layoutIfNeeded()
+        }
+
+        if animated {
+            UIView.animate(
+                withDuration: 0.25,
+                delay: 0,
+                options: [.curveEaseInOut, .beginFromCurrentState],
+                animations: update
+            )
+        } else {
+            update()
+        }
+    }
+
     func updateNextBillingHint(hint: String, highlightRange: NSRange?) {
         let attributedString = NSMutableAttributedString(string: hint)
         if let range = highlightRange {
@@ -682,9 +788,11 @@ final class EditSubscriptionView: UIView {
         let update = {
             self.cycleSectionView.isHidden = enabled
             self.trialSectionView.isHidden = enabled
+            self.endDateSectionView.isHidden = enabled
             self.reminderSectionView.isHidden = enabled
             self.nextBillingHintLabel.isHidden = enabled
             self.dateLabel.text = enabled ? String(localized: "Purchase Date") : String(localized: "Last Billing Date")
+            self.endDateContentStack.isHidden = !self.endDateSwitch.isOn
             self.layoutIfNeeded()
         }
 

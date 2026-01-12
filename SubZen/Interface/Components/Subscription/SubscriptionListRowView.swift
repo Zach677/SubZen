@@ -124,6 +124,9 @@ class SubscriptionListRowView: UIView {
         if subscription.isLifetime {
             daysLabel.text = String(localized: "Lifetime")
             daysLabel.textColor = .secondaryLabel
+        } else if subscription.isEnded() {
+            daysLabel.text = String(localized: "Ended")
+            daysLabel.textColor = .secondaryLabel
         } else {
             let remainingDays = subscription.remainingDays
             let daysLeftKey: String.LocalizationValue = "\(Int64(remainingDays)) days left"

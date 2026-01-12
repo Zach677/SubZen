@@ -100,7 +100,7 @@ class SubscriptionNotificationService: SubscriptionNotificationScheduling {
         }
 
         let remainingDays = subscription.remainingDays
-        let nextBillingDate = subscription.nextBillingDate()
+        let expirationDate = subscription.endDate ?? subscription.nextBillingDate()
         let now = Date()
         var deliveredNotifications: [DeliveredNotificationSnapshot]?
 
@@ -122,8 +122,8 @@ class SubscriptionNotificationService: SubscriptionNotificationScheduling {
             let notificationDate = Calendar.current.date(
                 byAdding: .day,
                 value: -daysBefore,
-                to: nextBillingDate
-            ) ?? nextBillingDate
+                to: expirationDate
+            ) ?? expirationDate
 
             let identifier = "\(subscription.id.uuidString).expiry.\(daysBefore)days"
             let content = createNotificationContent(for: subscription, daysBefore: daysBefore)
@@ -176,28 +176,29 @@ class SubscriptionNotificationService: SubscriptionNotificationScheduling {
     /// Create notification content for a subscription
     private func createNotificationContent(for subscription: Subscription, daysBefore: Int) -> UNMutableNotificationContent {
         let content = UNMutableNotificationContent()
+        let isEnding = subscription.endDate != nil
 
         switch daysBefore {
         case 1:
-            content.title = String(localized: "Subscription Renews Tomorrow!")
-            let key: String.LocalizationValue = "\(subscription.name) will renew tomorrow."
+            content.title = String(localized: isEnding ? "Subscription Ends Tomorrow!" : "Subscription Renews Tomorrow!")
+            let key: String.LocalizationValue = isEnding ? "\(subscription.name) will end tomorrow." : "\(subscription.name) will renew tomorrow."
             content.body = String(localized: key)
         case 3:
-            content.title = String(localized: "Subscription Renews in 3 Days")
-            let key: String.LocalizationValue = "\(subscription.name) will renew in 3 days."
+            content.title = String(localized: isEnding ? "Subscription Ends in 3 Days" : "Subscription Renews in 3 Days")
+            let key: String.LocalizationValue = isEnding ? "\(subscription.name) will end in 3 days." : "\(subscription.name) will renew in 3 days."
             content.body = String(localized: key)
         case 7:
-            content.title = String(localized: "Subscription Renews Next Week")
-            let key: String.LocalizationValue = "\(subscription.name) will renew next week."
+            content.title = String(localized: isEnding ? "Subscription Ends Next Week" : "Subscription Renews Next Week")
+            let key: String.LocalizationValue = isEnding ? "\(subscription.name) will end next week." : "\(subscription.name) will renew next week."
             content.body = String(localized: key)
         case 14:
-            content.title = String(localized: "Subscription Renews in 2 Weeks")
-            let key: String.LocalizationValue = "\(subscription.name) will renew in 2 weeks."
+            content.title = String(localized: isEnding ? "Subscription Ends in 2 Weeks" : "Subscription Renews in 2 Weeks")
+            let key: String.LocalizationValue = isEnding ? "\(subscription.name) will end in 2 weeks." : "\(subscription.name) will renew in 2 weeks."
             content.body = String(localized: key)
         default:
             content.title = String(localized: "Subscription Reminder")
             let daysValue = Int64(daysBefore)
-            let key: String.LocalizationValue = "\(subscription.name) will renew in \(daysValue) days."
+            let key: String.LocalizationValue = isEnding ? "\(subscription.name) will end in \(daysValue) days." : "\(subscription.name) will renew in \(daysValue) days."
             content.body = String(localized: key)
         }
 

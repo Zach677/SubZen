@@ -33,6 +33,24 @@ final class SubscriptionTests: XCTestCase {
         }
     }
 
+    func testInitValidationEndDateBeforeLastBillingDate() {
+        let lastBillingDate = Date()
+        let endDate = lastBillingDate.addingTimeInterval(-24 * 60 * 60)
+
+        XCTAssertThrowsError(
+            try Subscription(
+                name: "Pro",
+                price: 5,
+                cycle: .monthly,
+                lastBillingDate: lastBillingDate,
+                endDate: endDate,
+                currencyCode: "USD"
+            )
+        ) { error in
+            XCTAssertEqual(error as? SubscriptionValidationError, .endDateBeforeLastBillingDate)
+        }
+    }
+
     func testCodableBackwardCompatibilityWithStringCycle() throws {
         // Prepare JSON where cycle is a string (legacy data)
         let json = """
@@ -76,5 +94,59 @@ final class SubscriptionTests: XCTestCase {
         let s = try Subscription(name: "Pro", price: 5, cycle: .weekly, lastBillingDate: lastWeek, currencyCode: "USD")
 
         XCTAssertGreaterThanOrEqual(s.remainingDays, 0)
+    }
+
+    func testRemainingDaysUsesEndDateWhenSet() throws {
+        let calendar = Calendar.current
+        let startOfToday = calendar.startOfDay(for: Date())
+        let lastBillingDate = calendar.date(byAdding: .day, value: -1, to: startOfToday)!
+        let endDate = calendar.date(byAdding: .day, value: 3, to: startOfToday)!
+
+        let subscription = try Subscription(
+            name: "Pro",
+            price: 5,
+            cycle: .monthly,
+            lastBillingDate: lastBillingDate,
+            endDate: endDate,
+            currencyCode: "USD"
+        )
+
+        XCTAssertEqual(subscription.remainingDays, 3)
+    }
+
+    func testMonthlyAmountIsZeroWhenEndDateIsSet() throws {
+        let calendar = Calendar.current
+        let startOfToday = calendar.startOfDay(for: Date())
+        let lastBillingDate = calendar.date(byAdding: .day, value: -1, to: startOfToday)!
+        let endDate = calendar.date(byAdding: .day, value: 3, to: startOfToday)!
+
+        let subscription = try Subscription(
+            name: "Pro",
+            price: 10,
+            cycle: .monthly,
+            lastBillingDate: lastBillingDate,
+            endDate: endDate,
+            currencyCode: "USD"
+        )
+
+        XCTAssertEqual(SubscriptionSpendingCalculator().monthlyAmount(for: subscription), .zero)
+    }
+
+    func testIsEndedTrueWhenEndDateIsInPast() throws {
+        let calendar = Calendar.current
+        let startOfToday = calendar.startOfDay(for: Date())
+        let lastBillingDate = calendar.date(byAdding: .day, value: -30, to: startOfToday)!
+        let endDate = calendar.date(byAdding: .day, value: -1, to: startOfToday)!
+
+        let subscription = try Subscription(
+            name: "Pro",
+            price: 10,
+            cycle: .monthly,
+            lastBillingDate: lastBillingDate,
+            endDate: endDate,
+            currencyCode: "USD"
+        )
+
+        XCTAssertTrue(subscription.isEnded())
     }
 }

@@ -252,6 +252,7 @@ enum SubscriptionValidationError: LocalizedError {
     case negativePriceQuestionablePrice
     case invalidCurrency
     case futureBillingDate
+    case endDateBeforeLastBillingDate
 
     var errorDescription: String? {
         switch self {
@@ -263,6 +264,8 @@ enum SubscriptionValidationError: LocalizedError {
             String(localized: "Invalid currency code")
         case .futureBillingDate:
             String(localized: "Last billing date cannot be in the future")
+        case .endDateBeforeLastBillingDate:
+            String(localized: "End date cannot be earlier than last billing date")
         }
     }
 }
@@ -275,6 +278,7 @@ final class Subscription: Codable, Identifiable, Equatable {
     var price: Decimal
     var cycle: BillingCycle
     var lastBillingDate: Date
+    var endDate: Date?
     var trialPeriod: TrialPeriod?
     var currencyCode: String
     var reminderIntervals: [Int] // Days before expiration to send reminders (e.g., [1, 7, 14])
@@ -288,6 +292,7 @@ final class Subscription: Codable, Identifiable, Equatable {
         price: Decimal = 0.0,
         cycle: BillingCycle = .monthly,
         lastBillingDate: Date = .now,
+        endDate: Date? = nil,
         trialPeriod: TrialPeriod? = nil,
         currencyCode: String = "USD",
         reminderIntervals: [Int] = []
@@ -298,6 +303,7 @@ final class Subscription: Codable, Identifiable, Equatable {
             name: name,
             price: price,
             lastBillingDate: lastBillingDate,
+            endDate: endDate,
             currencyCode: normalizedCurrencyCode
         )
 
@@ -305,6 +311,7 @@ final class Subscription: Codable, Identifiable, Equatable {
         self.price = price
         self.cycle = cycle
         self.lastBillingDate = lastBillingDate
+        self.endDate = endDate
         self.trialPeriod = trialPeriod
         self.currencyCode = normalizedCurrencyCode
         self.reminderIntervals = reminderIntervals
@@ -312,7 +319,11 @@ final class Subscription: Codable, Identifiable, Equatable {
 
     /// Input validation
     private static func validateInputs(
-        name: String, price: Decimal, lastBillingDate: Date, currencyCode: String
+        name: String,
+        price: Decimal,
+        lastBillingDate: Date,
+        endDate: Date?,
+        currencyCode: String
     ) throws {
         guard !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             throw SubscriptionValidationError.emptyName
@@ -326,6 +337,10 @@ final class Subscription: Codable, Identifiable, Equatable {
             throw SubscriptionValidationError.futureBillingDate
         }
 
+        if let endDate, endDate < lastBillingDate {
+            throw SubscriptionValidationError.endDateBeforeLastBillingDate
+        }
+
         // Basic currency validation (you can enhance this with Currency enum validation)
         guard currencyCode.count == 3 else {
             throw SubscriptionValidationError.invalidCurrency
@@ -337,7 +352,7 @@ final class Subscription: Codable, Identifiable, Equatable {
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, name, price, cycle, lastBillingDate, trialPeriod, currencyCode, reminderIntervals
+        case id, name, price, cycle, lastBillingDate, endDate, trialPeriod, currencyCode, reminderIntervals
     }
 
     required init(from decoder: Decoder) throws {
@@ -350,6 +365,7 @@ final class Subscription: Codable, Identifiable, Equatable {
         cycle = try container.decode(BillingCycle.self, forKey: .cycle)
 
         lastBillingDate = try container.decode(Date.self, forKey: .lastBillingDate)
+        endDate = try container.decodeIfPresent(Date.self, forKey: .endDate)
         trialPeriod = try container.decodeIfPresent(TrialPeriod.self, forKey: .trialPeriod)
         currencyCode = try container.decode(String.self, forKey: .currencyCode).uppercased()
 
@@ -364,6 +380,7 @@ final class Subscription: Codable, Identifiable, Equatable {
         try container.encode(price, forKey: .price)
         try container.encode(cycle, forKey: .cycle)
         try container.encode(lastBillingDate, forKey: .lastBillingDate)
+        try container.encodeIfPresent(endDate, forKey: .endDate)
         try container.encodeIfPresent(trialPeriod, forKey: .trialPeriod)
         try container.encode(currencyCode, forKey: .currencyCode)
         try container.encode(reminderIntervals, forKey: .reminderIntervals)
@@ -373,8 +390,13 @@ final class Subscription: Codable, Identifiable, Equatable {
 
     static func == (lhs: Subscription, rhs: Subscription) -> Bool {
         lhs.id == rhs.id && lhs.name == rhs.name && lhs.price == rhs.price && lhs.cycle == rhs.cycle
-            && lhs.lastBillingDate == rhs.lastBillingDate && lhs.currencyCode == rhs.currencyCode
+            && lhs.lastBillingDate == rhs.lastBillingDate && lhs.endDate == rhs.endDate && lhs.currencyCode == rhs.currencyCode
             && lhs.trialPeriod == rhs.trialPeriod && lhs.reminderIntervals == rhs.reminderIntervals
+    }
+
+    func isEnded(on date: Date = .now, calendar: Calendar = .current) -> Bool {
+        guard let endDate else { return false }
+        return calendar.startOfDay(for: endDate) < calendar.startOfDay(for: date)
     }
 
     // MARK: - priceLabel formatting
@@ -409,6 +431,15 @@ final class Subscription: Codable, Identifiable, Equatable {
 
         let currentDate = Date()
         let calendar = Calendar.current
+
+        if let endDate {
+            let startOfCurrentDay = calendar.startOfDay(for: currentDate)
+            let startOfEndDay = calendar.startOfDay(for: endDate)
+            let components = calendar.dateComponents(
+                [.day], from: startOfCurrentDay, to: startOfEndDay
+            )
+            return max(0, components.day ?? 0)
+        }
 
         if let trialEnd = trialEndDate(calendar: calendar) {
             if calendar.isDate(trialEnd, inSameDayAs: currentDate) {

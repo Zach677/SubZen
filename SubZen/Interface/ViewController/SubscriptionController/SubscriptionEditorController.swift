@@ -24,6 +24,7 @@ class SubscriptionEditorController: UIViewController {
     private var selectedCurrency: Currency
     private var selectedCycle: BillingCycle = .monthly
     private var selectedTrialPeriod: TrialPeriod?
+    private var selectedEndDate: Date?
     private var isLifetimeSelected = false
     private var pendingIconImage: UIImage?
 
@@ -68,10 +69,15 @@ class SubscriptionEditorController: UIViewController {
             editSubscriptionView.priceTextField.text = NSDecimalNumber(decimal: existingSubscription.price).stringValue
             editSubscriptionView.datePicker.date = existingSubscription.lastBillingDate
             editSubscriptionView.setReminderIntervals(existingSubscription.reminderIntervals)
+            selectedEndDate = existingSubscription.endDate
 
             isLifetimeSelected = existingSubscription.isLifetime
             editSubscriptionView.billingTypeSegmentedControl.selectedSegmentIndex = isLifetimeSelected ? 1 : 0
             editSubscriptionView.setLifetimeModeEnabled(isLifetimeSelected, animated: false)
+
+            if isLifetimeSelected {
+                selectedEndDate = nil
+            }
 
             if isLifetimeSelected {
                 selectedCycle = .monthly
@@ -101,7 +107,12 @@ class SubscriptionEditorController: UIViewController {
 
             selectedTrialPeriod = nil
             editSubscriptionView.trialSegmentedControl.selectedSegmentIndex = 0
+            selectedEndDate = nil
         }
+
+        let isEndDateEnabled = selectedEndDate != nil
+        editSubscriptionView.endDateSwitch.isOn = isEndDateEnabled
+        editSubscriptionView.setEndDateSelectionVisible(isEndDateEnabled, animated: false)
         editSubscriptionView.updateSelectedCurrencyDisplay(with: selectedCurrency)
         editSubscriptionView.onSaveTapped = { [weak self] in
             self?.handleSave()
@@ -132,6 +143,12 @@ class SubscriptionEditorController: UIViewController {
         }
         editSubscriptionView.onDateTapped = { [weak self] in
             self?.handleDateTapped()
+        }
+        editSubscriptionView.onEndDateTapped = { [weak self] in
+            self?.handleEndDateTapped()
+        }
+        editSubscriptionView.onEndDateSwitchChanged = { [weak self] isEnabled in
+            self?.handleEndDateSwitchChanged(isEnabled)
         }
 
         title = editSubscription == nil ? String(localized: "New Subscription") : String(localized: "Edit Subscription")
@@ -246,9 +263,36 @@ class SubscriptionEditorController: UIViewController {
     private func handleBillingTypeSegmentChanged(_ index: Int) {
         isLifetimeSelected = index == 1
         editSubscriptionView.setLifetimeModeEnabled(isLifetimeSelected, animated: true)
+        if isLifetimeSelected {
+            selectedEndDate = nil
+            editSubscriptionView.endDateSwitch.isOn = false
+            editSubscriptionView.setEndDateSelectionVisible(false, animated: true)
+        }
         updateTrialHint()
         updateNextBillingHint()
         updateReminderPermissionBanner()
+    }
+
+    private func handleEndDateSwitchChanged(_ isEnabled: Bool) {
+        guard !isLifetimeSelected else {
+            editSubscriptionView.endDateSwitch.isOn = false
+            editSubscriptionView.setEndDateSelectionVisible(false, animated: true)
+            selectedEndDate = nil
+            updateNextBillingHint()
+            return
+        }
+
+        if isEnabled {
+            if selectedEndDate == nil {
+                let lastDate = editSubscriptionView.datePicker.date
+                selectedEndDate = calculateNextBillingBoundaryDate(lastBillingDate: lastDate)
+            }
+        } else {
+            selectedEndDate = nil
+        }
+
+        editSubscriptionView.setEndDateSelectionVisible(isEnabled, animated: true)
+        updateNextBillingHint()
     }
 
     private func handleSave() {
@@ -261,6 +305,9 @@ class SubscriptionEditorController: UIViewController {
     private func performSave() async {
         let cycle: BillingCycle = isLifetimeSelected ? .lifetime : selectedCycle
         let trialPeriod: TrialPeriod? = isLifetimeSelected ? nil : selectedTrialPeriod
+        if isLifetimeSelected {
+            selectedEndDate = nil
+        }
         view.endEditing(true)
 
         let name = (editSubscriptionView.nameTextField.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
@@ -280,6 +327,8 @@ class SubscriptionEditorController: UIViewController {
         }
 
         let reminderIntervals = isLifetimeSelected ? [] : editSubscriptionView.selectedReminderIntervals()
+        clampSelectedEndDateIfNeeded()
+        let endDate = isLifetimeSelected ? nil : selectedEndDate
 
         if reminderPermissionPresenter.shouldRequestPermissionOnSelectionChange(hasReminderSelection: !reminderIntervals.isEmpty) {
             await notificationPermissionService.requestNotificationPermission()
@@ -294,6 +343,7 @@ class SubscriptionEditorController: UIViewController {
                     editingSubscription.lastBillingDate = date
                     editingSubscription.cycle = cycle
                     editingSubscription.trialPeriod = trialPeriod
+                    editingSubscription.endDate = endDate
                     editingSubscription.currencyCode = selectedCurrency.code
                     editingSubscription.reminderIntervals = reminderIntervals
                 }
@@ -303,6 +353,7 @@ class SubscriptionEditorController: UIViewController {
                     price: price,
                     cycle: cycle,
                     lastBillingDate: date,
+                    endDate: endDate,
                     trialPeriod: trialPeriod,
                     currencyCode: selectedCurrency.code,
                     reminderIntervals: reminderIntervals
@@ -453,6 +504,70 @@ class SubscriptionEditorController: UIViewController {
         editSubscriptionView.updateLastBillingDisplay(dateString: dateString)
     }
 
+    private func updateEndDateDisplay() {
+        guard let endDate = selectedEndDate else {
+            editSubscriptionView.updateEndDateDisplay(dateString: nil)
+            return
+        }
+
+        let formatter = DateFormatter()
+        formatter.dateStyle = .long
+        formatter.timeStyle = .none
+        let dateString = formatter.string(from: endDate)
+        editSubscriptionView.updateEndDateDisplay(dateString: dateString)
+    }
+
+    private func clampSelectedEndDateIfNeeded() {
+        guard !isLifetimeSelected else {
+            selectedEndDate = nil
+            updateEndDateDisplay()
+            return
+        }
+
+        guard let selectedEndDate else {
+            updateEndDateDisplay()
+            return
+        }
+
+        let lastDate = editSubscriptionView.datePicker.date
+        var clampedDate = selectedEndDate
+        if clampedDate < lastDate {
+            clampedDate = lastDate
+        }
+
+        self.selectedEndDate = clampedDate
+        updateEndDateDisplay()
+    }
+
+    private func calculateNextBillingBoundaryDate(lastBillingDate: Date) -> Date {
+        let cycle = selectedCycle
+
+        let calendar = Calendar.current
+        let now = Date()
+        var nextDate: Date = if let trialPeriod = selectedTrialPeriod,
+                                let trialEnd = trialPeriod.endDate(from: lastBillingDate, calendar: calendar)
+        {
+            trialEnd
+        } else {
+            calendar.date(
+                byAdding: cycle.calendarComponent,
+                value: cycle.calendarValue,
+                to: lastBillingDate
+            ) ?? lastBillingDate
+        }
+
+        while !calendar.isDate(nextDate, inSameDayAs: now), nextDate < now {
+            guard let next = calendar.date(
+                byAdding: cycle.calendarComponent,
+                value: cycle.calendarValue,
+                to: nextDate
+            ) else { break }
+            nextDate = next
+        }
+
+        return nextDate
+    }
+
     private func updateTrialHint() {
         guard !isLifetimeSelected else {
             editSubscriptionView.updateTrialHint(hint: nil, highlightRange: nil)
@@ -485,42 +600,88 @@ class SubscriptionEditorController: UIViewController {
         }
 
         let lastDate = editSubscriptionView.datePicker.date
-        let cycle = selectedCycle
-
-        // Calculate next billing date
-        let calendar = Calendar.current
-        let now = Date()
-        var nextDate: Date = if let trialPeriod = selectedTrialPeriod,
-                                let trialEnd = trialPeriod.endDate(from: lastDate, calendar: calendar)
-        {
-            trialEnd
-        } else {
-            calendar.date(
-                byAdding: cycle.calendarComponent,
-                value: cycle.calendarValue,
-                to: lastDate
-            ) ?? lastDate
-        }
-
-        while !calendar.isDate(nextDate, inSameDayAs: now), nextDate < now {
-            guard let next = calendar.date(
-                byAdding: cycle.calendarComponent,
-                value: cycle.calendarValue,
-                to: nextDate
-            ) else { break }
-            nextDate = next
-        }
+        let nextDate = calculateNextBillingBoundaryDate(lastBillingDate: lastDate)
+        clampSelectedEndDateIfNeeded()
 
         let formatter = DateFormatter()
         formatter.dateStyle = .long
         formatter.timeStyle = .none
-        let dateString = formatter.string(from: nextDate)
+        let dateString = formatter.string(from: selectedEndDate ?? nextDate)
 
-        let fullTextKey: String.LocalizationValue = "Next billing date will be on \(dateString)"
+        let fullTextKey: String.LocalizationValue = if selectedEndDate == nil {
+            "Next billing date will be on \(dateString)"
+        } else {
+            "Subscription ends on \(dateString)"
+        }
         let fullText = String(localized: fullTextKey)
         let range = (fullText as NSString).range(of: dateString)
 
         editSubscriptionView.updateNextBillingHint(hint: fullText, highlightRange: range)
+    }
+
+    private func handleEndDateTapped() {
+        guard !isLifetimeSelected else { return }
+
+        let lastDate = editSubscriptionView.datePicker.date
+        let suggestedDate = calculateNextBillingBoundaryDate(lastBillingDate: lastDate)
+
+        let pickerController = UIViewController()
+        pickerController.view.backgroundColor = .systemBackground
+
+        let picker = UIDatePicker().with {
+            $0.datePickerMode = .date
+            $0.preferredDatePickerStyle = .inline
+            $0.minimumDate = lastDate
+            $0.date = selectedEndDate ?? suggestedDate
+        }
+
+        let removeButton = UIButton(type: .system).with {
+            $0.setTitle(String(localized: "Remove End Date"), for: .normal)
+            $0.setTitleColor(.systemRed, for: .normal)
+            $0.isHidden = selectedEndDate == nil
+        }
+
+        removeButton.addAction(
+            UIAction { [weak self, weak pickerController] _ in
+                guard let self else { return }
+                self.selectedEndDate = nil
+                self.editSubscriptionView.endDateSwitch.isOn = false
+                self.editSubscriptionView.setEndDateSelectionVisible(false, animated: true)
+                self.updateNextBillingHint()
+                pickerController?.dismiss(animated: true)
+            },
+            for: .touchUpInside
+        )
+
+        let stackView = UIStackView(arrangedSubviews: [picker, removeButton]).with {
+            $0.axis = .vertical
+            $0.spacing = 12
+            $0.alignment = .fill
+        }
+
+        pickerController.view.addSubview(stackView)
+        stackView.snp.makeConstraints { make in
+            make.top.leading.trailing.equalToSuperview().inset(16)
+        }
+
+        picker.addTarget(self, action: #selector(inlineEndDatePickerChanged(_:)), for: .valueChanged)
+
+        if let sheet = pickerController.sheetPresentationController {
+            sheet.detents = [.medium(), .large()]
+            sheet.prefersGrabberVisible = true
+        }
+
+        present(pickerController, animated: true)
+    }
+
+    @objc private func inlineEndDatePickerChanged(_ sender: UIDatePicker) {
+        if !editSubscriptionView.endDateSwitch.isOn {
+            editSubscriptionView.endDateSwitch.isOn = true
+            editSubscriptionView.setEndDateSelectionVisible(true, animated: false)
+        }
+        selectedEndDate = sender.date
+        updateEndDateDisplay()
+        updateNextBillingHint()
     }
 
     private func handleDateTapped() {

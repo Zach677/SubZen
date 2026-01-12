@@ -84,6 +84,7 @@ struct SubscriptionSpendingCalculator {
     }
 
     func monthlyAmount(for subscription: Subscription) -> Decimal {
+        guard subscription.endDate == nil else { return .zero }
         guard !subscription.isInTrial() else { return .zero }
 
         switch subscription.cycle {

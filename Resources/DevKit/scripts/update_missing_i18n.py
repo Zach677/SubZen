@@ -50,14 +50,6 @@ NEW_STRINGS: dict[str, dict[str, str]] = {
         "ko": "아이콘을 설정하는 방법을 선택하세요.",
         "zh-Hans": "选择设置图标的方式。",
     },
-    "Edit Icon": {
-        "de": "Icon bearbeiten",
-        "es": "Editar icono",
-        "fr": "Modifier l’icône",
-        "ja": "アイコンを編集",
-        "ko": "아이콘 편집",
-        "zh-Hans": "编辑图标",
-    },
     "Failed to encode icon image.": {
         "de": "Icon-Bild konnte nicht kodiert werden.",
         "es": "No se pudo codificar la imagen del icono.",
@@ -234,12 +226,143 @@ NEW_STRINGS: dict[str, dict[str, str]] = {
         "ko": "https://example.com/icon.png",
         "zh-Hans": "https://example.com/icon.png",
     },
+    "End Date": {
+        "de": "Enddatum",
+        "es": "Fecha de finalización",
+        "fr": "Date de fin",
+        "ja": "終了日",
+        "ko": "종료일",
+        "zh-Hans": "结束日期",
+    },
+    "End date cannot be earlier than last billing date": {
+        "de": "Das Enddatum darf nicht vor dem letzten Abrechnungsdatum liegen",
+        "es": "La fecha de finalización no puede ser anterior a la última fecha de facturación",
+        "fr": "La date de fin ne peut pas être antérieure à la dernière date de facturation",
+        "ja": "終了日は最終請求日より前にできません",
+        "ko": "종료일은 마지막 결제일보다 이전일 수 없습니다",
+        "zh-Hans": "结束日期不能早于上次扣费日期",
+    },
+    "Ended": {
+        "de": "Beendet",
+        "es": "Finalizada",
+        "fr": "Terminé",
+        "ja": "終了",
+        "ko": "종료됨",
+        "zh-Hans": "已结束",
+    },
+    "Not set": {
+        "de": "Nicht festgelegt",
+        "es": "No establecido",
+        "fr": "Non défini",
+        "ja": "未設定",
+        "ko": "설정 안 됨",
+        "zh-Hans": "未设置",
+    },
+    "Remove End Date": {
+        "de": "Enddatum entfernen",
+        "es": "Eliminar fecha de finalización",
+        "fr": "Supprimer la date de fin",
+        "ja": "終了日を削除",
+        "ko": "종료일 제거",
+        "zh-Hans": "移除结束日期",
+    },
+    "Subscription Ends in 2 Weeks": {
+        "de": "Abonnement endet in 2 Wochen",
+        "es": "La suscripción termina en 2 semanas",
+        "fr": "L’abonnement se termine dans 2 semaines",
+        "ja": "サブスクリプションは2週間後に終了します",
+        "ko": "구독이 2주 후에 종료됩니다",
+        "zh-Hans": "订阅将于 2 周后结束",
+    },
+    "Subscription Ends in 3 Days": {
+        "de": "Abonnement endet in 3 Tagen",
+        "es": "La suscripción termina en 3 días",
+        "fr": "L’abonnement se termine dans 3 jours",
+        "ja": "サブスクリプションは3日後に終了します",
+        "ko": "구독이 3일 후에 종료됩니다",
+        "zh-Hans": "订阅将于 3 天后结束",
+    },
+    "Subscription Ends Next Week": {
+        "de": "Abonnement endet nächste Woche",
+        "es": "La suscripción termina la próxima semana",
+        "fr": "L’abonnement se termine la semaine prochaine",
+        "ja": "サブスクリプションは来週終了します",
+        "ko": "구독이 다음 주에 종료됩니다",
+        "zh-Hans": "订阅将于下周结束",
+    },
+    "Subscription Ends Tomorrow!": {
+        "de": "Abonnement endet morgen!",
+        "es": "¡La suscripción termina mañana!",
+        "fr": "L’abonnement se termine demain !",
+        "ja": "サブスクリプションは明日終了します！",
+        "ko": "구독이 내일 종료됩니다!",
+        "zh-Hans": "订阅将于明天结束！",
+    },
+    "Subscription ends on %@": {
+        "de": "Abo endet am %@",
+        "es": "La suscripción finaliza el %@",
+        "fr": "L’abonnement se termine le %@",
+        "ja": "サブスクリプションは%@に終了します",
+        "ko": "구독은 %@에 종료됩니다",
+        "zh-Hans": "订阅将于 %@ 结束",
+    },
+    "%@ will end in %lld days.": {
+        "de": "%@ endet in %lld Tagen.",
+        "es": "%@ termina en %lld días.",
+        "fr": "%@ se termine dans %lld jours.",
+        "ja": "%@は%lld日後に終了します。",
+        "ko": "%@이(가) %lld일 후에 종료됩니다.",
+        "zh-Hans": "%@ 将于 %lld 天后结束。",
+    },
+    "%@ will end in 2 weeks.": {
+        "de": "%@ endet in 2 Wochen.",
+        "es": "%@ termina en 2 semanas.",
+        "fr": "%@ se termine dans 2 semaines.",
+        "ja": "%@は2週間後に終了します。",
+        "ko": "%@이(가) 2주 후에 종료됩니다.",
+        "zh-Hans": "%@ 将于 2 周后结束。",
+    },
+    "%@ will end in 3 days.": {
+        "de": "%@ endet in 3 Tagen.",
+        "es": "%@ termina en 3 días.",
+        "fr": "%@ se termine dans 3 jours.",
+        "ja": "%@は3日後に終了します。",
+        "ko": "%@이(가) 3일 후에 종료됩니다.",
+        "zh-Hans": "%@ 将于 3 天后结束。",
+    },
+    "%@ will end next week.": {
+        "de": "%@ endet nächste Woche.",
+        "es": "%@ termina la próxima semana.",
+        "fr": "%@ se termine la semaine prochaine.",
+        "ja": "%@は来週終了します。",
+        "ko": "%@이(가) 다음 주에 종료됩니다.",
+        "zh-Hans": "%@ 将于下周结束。",
+    },
+    "%@ will end tomorrow.": {
+        "de": "%@ endet morgen.",
+        "es": "%@ termina mañana.",
+        "fr": "%@ se termine demain.",
+        "ja": "%@は明日終了します。",
+        "ko": "%@이(가) 내일 종료됩니다.",
+        "zh-Hans": "%@ 将于明天结束。",
+    },
+}
+
+# Keys removed from the app that should be deleted from the xcstrings file.
+REMOVED_STRINGS: set[str] = {
+    "Stop Renewing",
 }
 
 if __name__ == "__main__":
     file_path = sys.argv[1] if len(sys.argv) > 1 else default_file_path()
 
     data = load_strings(file_path)
+    removed_keys: list[str] = []
+    for key in REMOVED_STRINGS:
+        if key in data.get("strings", {}):
+            del data["strings"][key]
+            removed_keys.append(key)
+
     counts = update_missing_translations(
         data,
         new_strings=NEW_STRINGS,
@@ -248,3 +371,8 @@ if __name__ == "__main__":
     save_strings(file_path, data)
 
     print_update_summary(file_path, counts)
+    if removed_keys:
+        print()
+        print("Removed keys:")
+        for key in sorted(removed_keys):
+            print(f"  - {key}")
