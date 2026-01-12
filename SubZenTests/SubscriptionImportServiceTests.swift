@@ -231,4 +231,50 @@ final class SubscriptionImportServiceTests: XCTestCase {
         // Preview should not modify data
         XCTAssertEqual(SubscriptionManager.shared.allSubscriptions().count, 0)
     }
+
+    func testImportWithIconsRestoresIconFiles() throws {
+        let iconsDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("subzen-import-icons-tests", isDirectory: true)
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: iconsDirectory) }
+
+        let iconFileStore = SubscriptionIconFileStore(iconsDirectoryURL: iconsDirectory)
+        importService = SubscriptionImportService(iconFileStore: iconFileStore)
+
+        let exportSubscription = try Subscription(
+            name: "Netflix",
+            price: 15.99,
+            cycle: .monthly,
+            lastBillingDate: Date(timeIntervalSince1970: 1_700_000_000),
+            currencyCode: "USD",
+            reminderIntervals: []
+        )
+        exportSubscription.id = UUID()
+
+        let iconPayload = Data([9, 8, 7, 6, 5])
+        let exportData = SubscriptionExportData(
+            version: SubscriptionExportData.currentVersion,
+            exportedAt: Date(timeIntervalSince1970: 1_700_000_000),
+            subscriptions: [exportSubscription],
+            icons: [SubscriptionIconExport(subscriptionID: exportSubscription.id, pngData: iconPayload)]
+        )
+
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        let fileURL = FileManager.default.temporaryDirectory.appendingPathComponent("test-import-\(UUID().uuidString).json")
+        tempFileURL = fileURL
+        try encoder.encode(exportData).write(to: fileURL, options: .atomic)
+
+        let result = try importService.importFromJSON(fileURL: fileURL, mode: .replace)
+        XCTAssertEqual(result.imported, 1)
+        XCTAssertEqual(result.skipped, 0)
+
+        guard let created = SubscriptionManager.shared.allSubscriptions().first else {
+            XCTFail("Expected imported subscription")
+            return
+        }
+
+        XCTAssertTrue(iconFileStore.iconExists(for: created.id))
+        XCTAssertEqual(try iconFileStore.loadIconData(for: created.id), iconPayload)
+    }
 }

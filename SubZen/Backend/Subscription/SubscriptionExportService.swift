@@ -9,12 +9,18 @@ import Foundation
 
 // MARK: - Export Data Structure
 
+struct SubscriptionIconExport: Codable, Equatable {
+    let subscriptionID: UUID
+    let pngData: Data
+}
+
 struct SubscriptionExportData: Codable {
     let version: Int
     let exportedAt: Date
     let subscriptions: [Subscription]
+    let icons: [SubscriptionIconExport]?
 
-    static let currentVersion = 2
+    static let currentVersion = 3
 }
 
 // MARK: - Export Error
@@ -40,13 +46,16 @@ enum SubscriptionExportError: LocalizedError {
 final class SubscriptionExportService {
     private let subscriptionProvider: () -> [Subscription]
     private let fileManager: FileManager
+    private let iconFileStore: SubscriptionIconFileStore
 
     init(
         subscriptionProvider: @escaping () -> [Subscription] = { SubscriptionManager.shared.allSubscriptions() },
-        fileManager: FileManager = .default
+        fileManager: FileManager = .default,
+        iconFileStore: SubscriptionIconFileStore = SubscriptionIconFileStore()
     ) {
         self.subscriptionProvider = subscriptionProvider
         self.fileManager = fileManager
+        self.iconFileStore = iconFileStore
     }
 
     /// Exports all subscriptions to a JSON file in the temporary directory.
@@ -54,10 +63,12 @@ final class SubscriptionExportService {
     /// - Throws: `SubscriptionExportError` if export fails
     func exportToJSON() throws -> URL {
         let subscriptions = subscriptionProvider()
+        let icons = loadIcons(for: subscriptions)
         let exportData = SubscriptionExportData(
             version: SubscriptionExportData.currentVersion,
             exportedAt: Date(),
-            subscriptions: subscriptions
+            subscriptions: subscriptions,
+            icons: icons
         )
 
         let encoder = JSONEncoder()
@@ -94,5 +105,18 @@ final class SubscriptionExportService {
         dateFormatter.dateFormat = "yyyy-MM-dd"
         let dateString = dateFormatter.string(from: Date())
         return "SubZen-Subscriptions-\(dateString).json"
+    }
+
+    private func loadIcons(for subscriptions: [Subscription]) -> [SubscriptionIconExport]? {
+        let icons = subscriptions.compactMap { subscription -> SubscriptionIconExport? in
+            do {
+                guard let data = try iconFileStore.loadIconData(for: subscription.id) else { return nil }
+                return SubscriptionIconExport(subscriptionID: subscription.id, pngData: data)
+            } catch {
+                return nil
+            }
+        }
+
+        return icons.isEmpty ? nil : icons
     }
 }

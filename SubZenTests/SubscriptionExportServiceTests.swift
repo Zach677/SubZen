@@ -118,4 +118,42 @@ final class SubscriptionExportServiceTests: XCTestCase {
         let nonExistentURL = fileManager.temporaryDirectory.appendingPathComponent("non-existent-file.json")
         exportService.cleanupExportFile(at: nonExistentURL)
     }
+
+    func testExportIncludesIconsWhenAvailable() throws {
+        let iconsDirectory = fileManager.temporaryDirectory
+            .appendingPathComponent("subzen-export-icons-tests", isDirectory: true)
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        defer { try? fileManager.removeItem(at: iconsDirectory) }
+
+        let iconFileStore = SubscriptionIconFileStore(iconsDirectoryURL: iconsDirectory, fileManager: fileManager)
+
+        let subscription = try Subscription(
+            name: "Netflix",
+            price: 15.99,
+            cycle: .monthly,
+            lastBillingDate: Date(timeIntervalSince1970: 1_700_000_000),
+            currencyCode: "USD",
+            reminderIntervals: []
+        )
+        subscription.id = UUID()
+
+        let iconPayload = Data([0, 1, 2, 3, 4])
+        try iconFileStore.saveIconData(iconPayload, for: subscription.id)
+
+        exportService = SubscriptionExportService(
+            subscriptionProvider: { [subscription] },
+            fileManager: fileManager,
+            iconFileStore: iconFileStore
+        )
+
+        let fileURL = try exportService.exportToJSON()
+        let data = try Data(contentsOf: fileURL)
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        let exportData = try decoder.decode(SubscriptionExportData.self, from: data)
+
+        XCTAssertEqual(exportData.icons, [SubscriptionIconExport(subscriptionID: subscription.id, pngData: iconPayload)])
+
+        exportService.cleanupExportFile(at: fileURL)
+    }
 }

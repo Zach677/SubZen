@@ -52,9 +52,14 @@ enum SubscriptionImportError: LocalizedError {
 
 final class SubscriptionImportService {
     private let subscriptionManager: SubscriptionManager
+    private let iconFileStore: SubscriptionIconFileStore
 
-    init(subscriptionManager: SubscriptionManager = .shared) {
+    init(
+        subscriptionManager: SubscriptionManager = .shared,
+        iconFileStore: SubscriptionIconFileStore = SubscriptionIconFileStore()
+    ) {
         self.subscriptionManager = subscriptionManager
+        self.iconFileStore = iconFileStore
     }
 
     /// Previews the import data without actually importing.
@@ -103,6 +108,13 @@ final class SubscriptionImportService {
             subscriptionManager.eraseAll()
         }
 
+        var iconDataBySubscriptionID: [UUID: Data] = [:]
+        if let icons = exportData.icons {
+            for icon in icons {
+                iconDataBySubscriptionID[icon.subscriptionID] = icon.pngData
+            }
+        }
+
         var imported = 0
         var skipped = 0
         let existingSubscriptions = subscriptionManager.allSubscriptions()
@@ -114,7 +126,7 @@ final class SubscriptionImportService {
             }
 
             do {
-                _ = try subscriptionManager.createSubscription(
+                let created = try subscriptionManager.createSubscription(
                     name: subscription.name,
                     price: subscription.price,
                     cycle: subscription.cycle,
@@ -123,6 +135,9 @@ final class SubscriptionImportService {
                     currencyCode: subscription.currencyCode,
                     reminderIntervals: subscription.reminderIntervals
                 )
+                if let iconData = iconDataBySubscriptionID[subscription.id] {
+                    try? iconFileStore.saveIconData(iconData, for: created.id)
+                }
                 imported += 1
             } catch {
                 // Skip subscriptions that fail validation
