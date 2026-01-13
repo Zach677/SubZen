@@ -1198,6 +1198,7 @@
       }
     },
     "Cannot access the selected file" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
