@@ -78,6 +78,8 @@ class SubscriptionListView: UIView {
     private var subscriptions: [Subscription] = []
     private var selectedFilter: Filter = .subscription
 
+    private var traitChangeRegistrations: [any UITraitChangeRegistration] = []
+
     var iconStore: SubscriptionIconStore?
 
     override init(frame: CGRect) {
@@ -131,6 +133,15 @@ class SubscriptionListView: UIView {
             make.leading.trailing.bottom.equalToSuperview()
             make.height.equalTo(LayoutConstants.bottomFadeHeight)
         }
+
+        traitChangeRegistrations.append(
+            registerForTraitChanges([
+                UITraitUserInterfaceStyle.self,
+                UITraitAccessibilityContrast.self,
+            ]) { (view: SubscriptionListView, _) in
+                view.updateBottomFadeColorsIfNeeded()
+            }
+        )
     }
 
     @available(*, unavailable)
@@ -200,21 +211,17 @@ class SubscriptionListView: UIView {
         tableView.contentInset = LayoutConstants.tableContentInset
 
         if enabled {
-            bottomFadeView.updateColors(baseColor: .background)
+            updateBottomFadeColorsIfNeeded()
         }
     }
 
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-
-        guard previousTraitCollection == nil
-            || traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection)
-        else {
-            return
-        }
-
+    private func updateBottomFadeColorsIfNeeded() {
         guard !bottomFadeView.isHidden else { return }
         bottomFadeView.updateColors(baseColor: .background)
+    }
+
+    deinit {
+        traitChangeRegistrations.removeAll()
     }
 }
 

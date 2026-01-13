@@ -804,7 +804,7 @@ extension WebKitSVGRasterizationTask: WKNavigationDelegate {
 
         webView.takeSnapshot(with: configuration) { [weak self] image, error in
             guard let self else { return }
-            if let error {
+            guard error == nil else {
                 self.finish(.failure(SubscriptionIconRemoteServiceError.invalidResponse))
                 return
             }
