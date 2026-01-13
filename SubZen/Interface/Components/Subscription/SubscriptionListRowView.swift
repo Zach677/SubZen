@@ -53,9 +53,9 @@ class SubscriptionListRowView: UIView {
         let decimals = currency?.decimalDigits ?? 2
         let symbol = CurrencyList.displaySymbol(for: code)
         let cycleDisplayUnit = subscription.cycle.displayUnit
-
-        // For custom cycles with value > 1, show "/ 2 months" instead of "/ months"
-        let cycleDisplay = if case let .custom(value, _) = subscription.cycle, value > 1 {
+        let cycleDisplay: String? = if subscription.isLifetime {
+            nil
+        } else if case let .custom(value, _) = subscription.cycle, value > 1 {
             " / \(value) \(cycleDisplayUnit)"
         } else {
             " / \(cycleDisplayUnit)"
@@ -97,36 +97,43 @@ class SubscriptionListRowView: UIView {
                 ]
             )
         )
-        attributed.append(
-            NSAttributedString(
-                string: cycleDisplay,
-                attributes: [
-                    .font: metaFont,
-                    .foregroundColor: color.withAlphaComponent(0.7),
-                ]
+        if let cycleDisplay {
+            attributed.append(
+                NSAttributedString(
+                    string: cycleDisplay,
+                    attributes: [
+                        .font: metaFont,
+                        .foregroundColor: color.withAlphaComponent(0.7),
+                    ]
+                )
             )
-        )
-
-        priceLabel.attributedText = attributed
-        let accessibilityCycleDisplay: String
-        if case let .custom(value, _) = subscription.cycle, value > 1 {
-            let quantity = Int64(value)
-            let key: String.LocalizationValue = "\(quantity) \(cycleDisplayUnit)"
-            accessibilityCycleDisplay = String(localized: key)
-        } else {
-            accessibilityCycleDisplay = cycleDisplayUnit
         }
 
-        let accessibilityKey: String.LocalizationValue = "\(code) \(symbol) \(amount) per \(accessibilityCycleDisplay)"
-        let accessibilityAmountDescription = String(localized: accessibilityKey)
-        priceLabel.accessibilityLabel = accessibilityAmountDescription
+        priceLabel.attributedText = attributed
+        if subscription.isLifetime {
+            priceLabel.accessibilityLabel = attributed.string
+        } else {
+            let accessibilityCycleDisplay: String
+            if case let .custom(value, _) = subscription.cycle, value > 1 {
+                let quantity = Int64(value)
+                let key: String.LocalizationValue = "\(quantity) \(cycleDisplayUnit)"
+                accessibilityCycleDisplay = String(localized: key)
+            } else {
+                accessibilityCycleDisplay = cycleDisplayUnit
+            }
+
+            let accessibilityKey: String.LocalizationValue = "\(code) \(symbol) \(amount) per \(accessibilityCycleDisplay)"
+            let accessibilityAmountDescription = String(localized: accessibilityKey)
+            priceLabel.accessibilityLabel = accessibilityAmountDescription
+        }
 
         if subscription.isLifetime {
-            daysLabel.text = String(localized: "Lifetime")
-            daysLabel.textColor = .secondaryLabel
+            daysLabel.text = nil
+            daysLabel.isHidden = true
         } else if subscription.isEnded() {
             daysLabel.text = String(localized: "Ended")
             daysLabel.textColor = .secondaryLabel
+            daysLabel.isHidden = false
         } else {
             let remainingDays = subscription.remainingDays
             let daysLeftKey: String.LocalizationValue = "\(Int64(remainingDays)) days left"
@@ -137,6 +144,7 @@ class SubscriptionListRowView: UIView {
             } else {
                 daysLabel.textColor = .systemBlue.withAlphaComponent(0.7)
             }
+            daysLabel.isHidden = false
         }
 
         // Update expiration progress gradient with animation
