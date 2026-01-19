@@ -7,9 +7,9 @@
 
 SubZen is a privacy-first subscription manager for iOS, built with UIKit. Track renewals, understand spending, and catch hidden recurring charges before they bite.
 
-<p align="center">
+<!-- <p align="center">
   <img src="./SubZen/Resources/Assets.xcassets/AppIcon.appiconset/subzen.png" width="160" alt="SubZen app icon" />
-</p>
+</p> -->
 
 ## Features
 
